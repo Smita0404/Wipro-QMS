@@ -1,0 +1,49 @@
+.filtertxtbox {
+    border: 0;
+    border-bottom: 1px solid #ececec;
+    height: 35px;
+    margin-right: 8px;
+}
+
+#btnSrch {
+    background-color: green !important;
+    color: white;
+}
+
+.bborder {
+    border-bottom: 1px solid #eeeeee;
+}
+
+th {
+    border-bottom: 3px solid #eeeeee;
+}
+
+.current {
+    background-color: white !important;
+    color: blue !important;
+}
+
+.modal-header {
+    background-color: #ececec !important;
+    padding-bottom: 10px !important;
+}
+
+.form-control {
+    padding: 0 10px !important;
+    border: 0;
+    border-bottom: 1px solid #cccccc;
+    border-radius: 0px;
+}
+
+.filtertxtbox:focus {
+    outline: 0px !important;
+}
+
+label {
+    margin-bottom: 0;
+    margin-top: .3rem;
+}
+
+#myTable tbody tr:hover {
+    background-color: #D3D3D3; /* Change this color to your preference */
+}

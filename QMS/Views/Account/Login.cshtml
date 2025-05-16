@@ -1,0 +1,73 @@
+﻿@model QMS.Core.Models.LoginViewModel
+
+@{
+	Layout = "~/Views/Shared/_Account.cshtml";
+	ViewData["Title"] = "Login";
+}
+
+<style>
+	.card {
+		border-radius: 15px;
+		transition: transform 0.2s ease-in-out;
+	}
+
+		.card:hover {
+			transform: translateY(-5px);
+			box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+		}
+
+	.btn-primary {
+		background-color: #4682B4;
+		border: none;
+	}
+
+		.btn-primary:hover {
+			background-color: #004080;
+		}
+</style>
+
+<!-- Content area -->
+<div class="content d-flex justify-content-center align-items-center">
+
+	<!-- Login card -->
+	<form class="login-form" sp-controller="Account" asp-action="Login" method="post">
+		<div class="card mb-0 shadow" style="border-radius: 15px; overflow: hidden; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);">
+			<div class="text-center bg-white p-3">
+				<a>
+					<img id="imglogo" name="imglogo" src="~/images/wipro-logo.png" class="img-fluid  shadow-0 " alt="" />
+				</a>
+			</div>
+			<div class="text-center bg-white">
+				<h5 style="font-weight:bold; color: #333;">QMS</h5>
+			</div>
+			<div class="card-body">
+				<div class="form-group form-group-feedback form-group-feedback-left">
+					<input asp-for="Username" class="form-control rounded-pill" placeholder="Username">
+					<div class="form-control-feedback">
+						<i class="icon-user text-muted"></i>
+					</div>
+					<span asp-validation-for="Username" class="text-danger"></span>
+				</div>
+
+				<div class="form-group form-group-feedback form-group-feedback-left">
+					<input asp-for="Password" class="form-control rounded-pill" placeholder="Password">
+					<div class="form-control-feedback">
+						<i class="icon-lock2 text-muted"></i>
+					</div>
+					<span asp-validation-for="Password" class="text-danger"></span>
+				</div>
+				<span asp-validation-for="WrongCredentials" class="text-danger"></span>
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary btn-block rounded-pill">Sign in <i class="icon-circle-right2 ml-2"></i></button>
+				</div>
+
+				<div class="form-group d-flex align-items-center">
+					<a href="#" class="ml-auto">Forgot password?</a>
+				</div>
+			</div>
+		</div>
+	</form>
+	<!-- /login card -->
+
+</div>
+<!-- /content area -->

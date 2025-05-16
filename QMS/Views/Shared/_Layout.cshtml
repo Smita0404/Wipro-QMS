@@ -1,0 +1,436 @@
+﻿﻿@using QMS.Core.Enums
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - QMS Module</title>
+    <link href="~/css/icomoon/styles.min.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/css/fontawesome/styles.min.css" rel="stylesheet" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link href="~/css/bootstrap.min.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/css/bootstrap_limitless.min.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/css/colors.min.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/css/components.min.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/css/layout.min.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/lib/fontawesome/css/all.min.css" rel="stylesheet" asp-append-version="true" />
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Get the current URL
+            var currentUrl = window.location.href.toLowerCase();
+
+            // Highlight the active menu item for non-treeview items
+
+            $('ul.nav-sidebar a').filter(function () {
+                return this.href.toLowerCase() === currentUrl;
+            }).addClass('menu-active');
+
+            // For treeview items (submenus)
+            $('ul.nav-group-sub a').filter(function () {
+                return this.href.toLowerCase() === currentUrl;
+            }).each(function () {
+                // Open the parent submenu and highlight the active item
+                $(this).closest('.nav-item-submenu').addClass('menu-open');
+            });
+
+            $('.nav-group-sub').each(function () {
+                // Check if the submenu contains an active item
+                if ($(this).find('.menu-active').length > 0) {
+                    $(this).addClass('open');
+                }
+            });
+        });
+    </script>
+
+    <style type="text/css">
+        .menu-active {
+            background-color: #fff !important;
+            color: black !important;
+            font-weight: bold;
+            font-size: small;
+            border-radius: 8px;
+        }
+
+        .nav-group-sub {
+            display: none;
+        }
+
+            .nav-group-sub.open {
+                display: block; /* Show the submenu when it has the 'open' class */
+                color: #FFFF00 !important;
+            }
+
+        #verbtn {
+            border: 1px solid orange;
+            border-radius: 100%;
+            padding: 0px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: darkorange;
+            width: 20px;
+            height: 20px;
+            margin-top: -10px;
+            margin-left: 13px;
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Main navbar -->
+    <div class="navbar navbar-expand-md navbar-dark navbar-static">
+        <div class="d-md-none">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-mobile">
+                <i class="icon-tree5"></i>
+            </button>
+            <button class="navbar-toggler sidebar-mobile-main-toggle" type="button">
+                <i class="icon-paragraph-justify3"></i>
+            </button>
+        </div>
+
+        <div class="collapse navbar-collapse" id="navbar-mobile">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a href="#" class="navbar-nav-link sidebar-control sidebar-main-toggle d-none d-md-block mt-1">
+                        <i class="icon-paragraph-justify3"></i>
+                    </a>
+                </li>
+
+                <div class="navbar-brand">
+                    <span class="h5"><strong>QMS Module </strong></span><span id="versionSpan" onclick="" style="font-size: 14px; margin-left:8px; font-weight:500">Version - 1.0.0 25/04/2025</span>
+                    @* <i id="verbtn" class="fas fa-info" onclick=""></i> *@
+                </div>
+
+            </ul>
+            <span class="badge ml-md-3 mr-md-auto"> </span>
+            @if (@HttpContextAccessor.HttpContext.Session.GetInt32("UserId") > 0)
+            {
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown dropdown-user">
+                        <a href="#" class="navbar-nav-link d-flex align-items-center dropdown-toggle" data-toggle="dropdown">
+                            <span>
+                                @if (@HttpContextAccessor.HttpContext.Session.GetString("FullName") != null)
+                                {
+                                    <span class="font-weight-bold">@HttpContextAccessor.HttpContext.Session.GetString("FullName")</span>
+                                }
+                            </span>
+                        </a>
+
+                        <div class="dropdown-menu dropdown-menu-right">
+                            <a href="#" class="dropdown-item"><i class="icon-cog5"></i> Account settings</a>
+                            <a href="@Url.Action("Logout", "Account")" class="dropdown-item"><i class="icon-switch2"></i> Logout</a>
+                        </div>
+                    </li>
+                </ul>
+            }
+            else
+            {
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a href="@Url.Action("Login", "Account")" class="navbar-nav-link">
+                            <i class="icon-switch"></i>
+                            <span class="ml-2">Login</span>
+                        </a>
+                    </li>
+                </ul>
+            }
+        </div>
+    </div>
+    <!-- /main navbar -->
+    <!-- Page content -->
+    <div class="page-content">
+        <!-- Main sidebar -->
+        <div class="sidebar sidebar-dark sidebar-main sidebar-expand-md">
+            <!-- Sidebar mobile toggler -->
+            <div class="sidebar-mobile-toggler text-center">
+                <a href="#" class="sidebar-mobile-main-toggle">
+                    <i class="icon-arrow-left8"></i>
+                </a>
+                Navigation
+                <a href="#" class="sidebar-mobile-expand">
+                    <i class="icon-screen-full"></i>
+                    <i class="icon-screen-normal"></i>
+                </a>
+            </div>
+            <!-- /sidebar mobile toggler -->
+            <!-- Sidebar content -->
+            <div class="sidebar-content">
+                <!-- User menu -->
+                <div class="sidebar-user">
+                    <div class="card-body text-center bg-white p-3 border-right">
+                        <a>
+                            <img id="imglogo" name="imglogo" src="~/images/wipro-logo.png" class="img-fluid  shadow-0 " alt="" />
+                        </a>
+                    </div>
+                </div>
+                <!-- /user menu -->
+                <!-- Main navigation -->
+                <div class="card card-sidebar-mobile">
+                    <ul class="nav nav-sidebar" data-nav-type="accordion">
+                        @if (Convert.ToInt32(HttpContextAccessor.HttpContext.Session.GetInt32("UserRole")) > 0)
+                        {
+                            @if (Convert.ToInt32(HttpContextAccessor.HttpContext.Session.GetInt32("UserRole")) == ((int)UserRoles.Admin) || Convert.ToInt32(HttpContextAccessor.HttpContext.Session.GetInt32("UserRole")) == ((int)UserRoles.Manager))
+                            {
+                                <li class="nav-item">
+                                    <a asp-controller="Dashboard" asp-action="Index" class="nav-link" title="Dashboard" id="Dashboard">
+                                        <i class="icon-home4"></i>
+                                        <span>Dashboard</span>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a asp-controller="Vendor" asp-action="Vendor" class="nav-link" title="Vendor" id="Vendor">
+                                        <i class="fas fa-regular fa-people-roof"></i>
+                                        <span>Vendors</span>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a asp-controller="" asp-action="" class="nav-link" title="Product" id="Product">
+                                        <i class="fa-regular fa-lightbulb"></i>
+                                        <span>Product</span>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a asp-controller="" asp-action="" class="nav-link" title="Vendor Certifications" id="VenCerti">
+                                        <i class="fas fa-regular fa-file-image"></i>
+                                        <span>Vendor Certifications</span>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a asp-controller="" asp-action="" class="nav-link" title="Validation Reports" id="ValiRepo">
+                                        <i class="fas fa-regular fa-file-contract"></i>
+                                        <span>Validation Reports</span>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a asp-controller="" asp-action="" class="nav-link" title="AHP Notes" id="AHPNotes">
+                                        <i class="fas fa-regular fa-book-open"></i>
+                                        <span>AHP Notes</span>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a asp-controller="" asp-action="" class="nav-link" title="Internal Customer Complaints" id="IntCustCompl">
+                                        <i class="fas fa-regular fa-rectangle-list"></i>
+                                        <span>Internal Customer Complaints</span>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a asp-controller="" asp-action="" class="nav-link" title="Supplier Performance Management" id="SuppPerManag">
+                                        <i class="fas fa-regular fa-chart-bar"></i>
+                                        <span>Supplier Performance Management</span>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a asp-controller="" asp-action="" class="nav-link" title="Third Party Testing with Number" id="ThirdTestwNum">
+                                        <i class="fas fa-regular fa-square-check"></i>
+                                        <span>Third Party Testing with Number</span>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a asp-controller="" asp-action="" class="nav-link" title="Internal Testing" id="InterTest">
+                                        <i class="fas fa-regular fa-newspaper"></i>
+                                        <span>Internal Testing</span>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a asp-controller="ThirdPartyInspection" asp-action="Create" class="nav-link" title="Third Party Inspection" id="ThirdInspec">
+                                        <i class="fas fa-regular fa-rectangle-list"></i>
+                                        <span>Third Party Inspection</span>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a asp-controller="" asp-action="" class="nav-link" title="SEE Indices" id="SEEIndices">
+                                        <i class="fas fa-regular fa-clipboard"></i>
+                                        <span>SEE Indices</span>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a asp-controller="" asp-action="" class="nav-link" title="CSAT Comment Analysis" id="CSATCommenAnaly">
+                                        <i class="fas fa-regular fa-comments"></i>
+                                        <span>CSAT Comment Analysis</span>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a asp-controller="" asp-action="" class="nav-link" title="CSAT Summary" id="CSATSummary">
+                                        <i class="fas fa-regular fa-file-lines"></i>
+                                        <span>CSAT Summary</span>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a asp-controller="BisProjectTrac" asp-action="BisProjectTracker" class="nav-link" title="Bis Project Tracker" id="BisProjTrac">
+                                        <i class="fas fa-regular fa-chart-gantt"></i>
+                                        <span>Bis Project Tracker</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-controller="CSOTracker" asp-action="CSOTracker" class="nav-link" title="CSO Tracker" id="CSOTracker">
+                                        <i class="fas fa-regular fa-chart-gantt"></i>
+                                        <span>CSO Tracker</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-controller="NPITrac" asp-action="NPITracker" class="nav-link" title="NPI Tracker" id="NPITracker">
+                                        <i class="fas fa-regular fa-chart-gantt"></i>
+                                        <span>NPI Tracker</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-controller="PDITracker" asp-action="PDITracker" class="nav-link" title="PDI Tracker" id="PDITracker">
+                                        <i class="fas fa-regular fa-chart-gantt"></i>
+                                        <span>PDI Tracker</span>
+                                    </a>
+                                </li>
+                               @*  <li class="nav-item">
+                                    <a asp-controller="ThirdPartyInspection" asp-action="Create" class="nav-link" title="ThirdPartyInspection" id="ThirdPartyInspection">
+                                        <i class="icon-pencil5"></i><span>Third Party Inspection Tracker</span>
+                                    </a>
+                                </li> *@
+                            }
+
+                            @if (Convert.ToInt32(HttpContextAccessor.HttpContext.Session.GetInt32("UserRole")) == ((int)UserRoles.Admin))
+                            {
+                                <li class="nav-item">
+                                    <a asp-controller="Users" asp-action="Index" class="nav-link" title="Users" id="Users">
+                                        <i class="icon-users"></i>
+                                        <span>Users</span>
+                                    </a>
+                                </li>
+                            }
+
+                            <li class="nav-item nav-item-submenu">
+                                <a href="#" class="nav-link" title="Masters" id="Masters"><i class="icon-gear"></i> <span>Masters</span></a>
+                                <ul class="nav nav-group-sub" data-submenu-title="Master">
+                                    <li class="nav-item">
+                                        <a asp-controller="/Certification" asp-action="Create" class="nav-link" title="Vendor Certifications" id="VendorCertifications">
+                                            <i class="icon-pencil5"></i>
+                                            <span>Vendor Certifications</span>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a asp-controller="/ThirdPartyCertificate" asp-action="Index" class="nav-link" title="Third Party Certifications" id="ThirdPartyCertificate">
+                                            <i class="icon-pencil5"></i>
+                                            <span>Third Party Certifications</span>
+                                        </a>
+                                    </li>
+                                    @* <li class="nav-item  nav-item-submenu">
+                                        <a asp-controller="/FeaturesBenefits" asp-action="Index" class="nav-link" title="Features & Benefits" id="FeaturesBenefits">
+                                            <i class="icon-pencil5"></i>
+                                            <span>Features & Benefits</span>
+                                        </a>
+                                    </li>
+
+                                    <li class="nav-item  nav-item-submenu">
+                                        <a asp-controller="/Installation" asp-action="Index" class="nav-link" title="Installation Details" id="Installation">
+                                            <i class="icon-pencil5"></i>
+                                            <span>Installation Details</span>
+                                        </a>
+                                    </li>
+
+                                    <li class="nav-item  nav-item-submenu">
+                                        <a asp-controller="/Application" asp-action="Index" class="nav-link" title="Applications" id="Applications">
+                                            <i class="icon-pencil5"></i>
+                                            <span>Applications</span>
+                                        </a>
+                                    </li>
+
+                                    <li class="nav-item  nav-item-submenu">
+                                        <a asp-controller="/Suspension" asp-action="Index" class="nav-link" title="Suspension Tables" id="Suspension">
+                                            <i class="icon-pencil5"></i>
+                                            <span>Suspension Tables</span>
+                                        </a>
+                                    </li>
+
+                                    <li class="nav-item  nav-item-submenu">
+                                        <a href="#" class="nav-link" title="BOM Code" id="Driver"><i class="icon-pencil5"></i> <span>BOM Code</span></a>
+                                    </li> *@
+
+                                </ul>
+
+                            </li>
+
+                        }
+                    </ul>
+                </div>
+
+
+                <!-- /main navigation -->
+            </div>
+            <!-- /sidebar content -->
+        </div>
+        <!-- /main sidebar -->
+        <!-- Main content -->
+        <div class="content-wrapper">
+            @RenderBody()
+        </div>
+        <!-- /main content -->
+    </div>
+    <!-- /page content -->
+
+    @* <div class="modal fade" id="versionDetailModal" tabindex="-1" aria-labelledby="FeaturesModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <!-- Added modal-lg to increase width -->
+            <div class="modal-content">
+                <div class="modal-header custom-header">
+                    <h5 class="modal-title" id="FeaturesModalLabel">Release Version Details</h5>
+
+                    <div>
+                        <button type="button" class="btn btn-secondary legitRipple" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="ppsId" name="Id" value="0" />
+                    <div class="table-responsive">
+                        <div id="releVerTable" class="mt-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> *@
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <!-- Core JS files -->
+    <script src="~/js/app.js" asp-append-version="true"></script>
+    <script src="~/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.min.js" asp-append-version="true"></script>
+    <script src="~/js/jquery.min.js" asp-append-version="true"></script>
+    <script src="~/lib/bootstrap/dist/js/blockui.min.js" asp-append-version="true"></script>
+    <script src="~/lib/bootstrap/dist/js/d3.min.js" asp-append-version="true"></script>
+    <script src="~/lib/bootstrap/dist/js/d3_tooltip.js" asp-append-version="true"></script>
+    <script src="~/lib/bootstrap/dist/js/switchery.min.js" asp-append-version="true"></script>
+    <script src="~/lib/bootstrap/dist/js/moment.min.js" asp-append-version="true"></script>
+    <script src="~/lib/bootstrap/dist/js/daterangepicker.js" asp-append-version="true"></script>
+    <script src="~/lib/bootstrap/dist/js/echarts.min.js" asp-append-version="true"></script>
+    <script src="~/js/Dashboard/progress.js" asp-append-version="true"></script>
+    <script src="~/js/Dashboard/pie_basic.js" asp-append-version="true"></script>
+    <script src="~/js/Dashboard/columns_basic.js" asp-append-version="true"></script>
+    <script src="~/lib/bootstrap/dist/js/noty.min.js" asp-append-version="true"></script>
+    <script src="~/lib/bootstrap/dist/js/popupalert.js" asp-append-version="true"></script>
+    <script src="~/lib/bootstrap/dist/js/pnotify.min.js" asp-append-version="true"></script>
+    <script src="~/lib/bootstrap/dist/js/interactions.min.js" asp-append-version="true"></script>
+    <script src="~/lib/bootstrap/dist/js/touch.min.js" asp-append-version="true"></script>
+    <script src="~/js/components_collapsible.js" asp-append-version="true"></script>
+    <!-- /core JS files -->
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

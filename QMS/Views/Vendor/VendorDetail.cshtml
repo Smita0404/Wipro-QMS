@@ -1,0 +1,902 @@
+﻿@using QMS.Core.Models
+
+@model VendorViewModel
+
+@{
+    ViewData["Title"] = "Vendor Detail";
+}
+
+<link href="~/css/fontawesome/styles.min.css" rel="stylesheet" />
+<link href="~/css/tabulator/tabulator.min.css" rel="stylesheet" />
+<link href="~/css/tabulator/tabulator_bootstrap4.min.css" rel="stylesheet" />
+<script src="~/js/jquery.min.js"></script>
+<script src="~/js/jquery.datatables.js"></script>
+<link href="~/css/pnotify.css" rel="stylesheet" />
+<script src="~/js/pnotify.js"></script>
+<script src="~/js/pnotify.confirm.js"></script>
+<script src="~/lib/bootstrap/dist/js/datatables.buttons.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/popupAlert.js"></script>
+<script src="~/lib/bootstrap/dist/js/jszip.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/buttons.html5.min.js"></script>
+<script src="~/js/common.js"></script>
+<script src="~/js/tabulator.js"></script>
+<script src="~/js/xlsx.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.6.2/js/bootstrap.bundle.min.js"></script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+
+
+<style>
+    .nav-pills .nav-link {
+    text-align: left;
+    border-radius: 0;
+    border-left: 4px solid transparent;
+    font-weight: 500;
+    width: 100%;
+    padding: 12px;
+    background-color: #fff;
+    color: #333;
+    margin-bottom: 4px;
+    }
+
+    .nav-pills .nav-link.active {
+    background-color: #f4f3f8;
+    border-left: 4px solid #4682B4;
+    color: #4682B4;
+    font-weight: bold;
+    }
+
+    .form-control {
+    padding: 0 9px !important;
+    border: 0;
+    border-bottom: 1px solid #cccccc;
+    border-radius: 0px;
+    }
+
+    label {
+    margin-bottom: 0;
+    margin-top: .3rem;
+    }
+
+    .form-group {
+    margin-bottom: 0.5rem; /* Reduce space between each input group */
+    }
+
+    .custome-body {
+    margin-bottom: -17px !important;
+    padding: 0.75rem !important;
+    margin-top: -17px !important;
+    }
+
+    .form-control {
+        padding: 0 10px !important;
+        border: 0;
+        border-bottom: 1px solid #cccccc;
+        border-radius: 0px;
+    }
+
+    label {
+        margin-bottom: 0;
+        margin-top: .3rem;
+    }
+
+    #scrollToTopBtn:hover {
+        background-color: #0056b3; /* Darker blue */
+    }
+
+    #scrollToTopBtn {
+        outline: none; /* Removes the focus border */
+    }
+
+
+    .tabulator .tabulator-header .tabulator-col {
+        font-size: 14px;
+        background-color: #D6E4F0;
+        font-weight: 600;
+        border-right: 1px solid #ccc;
+    }
+
+    .tabulator-row .tabulator-cell {
+        padding: 5px 5px;
+        font-size: 14px;
+        height: 30px;
+    }
+
+    .tabulator-cell:hover {
+        color: #4682B4 !important;
+        cursor: pointer !important;
+        font-weight: bold;
+    }
+
+
+    .tabulator-row .tabulator-cell.tabulator-frozen.tabulator-frozen-left {
+        border-right: 1px solid #ccc;
+    }
+
+    .tabulator .tabulator-header .tabulator-frozen.tabulator-frozen-left {
+        border-right: 1px solid #ccc;
+    }
+
+    .form-group {
+        margin-bottom: 0.5rem; /* Reduce space between each input group */
+    }
+</style>
+
+
+
+<div class="content">
+    <input type="hidden" id="hdnId" name="Id" value="@Model?.Id" />
+    <input type="hidden" id="hdnDate" name="Date" value="@Model?.CreatedDate" />
+    <input type="hidden" id="hdnCreateBy" name="CreateBy" value="@Model?.CreatedBy" />
+    <input type="hidden" id="hdnVendorCode" name="Vendor_Code" value="@Model?.Vendor_Code" />
+    <div class="card mb-3">
+        <div class="card-body d-flex justify-content-between align-items-center">
+            @if (Model?.Id > 0)
+            {
+                <h5 class="card-title custome-body" style="color:#4682B4;font-size:larger;font-weight:650">@Model?.Name</h5>
+                <h5 class="card-title custome-body" style="color:#4682B4;font-size:larger;font-weight:650">@Model?.Email</h5>
+                <h5 class="card-title custome-body" style="color:#4682B4;font-size:larger;font-weight:650">@Model?.MobileNo</h5>
+            }
+            else
+            {
+                <b style="font-size:larger;color: #4682B4;">Vendor Details</b>
+            }
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-2">
+                    <div class="nav flex-column nav-pills" id="v-tabs" role="tablist" aria-orientation="vertical" style="border-right:2px double;font-size:14px;">
+                        <a class="nav-link active" id="v-tab1" data-bs-toggle="pill" href="#tab1" role="tab">Vendor Details</a>
+                        @if(Model?.Vendor_Code == null || Model?.Vendor_Code == "")
+                        {
+                            <a class="nav-link disabled" id="v-tab2" href="#" role="tab" tabindex="-1" aria-disabled="true">Certificates</a>
+                            <a class="nav-link disabled" id="v-tab3" href="#" role="tab" tabindex="-1" aria-disabled="true">Products</a>
+                            <a class="nav-link disabled" id="v-tab4" href="#" role="tab" tabindex="-1" aria-disabled="true">Third Party Testing Report</a>
+                            <a class="nav-link disabled" id="v-tab5" href="#" role="tab" tabindex="-1" aria-disabled="true">BIS Certification<br>(Product Wise)</a>
+                            @* <a class="nav-link disabled" id="v-tab6" href="#" role="tab" tabindex="-1" aria-disabled="true">Products</a> *@
+                            <a class="nav-link disabled" id="v-tab7" href="#" role="tab" tabindex="-1" aria-disabled="true">Validation Reports of Products</a>
+                            <a class="nav-link disabled" id="v-tab8" href="#" role="tab" tabindex="-1" aria-disabled="true">NPI Tracker</a>
+                            <a class="nav-link disabled" id="v-tab9" href="#" role="tab" tabindex="-1" aria-disabled="true">CSO Tracker</a>
+                            <a class="nav-link disabled" id="v-tab10" href="#" role="tab" tabindex="-1" aria-disabled="true">Supplier Performance<br>Management (SPM)</a>
+                            <a class="nav-link disabled" id="v-tab11" href="#" role="tab" tabindex="-1" aria-disabled="true">Overall Quality Level(OQL)</a>
+                            <a class="nav-link disabled" id="v-tab12" href="#" role="tab" tabindex="-1" aria-disabled="true">Replacement Lead Time (RLT)</a>
+                            <a class="nav-link disabled" id="v-tab13" href="#" role="tab" tabindex="-1" aria-disabled="true">PPM (Parts Per Million)</a>
+                            <a class="nav-link disabled" id="v-tab14" href="#" role="tab" tabindex="-1" aria-disabled="true">Audit Score</a>
+                            <a class="nav-link disabled" id="v-tab15" href="#" role="tab" tabindex="-1" aria-disabled="true">PDI</a>
+                            <a class="nav-link disabled" id="v-tab16" href="#" role="tab" tabindex="-1" aria-disabled="true">RM TC</a>
+                            <a class="nav-link disabled" id="v-tab17" href="#" role="tab" tabindex="-1" aria-disabled="true">Service Spare tracker</a>
+                        }
+                        else
+                        {
+                            <a class="nav-link" id="v-tab2"  data-bs-toggle="pill" href="#tab2" role="tab">Certificates</a>
+                            <a class="nav-link" id="v-tab3"  data-bs-toggle="pill" href="#tab3" role="tab">Products</a>
+                            <a class="nav-link" id="v-tab4"  data-bs-toggle="pill" href="#tab4" role="tab">Third Party Testing Report</a>
+                            <a class="nav-link" id="v-tab5"  data-bs-toggle="pill" href="#tab5" role="tab">BIS Certification<br>(Product Wise)</a>
+                            @* <a class="nav-link" id="v-tab6"  data-bs-toggle="pill" href="#tab6" role="tab">Products</a> *@
+                            <a class="nav-link" id="v-tab7"  data-bs-toggle="pill" href="#tab7" role="tab">Validation Reports of Products</a>
+                            <a class="nav-link" id="v-tab8"  data-bs-toggle="pill" href="#tab8" role="tab">NPI Tracker</a>
+                            <a class="nav-link" id="v-tab9"  data-bs-toggle="pill" href="#tab9" role="tab">CSO Tracker</a>
+                            <a class="nav-link" id="v-tab10" data-bs-toggle="pill" href="#tab10" role="tab">Supplier Performance<br>Management (SPM)</a>
+                            <a class="nav-link" id="v-tab11" data-bs-toggle="pill" href="#tab11" role="tab">Overall Quality Level(OQL)</a>
+                            <a class="nav-link" id="v-tab12" data-bs-toggle="pill" href="#tab12" role="tab">Replacement Lead Time (RLT)</a>
+                            <a class="nav-link" id="v-tab13" data-bs-toggle="pill" href="#tab13" role="tab">PPM (Parts Per Million)</a>
+                            <a class="nav-link" id="v-tab14" data-bs-toggle="pill" href="#tab14" role="tab">Audit Score</a>
+                            <a class="nav-link" id="v-tab15" data-bs-toggle="pill" href="#tab15" role="tab">PDI</a>
+                            <a class="nav-link" id="v-tab16" data-bs-toggle="pill" href="#tab15" role="tab">RM TC</a>
+                            <a class="nav-link" id="v-tab17" data-bs-toggle="pill" href="#tab17" role="tab">Service Spare tracker</a>
+                        }
+
+                    </div>
+                </div>
+
+                <div class="col-10">
+                    <div class="tab-content" id="v-tabContent">
+                        <div class="tab-pane fade show active" id="tab1" role="tabpanel">
+                            <div class="d-flex justify-content-between align-items-center" style="padding: 0.7rem;">
+                                <div style="font-size:large;color:#4682B4">
+                                    <b hidden>Vendor Details</b>
+                                </div>
+                                @* <div>
+                                    <button type="button" id="saveButton" onclick="InsertUpdateVendorDetail()" class="btn btn-outline-success legitRipple">
+                                        <i class="fas fa-floppy-disk mr-2"></i>Save
+                                    </button>&nbsp;
+
+                                    <button type="button" class="btn btn-outline-warning legitRipple" onclick="history.back()">
+                                        <i class="fas fa-arrow-left mr-2"></i>Back
+                                    </button>
+                                </div> *@
+                            </div>
+                            <div class="col-12 row">
+                                <div class="col-12" style="margin-top:-30px;">
+                                    <div class="card" style="border-radius:10px;border:1px solid #4682B4;">
+                                        <div class="card-header d-flex justify-content-between align-items-center" style="border-radius: 10px 10px 0px 0px;border-bottom-color:#4682B4;">
+                                            <h5 class="card-title" style="font-weight:640;">Vendor Details</h5>
+                                            <div>
+                                                <button type="button" id="saveButton" onclick="InsertUpdateVendorDetail()" class="btn btn-success">
+                                                    <i class="fas fa-floppy-disk mr-2"></i>Save
+                                                </button>
+
+                                                <button type="button" class="btn btn-warning" onclick="history.back()">
+                                                    <i class="fas fa-arrow-left mr-2"></i>Back
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="card-body" style="margin-top: 15px;">
+
+                                            <div class="row form-group align-items-center mb-2">
+                                                <label class="col-1"><b>Name</b></label>
+                                                <div class="col-5 mr-4">
+                                                    <input name="Name" id="Name" class="form-control" required value="@Model?.Name" />
+                                                </div>
+                                                <label class="col-1"><b>Code</b></label>
+                                                <div class="col-2">
+                                                    <input name="Vendor_Code" id="Vendor_Code" class="form-control" required value="@Model?.Vendor_Code" />
+                                                </div>
+                                            </div>
+
+                                            <div class="row form-group align-items-center mb-2">
+                                                <label class="col-1"><b>Address</b></label>
+                                                <div class="col-10">
+                                                    <input name="Address" id="Address" class="form-control" required value="@Model?.Address" />
+                                                </div>
+                                            </div>
+
+                                            <div class="row form-group align-items-center mb-2">
+                                                <label class="col-2"><b>Contact Person</b></label>
+                                                <div class="col-3">
+                                                    <input name="Contact_Persons" id="Contact_Persons" class="form-control" required value="@Model?.Contact_Persons" />
+                                                </div>
+
+                                                <label class="col-1"><b>Mobile</b></label>
+                                                <div class="col-2">
+                                                    <input name="MobileNo" id="MobileNo" class="form-control" required value="@Model?.MobileNo" />
+                                                </div>
+
+                                                <label class="col-1"><b>Email</b></label>
+                                                <div class="col-3">
+                                                    <input name="Email" id="Email" class="form-control" required value="@Model?.Email" />
+                                                </div>
+                                            </div>
+
+                                            <div class="row form-group align-items-center mb-2">
+                                                <label class="col-1"><b>GST No.</b></label>
+                                                <div class="col-5">
+                                                    <input name="GstNo" id="GstNo" class="form-control" required value="@Model?.GstNo" />
+                                                    <span id="GstNo_Error" class="text-danger"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="card" style="border-radius:10px;border:1px solid #4682B4;">
+                                        <div class="card-header" style="border-radius: 10px 10px 0px 0px;border-bottom-color:#4682B4;">
+                                            <h5 class="card-title" style="font-weight:640">Vendor Contact Master</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="form-group">
+                                                <div class="row form-group align-items-center mb-2">
+                                                    <label class="col-2"><b>Owner</b></label>
+                                                    <div class="col-4">
+                                                        <input name="Owner" id="Owner" class="form-control" required value="@Model?.Owner" placeholder="Owner Name" />
+                                                        <span id="Owner_Error" class="text-danger"></span>
+                                                    </div>
+
+                                                    <div class="col-3 mr-1">
+                                                        <input name="Owner_Email" id="Owner_Email" class="form-control" required value="@Model?.Owner_Email" placeholder="Owner Email" />
+                                                        <span id="Owner_Email_Error" class="text-danger"></span>
+                                                    </div>
+
+                                                    <div class="col-2 mr-1">
+                                                        <input name="Owner_Mobile" id="Owner_Mobile" class="form-control" required value="@Model?.Owner_Mobile" placeholder="Owner Mobile No." />
+                                                        <span id="Owner_Mobile_Error" class="text-danger"></span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row form-group align-items-center mb-2">
+                                                    <label class="col-2"><b>Plant Head</b></label>
+                                                    <div class="col-4">
+                                                        <input name="Plant_Head" id="Plant_Head" class="form-control" required value="@Model?.Plant_Head" placeholder="Plant Head Name" />
+                                                        <span id="Plant_Head_Error" class="text-danger"></span>
+                                                    </div>
+
+                                                    <div class="col-3 mr-1">
+                                                        <input name="Plant_Email" id="Plant_Email" class="form-control" required value="@Model?.Plant_Email" placeholder="Plant Head Email" />
+                                                        <span id="Plant_Email_Error" class="text-danger"></span>
+                                                    </div>
+
+                                                    <div class="col-2 mr-1">
+                                                        <input name="Plant_Mobile" id="Plant_Mobile" class="form-control" required value="@Model?.Plant_Mobile" placeholder="Plant Head Mobile No." />
+                                                        <span id="Plant_Mobile_Error" class="text-danger"></span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row form-group align-items-center mb-2">
+                                                    <label class="col-2"><b>Quality Manager</b></label>
+                                                    <div class="col-4">
+                                                        <input name="Quality_Manger" id="Quality_Manger" class="form-control" value="@Model?.Quality_Manager" placeholder="Quality Manager Name" />
+                                                        <span id="Quality_Manger_Error" class="text-danger"></span>
+                                                    </div>
+
+                                                    <div class="col-3 mr-1">
+                                                        <input name="Quality_Email" id="Quality_Email" class="form-control" value="@Model?.Quality_Email" placeholder="Quality Manager Email" />
+                                                        <span id="Quality_Email_Error" class="text-danger"></span>
+                                                    </div>
+
+                                                    <div class="col-2 mr-1">
+                                                        <input name="Quality_Mobile" id="Quality_Mobile" class="form-control" value="@Model?.Quality_Mobile" placeholder="Quality Manager Mobile No." />
+                                                        <span id="Quality_Mobile_Error" class="text-danger"></span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row form-group align-items-center mb-2">
+                                                    <label class="col-2"><b>PDG Manager</b></label>
+                                                    <div class="col-4">
+                                                        <input name="PDG_Manager" id="PDG_Manager" class="form-control" required value="@Model?.PDG_Manager" placeholder="PDG Manager Name" />
+                                                        <span id="PDG_Manager_Error" class="text-danger"></span>
+                                                    </div>
+
+                                                    <div class="col-3">
+                                                        <input name="PDG_Email" id="PDG_Email" class="form-control" required value="@Model?.PDG_Email" placeholder="PDG Manager Email" />
+                                                        <span id="PDG_Manager_Error" class="text-danger"></span>
+                                                    </div>
+
+                                                    <div class="col-2">
+                                                        <input name="PDG_Mobile" id="PDG_Mobile" class="form-control" required value="@Model?.PDG_Mobile" placeholder="PDG Manager Mobile No." />
+                                                        <span id="PDG_Manager_Error" class="text-danger"></span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row form-group align-items-center mb-2">
+                                                    <label class="col-2"><b>SCM Manager</b></label>
+                                                    <div class="col-4">
+                                                        <input name="SCM_Manager" id="SCM_Manager" class="form-control" required value="@Model?.SCM_Manager" placeholder="SCM Manager Name" />
+                                                        <span id="SCM_Manager_Error" class="text-danger"></span>
+                                                    </div>
+
+                                                    <div class="col-3">
+                                                        <input name="SCM_Email" id="SCM_Email" class="form-control" required value="@Model?.SCM_Email" placeholder="SCM Manager Email" />
+                                                        <span id="SCM_Email_Error" class="text-danger"></span>
+                                                    </div>
+
+                                                    <div class="col-2">
+                                                        <input name="SCM_Mobile" id="SCM_Mobile" class="form-control" required value="@Model?.SCM_Mobile" placeholder="SCM Manager Mobile No." />
+                                                        <span id="SCM_Mobile_Error" class="text-danger"></span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row form-group align-items-center mb-2">
+                                                    <label class="col-2"><b>PRD Manager</b></label>
+                                                    <div class="col-4">
+                                                        <input name="PRD_Manager" id="PRD_Manager" class="form-control" required value="@Model?.PRD_Manager" placeholder="PRD Manager Name" />
+                                                        <span id="PRD_Manager_Error" class="text-danger"></span>
+                                                    </div>
+
+                                                    <div class="col-3">
+                                                        <input name="PRD_Email" id="PRD_Email" class="form-control" required value="@Model?.PRD_Email" placeholder="PRD Manager Email" />
+                                                        <span id="PRD_Email_Error" class="text-danger"></span>
+                                                    </div>
+
+                                                    <div class="col-2">
+                                                        <input name="PRD_Mobile" id="PRD_Mobile" class="form-control" required value="@Model?.PRD_Mobile" placeholder="PRD Manager Mobile No." />
+                                                        <span id="PRD_Mobile_Error" class="text-danger"></span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row form-group align-items-center mb-2">
+                                                    <label class="col-2"><b>Service Manager</b></label>
+                                                    <div class="col-4">
+                                                        <input name="Service_Manager" id="Service_Manager" class="form-control" required value="@Model?.Service_Manager" placeholder="Service Manager Name" />
+                                                        <span id="Service_Manager_Error" class="text-danger"></span>
+                                                    </div>
+
+                                                     <div class="col-3">
+                                                        <input name="Service_Email" id="Service_Email" class="form-control" required value="@Model?.Service_Email" placeholder="Service Manager Email" />
+                                                        <span id="Service_Email_Error" class="text-danger"></span>
+                                                    </div>
+
+                                                    <div class="col-2">
+                                                        <input name="Service_Mobile" id="Service_Mobile" class="form-control" required value="@Model?.Service_Mobile" placeholder="Service Manager Mobile No." />
+                                                        <span id="Service_Mobile_Error" class="text-danger"></span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row form-group align-items-center mb-2">
+                                                    <label class="col-2"><b>Other Contact 1</b></label>
+                                                    <div class="col-4">
+                                                        <input name="Other_Cont_One" id="Other_Cont_One" class="form-control" required value="@Model?.Other_Cont_One" placeholder="Contact One Name" />
+                                                        <span id="Other_Cont_One_Error" class="text-danger"></span>
+                                                    </div>
+
+                                                    <div class="col-3">
+                                                        <input name="Other_Cont_OneEmail" id="Other_Cont_OneEmail" class="form-control" required value="@Model?.Other_Cont_OneEmail" placeholder="Contact One Email" />
+                                                        <span id="Other_Cont_One_Email_Error" class="text-danger"></span>
+                                                    </div>
+
+                                                    <div class="col-2">
+                                                        <input name="Other_Cont_OneMobile" id="Other_Cont_OneMobile" class="form-control" required value="@Model?.Other_Cont_OneMobile" placeholder="Contact One Mobile No." />
+                                                        <span id="Other_Cont_One_Mobile_Error" class="text-danger"></span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row form-group align-items-center mb-2">
+                                                    <label class="col-2"><b>Other Contact 2</b></label>
+                                                    <div class="col-4">
+                                                        <input name="Other_Cont_Two" id="Other_Cont_Two" class="form-control" required value="@Model?.Other_Cont_Two" placeholder="Contact Two Name" />
+                                                        <span id="Other_Cont_Two_Error" class="text-danger"></span>
+                                                    </div>
+
+                                                    <div class="col-3">
+                                                        <input name="Other_Cont_TwoEmail" id="Other_Cont_TwoEmail" class="form-control" required value="@Model?.Other_Cont_TwoEmail" placeholder="Contact Two Email" />
+                                                        <span id="Other_Cont_Two_Email_Error" class="text-danger"></span>
+                                                    </div>
+
+                                                    <div class="col-2">
+                                                        <input name="Other_Cont_TwoMobile" id="Other_Cont_TwoMobile" class="form-control" required value="@Model?.Other_Cont_TwoMobile" placeholder="Contact Two Mobile No." />
+                                                        <span id="Other_Cont_Two_Mobile_Error" class="text-danger"></span>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-4">
+                                    <div class="card" style="border-radius:10px;border:1px solid #4682B4;">
+                                        <div class="card-header" style="border-radius: 10px 10px 0px 0px;border-bottom-color:#4682B4;">
+                                            <h5 class="card-title" style="font-weight:640">Login Details</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="form-group">
+                                                <div class="row form-group align-items-center mb-2">
+                                                    <label class="col-4"><b>User Name</b></label>
+                                                    <div class="col-8">
+                                                        <input name="User_Name" id="User_Name" class="form-control" required value="@Model?.User_Name" />
+                                                        <span id="User_Name_Error" class="text-danger"></span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row form-group align-items-center mb-2">
+                                                    <label class="col-4"><b>Password</b></label>
+                                                    <div class="col-8">
+                                                        <input name="Password" id="Password" class="form-control text-center" required value="@Model?.Password" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        @* //// Certificate tab /////*@
+                        <div class="tab-pane fade" id="tab2" role="tabpanel">
+                            <div class="" style="margin-top: -20px">
+                                <div class="d-flex justify-content-between align-items-center" style="padding: 0.7rem;">
+                                    <div style="font-size:large;color:#4682B4">
+                                        <b hidden>Certificate Details</b>
+                                    </div>
+                                    <div>
+                                        <button type="button" id="saveCertButton" class="btn btn-outline-success legitRipple" data-bs-toggle="modal" data-bs-target="#certificateModal">
+                                            <i class="fas fa-plus mr-2"></i>Add
+                                        </button>
+
+
+                                        <button type="button" class="btn btn-outline-warning legitRipple" onclick="history.back()">
+                                            <i class="fas fa-arrow-left mr-2"></i>Back
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="CertificateTable"></div>
+                            </div>
+                        </div>
+
+                        @* //// Product tab /////*@
+                        <div class="tab-pane fade" id="tab3" role="tabpanel">Products content</div>
+
+                        @* //// Third Party Testing Report tab /////*@
+                        <div class="tab-pane fade" id="tab4" role="tabpanel">
+                            <div class="" style="margin-top: -20px">
+                                <div class="d-flex justify-content-between align-items-center" style="padding: 0.7rem;">
+                                    <div style="font-size:large;color:#4682B4">
+                                        <b hidden>Third Party Testing Report</b>
+                                    </div>
+                                    <div>
+                                        <button type="button" id="saveTPTButton" class="btn btn-outline-success legitRipple" data-bs-toggle="modal" data-bs-target="#TPTReportModal">
+                                            <i class="fas fa-plus mr-2"></i>Add
+                                        </button>
+
+                                        <button type="button" class="btn btn-outline-warning legitRipple" onclick="history.back()">
+                                            <i class="fas fa-arrow-left mr-2"></i>Back
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="TPTReportTable"></div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="tab5" role="tabpanel">
+                            <div class="" style="margin-top: -20px">
+                                <div class="d-flex justify-content-between align-items-center" style="padding: 0.7rem;">
+                                    <div style="font-size:large;color:#4682B4">
+                                        <b hidden>BIS Certificate Details</b>
+                                    </div>
+                                    <div>
+                                        <button type="button" id="saveBISButton" class="btn btn-outline-success legitRipple" data-bs-toggle="modal" data-bs-target="#BISCertificateModal">
+                                            <i class="fas fa-plus mr-2"></i>Add
+                                        </button>
+
+
+                                        <button type="button" class="btn btn-outline-warning legitRipple" onclick="history.back()">
+                                            <i class="fas fa-arrow-left mr-2"></i>Back
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="BISCertificateTable"></div>
+                            </div>
+                        </div>
+
+                        </div>
+                        @* <div class="tab-pane fade" id="tab6" role="tabpanel">Customer Complaints content</div> *@
+                        <div class="tab-pane fade" id="tab7" role="tabpanel">Validation Reports of Products content</div>
+                        <div class="tab-pane fade" id="tab8" role="tabpanel">NPI Tracker content</div>
+                        <div class="tab-pane fade" id="tab9" role="tabpanel">CSO Tracker content</div>
+                        <div class="tab-pane fade" id="tab10" role="tabpanel">Supplier Performance Management (SPM) content</div>
+                        <div class="tab-pane fade" id="tab11" role="tabpanel">Overall Quality Level(OQL) content</div>
+                        <div class="tab-pane fade" id="tab12" role="tabpanel">Replacement Lead Time (RLT) content</div>
+                        <div class="tab-pane fade" id="tab13" role="tabpanel">PPM (Parts Per Million) content</div>
+                        <div class="tab-pane fade" id="tab14" role="tabpanel">Audit Score content</div>
+                        <div class="tab-pane fade" id="tab15" role="tabpanel">PDI content</div>
+                        <div class="tab-pane fade" id="tab16" role="tabpanel">RM TC content</div>
+                        <div class="tab-pane fade" id="tab17" role="tabpanel">Service Spare tracker content</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Add Certificate Modal -->
+<div id="certificateModal" class="modal fade" tabindex="-1">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: #bec6e1;margin-bottom:10px">
+                <h5 class="modal-title" id="certificateModalTitle"><strong>Add Certificate</strong></h5>
+                <button type="button" class="close" onclick="CloseModel()">&times;</button>
+            </div>
+            <form id="certificateForm"  enctype="multipart/form-data" class="form-horizontal">
+                <input type="hidden" id="vendorCertID" />
+                <div class="modal-body">
+                <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group row" style="margin: 5px;">
+                                <label class="col-lg-5 col-form-label Ph" style="padding-top: 10px;">Certificate</label>
+                                <div class="Ph" style="padding-top: 10px;">:</div>
+                                <div class="col-6 Ph">
+                                   
+                                    <select class="form-control form-control-border txt Ph" id="certificateID" required>
+                                        <!-- Options will be populated dynamically -->
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row" style="margin: 5px;">
+                                <label class="col-lg-5 col-form-label Ph" style="padding-top: 10px;">
+                                    Product Code
+                                </label>
+                                <div class="Ph" style="padding-top: 10px;">:</div>
+                                <div class="col-4 Ph">
+                                    <input type="text" id="productCodeInput" class="form-control form-control-border txt Ph" placeholder="Enter Product code…" autocomplete="off" required />
+                                </div>
+                                <div class="col-2">
+                                    <input name="sear_Code" id="sear_Code" class="form-control" placeholder="Search Code" oninput="handleSearch(this)" style="text-transform: uppercase;margin-top: -17px;" />
+                                </div>
+                            </div>
+
+                          @*   <div class="form-group row" style="margin: 5px;">
+                                <label class="col-lg-5 col-form-label Ph" style="padding-top: 10px;">Vendor</label>
+                                <div class="Ph" style="padding-top: 10px;">:</div>
+                                <div class="col-6 Ph">
+                                    <select class="form-control form-control-border txt Ph" id="vendorID" required>
+                                        <!-- Options will be populated dynamically -->
+                                    </select>
+                                </div>
+                            </div>
+ *@
+                            <div class="form-group row" style="margin: 5px;">
+                                <label class="col-lg-5 col-form-label Ph" style="padding-top: 10px;">Issue Date</label>
+                                <div class="Ph" style="padding-top: 10px;">:</div>
+                                <div class="col-6 Ph">
+                                    <input type="date" class="form-control form-control-border txt Ph" id="issueDate" required />
+                                </div>
+                            </div>
+
+                            <div class="form-group row" style="margin: 5px;">
+                                <label class="col-lg-5 col-form-label Ph" style="padding-top: 10px;">Expiry Date</label>
+                                <div class="Ph" style="padding-top: 10px;">:</div>
+                                <div class="col-6 Ph">
+                                    <input type="date" class="form-control form-control-border txt Ph" id="expiryDate" required />
+                                </div>
+                            </div>
+
+                            <div class="form-group row" style="margin: 5px;">
+                                <label class="col-lg-5 col-form-label Ph" style="padding-top: 10px;">Remarks</label>
+                                <div class="Ph" style="padding-top: 10px;">:</div>
+                                <div class="col-6 Ph">
+                                    <textarea class="form-control form-control-border txt Ph" id="remarks"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="form-group row" style="margin: 5px;">
+                                <label class="col-lg-5 col-form-label Ph" style="padding-top: 10px;">Certificate Upload</label>
+                                <div class="Ph" style="padding-top: 10px;">:</div>
+                                <div class="col-6 Ph">
+                                    <input type="file" class="form-control form-control-border txt Ph" id="certUpload" required />
+                                    <div id="attachmentLinks" class="file-item"></div>
+
+                                    <!-- Hidden input for remaining attachments -->
+                                    <input type="hidden" id="remainingAttachments" name="RemainingAttachments" value="">
+                                
+                                <input type="hidden" id="Attachments" name="Attachments">
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-outline-success btn-labeled" id="certificateSaveBtn" onclick="InsertUpdateVendorcert(event)">
+                        <i class="fas fa-floppy-disk mr-2"></i>Save
+                    </button>
+                    <button type="button" class="btn btn-outline-success legitRipple" onclick="CloseModel()">Close</button>
+
+                </div>
+            </form>
+                 </div>
+    </div>
+</div>
+
+<!-- Add Report Modal -->
+<div id="TPTReportModal" class="modal fade" tabindex="-1">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: #bec6e1;margin-bottom:10px">
+                <h5 class="modal-title" id="TPTReportModalTitle"><strong>Add Third Party Testing Report</strong></h5>
+                <button type="button" class="close" onclick="TPTCloseModel()">&times;</button>
+            </div>
+            <form id="TPTReportForm" enctype="multipart/form-data" class="form-horizontal">
+                <input type="hidden" id="tptr_Id" />
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group row" style="margin: 5px;">
+                                <label class="col-lg-5 col-form-label Ph" style="padding-top: 10px;">Third Party Testing Report</label>
+                                <div class="Ph" style="padding-top: 10px;">:</div>
+                                <div class="col-6 Ph">
+                                    <select class="form-control form-control-border txt Ph" id="TPTReportID" required>
+                                        <!-- Options will be populated dynamically -->
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group row" style="margin: 5px;">
+                                <label class="col-lg-5 col-form-label Ph" style="padding-top: 10px;">Product Code</label>
+                                <div class="Ph" style="padding-top: 10px;">:</div>
+                                <div class="col-6 Ph">
+                                    <input type="text"
+                                           id="tptr_productCodeInput"
+                                           class="form-control form-control-border txt Ph"
+                                           placeholder="Enter Product code…"
+                                           autocomplete="off"
+                                           required />
+                                </div>
+                            </div>
+
+                            <div class="form-group row" style="margin: 5px;">
+                                <label class="col-lg-5 col-form-label Ph" style="padding-top: 10px;">Issue Date</label>
+                                <div class="Ph" style="padding-top: 10px;">:</div>
+                                <div class="col-6 Ph">
+                                    <input type="date" class="form-control form-control-border txt Ph" id="TPTRissueDate" required />
+                                </div>
+                            </div>
+
+                            <div class="form-group row" style="margin: 5px;">
+                                <label class="col-lg-5 col-form-label Ph" style="padding-top: 10px;">Expiry Date</label>
+                                <div class="Ph" style="padding-top: 10px;">:</div>
+                                <div class="col-6 Ph">
+                                    <input type="date" class="form-control form-control-border txt Ph" id="TPTRexpiryDate" required />
+                                </div>
+                            </div>
+
+                            <div class="form-group row" style="margin: 5px;">
+                                <label class="col-lg-5 col-form-label Ph" style="padding-top: 10px;">Remarks</label>
+                                <div class="Ph" style="padding-top: 10px;">:</div>
+                                <div class="col-6 Ph">
+                                    <textarea class="form-control form-control-border txt Ph" id="TPTRremarks"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="form-group row" style="margin: 5px;">
+                                <label class="col-lg-5 col-form-label Ph" style="padding-top: 10px;">Report Upload</label>
+                                <div class="Ph" style="padding-top: 10px;">:</div>
+                                <div class="col-6 Ph">
+                                    <input type="file" class="form-control form-control-border txt Ph" id="reportUpload" required />
+                                    <div id="tptr_attachmentLinks" class="file-item"></div>
+
+                                    <!-- Hidden input for remaining attachments -->
+                                    <input type="hidden" id="tptr_remainingAttachments" name="RemainingAttachments" value="">
+                                    <input type="hidden" id="tptr_Attachments" name="Attachments">
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-outline-success btn-labeled" id="reportSaveBtn" onclick="InsertUpdateVendorReport(event)">
+                        <i class="fas fa-floppy-disk mr-2"></i>Save
+                    </button>
+                    <button type="button" class="btn btn-outline-success legitRipple" onclick="TPTCloseModel()">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Add BIS Certificate Modal -->
+<div id="BISCertificateModal" class="modal fade" tabindex="-1">
+    <div class="modal-dialog modal-md" role="document">
+        <!-- Change here -->
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: #bec6e1; margin-bottom: 10px;">
+                <h5 class="modal-title" id="BIScertificateModalTitle"><strong>Add BIS Certificate</strong></h5>
+                <button type="button" class="close" onclick="BISCloseModel()">&times;</button>
+            </div>
+
+            <form id="BIScertificateForm" enctype="multipart/form-data" class="form-horizontal">
+                <input type="hidden" id="Id" />
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+
+                            <!-- BIS Certificate dropdown -->
+                            <div class="form-group row" style="margin: 5px;">
+                                <label class="col-lg-4 col-form-label Ph" style="padding-top: 10px;">BIS Certificate</label>
+                                <div class="Ph" style="padding-top: 10px;">:</div>
+                                <div class="col-7 Ph">
+                                   
+                                    <input type="text" id="BIScertificateID" class="form-control form-control-border txt Ph" placeholder="Enter BIS Certificate Name" required />
+
+                                </div>
+                            </div>
+                            <div class="form-group row" style="margin: 5px;">
+                                <label class="col-lg-4 col-form-label Ph" style="padding-top: 10px;">Model Number</label>
+                                <div class="Ph" style="padding-top: 10px;">:</div>
+                                <div class="col-7 Ph">
+                                    <input type="text" id="ModelNo" class="form-control form-control-border txt Ph" placeholder="Enter Model Number…" />
+                                </div>
+                            </div>
+                            <div class="form-group row" style="margin: 5px;">
+                                <!-- Label -->
+                                <label class="col-lg-4 col-form-label Ph" style="padding-top: 10px;">
+                                    Product Code
+                                </label>
+
+                                <!-- Colon -->
+                                <div class="col-lg-0.5" style="padding-top: 10px;">:</div>
+
+                                <!-- Inputs Column -->
+                                <div class="col-lg-7 Ph">
+                                    <div class="row">
+                                       
+
+                                        <!-- Search Code Input -->
+                                        <div class="col-md-6">
+                                            <label for="BISsear_Code" class="sr-only">Search Code</label>
+                                            <input type="text"
+                                                   name="BISsear_Code"
+                                                   id="BISsear_Code"
+                                                   class="form-control"
+                                                   placeholder="Search Code"
+                                                   aria-label="Search Code"
+                                                   oninput="handleSearch(this)"
+                                                   style="text-transform: uppercase;" />
+
+                                        </div>
+                                         <!-- Product Code Input -->
+                                        <div class="col-md-6">
+                                            <input type="text"
+                                                   id="BISproductCodeInput"
+                                                   class="form-control form-control-border txt"
+                                                   placeholder="Enter Product Code…"
+                                                   aria-label="Product Code"
+                                                   autocomplete="off"
+                                                   required />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group row" style="margin: 5px;">
+                                <label class="col-lg-4 col-form-label Ph" style="padding-top: 10px;">R Number</label>
+                                <div class="Ph" style="padding-top: 10px;">:</div>
+                                <div class="col-7 Ph">
+                                    <input type="text" id="RNumber" class="form-control form-control-border txt Ph" placeholder="Enter R Number…" />
+                                </div>
+                            </div>
+
+                            <!-- New Fields Start -->
+                            <div class="form-group row" style="margin: 5px;">
+                                <label class="col-lg-4 col-form-label Ph" style="padding-top: 10px;">BIS Section</label>
+                                <div class="Ph" style="padding-top: 10px;">:</div>
+                                <div class="col-7 Ph">
+                                    <input type="text" id="BISSection" class="form-control form-control-border txt Ph" placeholder="Enter BIS Section…" />
+                                </div>
+                            </div>
+
+                           
+                            <div class="form-group row" style="margin: 5px;">
+                                <label class="col-lg-4 col-form-label Ph" style="padding-top: 10px;">Issue Date</label>
+                                <div class="Ph" style="padding-top: 10px;">:</div>
+                                <div class="col-7 Ph">
+                                    <input type="date" class="form-control form-control-border txt Ph" id="BISissueDate" required />
+                                </div>
+                            </div>
+
+                            <!-- Expiry Date -->
+                            <div class="form-group row" style="margin: 5px;">
+                                <label class="col-lg-4 col-form-label Ph" style="padding-top: 10px;">Expiry Date</label>
+                                <div class="Ph" style="padding-top: 10px;">:</div>
+                                <div class="col-7 Ph">
+                                    <input type="date" class="form-control form-control-border txt Ph" id="BISexpiryDate" required />
+                                </div>
+                            </div>
+
+                            <!-- Remarks -->
+                            <div class="form-group row" style="margin: 5px;">
+                                <label class="col-lg-4 col-form-label Ph" style="padding-top: 10px;">Remarks</label>
+                                <div class="Ph" style="padding-top: 10px;">:</div>
+                                <div class="col-7 Ph">
+                                    <textarea class="form-control form-control-border txt Ph" id="BISremarks"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Certificate Upload -->
+                            <div class="form-group row" style="margin: 5px;">
+                                <label class="col-lg-4 col-form-label Ph" style="padding-top: 10px;">Certificate Upload</label>
+                                <div class="Ph" style="padding-top: 10px;">:</div>
+                                <div class="col-7 Ph">
+                                    <input type="file" class="form-control form-control-border txt Ph" id="BIScertUpload" required />
+                                    <div id="BISattachmentLinks" class="file-item mt-2"></div>
+
+                                    <input type="hidden" id="BISremainingAttachments" name="RemainingAttachments" value="">
+                                    <input type="hidden" id="BISAttachments" name="Attachments">
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-outline-success btn-labeled" id="BISsaveBtn" onclick="InsertUpdateVendorBIS(event)">
+                        <i class="fas fa-floppy-disk mr-2"></i>Save
+                    </button>
+                    <button type="button" class="btn btn-outline-success legitRipple" onclick="BISCloseModel()">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/scripts/vendor/vendordetails.js" asp-append-version="true"></script>
+    <script src="~/scripts/vendor/bis-certificate.js" asp-append-version="true"></script>
+    <script src="~/scripts/vendor/thirdPartyTesting.js" asp-append-version="true"></script>
+}

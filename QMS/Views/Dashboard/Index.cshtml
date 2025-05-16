@@ -1,0 +1,166 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+<style>
+
+    .tiles {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        width: 100%;
+    }
+
+    .tile {
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .tile-icon {
+        font-size: 24px;
+        color: #6c757d;
+    }
+
+    .tile-data h3 {
+        margin: 0;
+        font-size: 24px;
+        color: #333;
+    }
+
+    .tile-data p {
+        margin: 0;
+        font-size: 14px;
+        color: #777;
+    }
+
+    .chart-section {
+        width: 100%;
+        padding: 10px;
+    }
+
+    .tile, .card {
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+</style>
+
+<div class="content">
+    <div class="row">
+        <div class="col-xl-5">
+            <h2 style="text-align:center">Comming Soon</h2>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- JavaScript for Pie Chart -->
+    
+}
+
+<script>
+
+    $(document).ready(function () {
+        // updateBarChart();
+
+        $('.sidebar-main-toggle').click();
+
+    });
+
+    // function updateBarChart() {
+    //     Highcharts.chart('barChart', {
+    //         chart: {
+    //             type: 'column',
+    //             // events: {
+    //             //     render: function () {
+    //             //         const totalSaved = this.series[0].data.reduce((acc, point) => acc + point.y, 0);
+    //             //         const totalSubmitted = this.series[1].data.reduce((acc, point) => acc + point.y, 0);
+
+    //             //         // Create or update the custom totals element
+    //             //         let totals = document.getElementById('chart-totals');
+    //             //         if (!totals) {
+    //             //             totals = document.createElement('div');
+    //             //             totals.id = 'chart-totals';
+    //             //             totals.style.position = 'absolute';
+    //             //             totals.style.top = '10px';
+    //             //             totals.style.right = '10px';
+    //             //             totals.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+    //             //             totals.style.padding = '5px 10px';
+    //             //             totals.style.borderRadius = '5px';
+    //             //             totals.style.fontSize = '12px';
+    //             //             totals.style.boxShadow = '0 0 5px rgba(0, 0, 0, 0.2)';
+    //             //             document.getElementById('barChart').appendChild(totals);
+    //             //         }
+
+    //             //         totals.innerHTML = `
+    //             //                                         <b>Totals:</b><br>
+    //             //                                         Saved: ${totalSaved}<br>
+    //             //                                         Submitted: ${totalSubmitted}
+    //             //                                     `;
+    //             //     }
+    //             // }
+    //         },
+    //         title: {
+    //             text: '',
+    //             style: {
+    //                 color: '#333333', // Text color
+    //                 fontSize: '14px', // Font size
+    //                 fontWeight: 400, // Font weight
+    //                 fontFamily: 'Arial, sans-serif' // Font family
+    //             }
+    //         },
+    //         xAxis: {
+    //             categories: ['Jan', 'Feb', 'March', 'April', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'],
+    //             crosshair: true,
+    //             accessibility: {
+    //                 description: 'Months'
+    //             }
+    //         },
+    //         yAxis: {
+    //             min: 0,
+    //             title: {
+    //                 text: null
+    //             }
+    //         },
+    //         tooltip: {
+    //             valueSuffix: ''
+    //         },
+    //         plotOptions: {
+    //             column: {
+    //                 pointPadding: 0.2,
+    //                 borderWidth: 0
+    //             }
+    //         },
+    //         series: [
+    //             {
+    //                 name: 'Product Code',
+    //                 data: [12, 16, 18, 20, 5, 0, 82, 2, 11, 0, 59, 10],
+    //                 color: '#4682B4'
+    //             },
+    //             {
+    //                 name: 'PPS',
+    //                 data: [50, 15, 5, 35, 2, 7, 24, 55, 90, 11, 2, 30],
+    //                 color: '#00BCD4'
+    //             },
+    //             {
+    //                 name: 'CPS',
+    //                 data: [20, 50, 15, 23, 42, 17, 14, 95, 30, 91, 22, 50],
+    //                 color: '#009688'
+    //             }
+    //         ],
+    //         credits: {
+    //             enabled: false
+    //         }
+    //     });
+    //}
+
+</script>

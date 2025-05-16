@@ -1,0 +1,418 @@
+﻿@using QMS.Core.Models
+
+@model List<UserViewModel>
+
+@{
+    ViewData["Title"] = "Users";
+}
+
+<style>
+    .filtertxtbox {
+        border: 0;
+        border-bottom: 1px solid #ececec;
+        height: 35px;
+        margin-right: 8px;
+    }
+
+    #btnSrch {
+        background-color: green !important;
+        color: white;
+    }
+
+    .bborder {
+        border-bottom: 1px solid #eeeeee;
+    }
+
+    th {
+        border-bottom: 3px solid #eeeeee;
+    }
+
+    .current {
+        background-color: white !important;
+        color: blue !important;
+    }
+
+    .modal-header {
+        background-color: #ececec !important;
+        padding-bottom: 10px !important;
+    }
+
+    .form-control {
+        padding: 0 10px !important;
+        border: 0;
+        border-bottom: 1px solid #cccccc;
+        border-radius: 0px;
+        height: 25px;
+    }
+
+    .filtertxtbox:focus {
+        outline: 0px !important;
+    }
+
+    .row {
+        margin-bottom: 12px !important;
+    }
+
+    label {
+        margin-bottom: 2px !important;
+    }
+
+    #userTable tbody tr:hover {
+        background-color: #D3D3D3; /* Change this color to your preference */
+    }
+</style>
+
+
+<div class="content">
+    <div class="card">
+        <div class="card-body">
+            <div class="chart-container">
+                <b>Users</b>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-4">
+            <div class="card col-12">
+                <div class="form-group">
+                    <br />
+                    <div id="cardTitle" class="col-12"><b>Add User</b></div>
+                    <div class="col-12">
+                        <div class="modal-body">
+                            <div class="form-group row">
+                                <div class="form-group">
+                                    <div class="row">
+                                        <input type="hidden" id="hdnId" name="hdnId" value="" />
+                                        <label class="col-12"><b>ADid</b><em>*</em></label>
+                                        <div class="col-12"><input id="Adid" name="AdId" class="form-control" /></div>
+                                        <br />
+                                        <br />
+                                        <label class="col-12"><b>Name</b><em>*</em></label>
+                                        <div class="col-12"><input id="Name" name="Name" class="form-control" /></div>
+                                        <br />
+                                        <br />
+                                        <label class="col-12"><b>Email</b><em>*</em></label>
+                                        <div class="col-12"><input id="UserEmail" name="UserEmail" class="form-control" /></div>
+                                        <br />
+                                        <br />
+                                        <label class="col-12"><b>Mobile No</b><em>*</em></label>
+                                        <div class="col-12"><input id="MobileNo" name="MobileNo" class="form-control" maxlength="10" /></div>
+                                        <br />
+                                        <br />
+                                        <label class="col-12"><b>Designation</b><em>*</em></label>
+                                        <div class="col-12"><input id="Designation" name="Designation" class="form-control" /></div>
+                                        <br />
+                                        <br />
+                                        <label class="col-12"><b>Role</b><em>*</em></label>
+                                        <select name="RoleId" id="RoleId" class="form-control" required>
+                                            <option value="">Select Role</option>
+                                            @foreach (var item in ViewBag.Role)
+                                            {
+                                                <option value="@item.Id">@item.RoleName</option>
+
+                                            }
+                                        </select>
+                                        <br />
+                                        <br />
+                                        <br />
+                                        <br />
+                                        <button type="button" class="btn btn-primary" onclick="InsertUpdateUser()">Save</button>&nbsp;&nbsp;
+                                        <button type="button" class="btn btn-danger" onclick="window.location.reload()">Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-8">
+            <div class="card">
+                <div class="card-body">
+                    <div class="chart-container">
+                        <table id="userTable" class="display col-12">
+                            <thead>
+                                <tr style="height:45px;font-size:15px; background-color: #bec6e1;">
+                                    <th style="text-align:left; display:none;">ID</th>
+                                    <th>Name</th>
+                                    <th>ADid</th>
+                                    <th>Email</th>
+                                    <th>Mobile No</th>
+                                    <th>Role</th>
+                                    <th class="col-1">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var user in Model)
+                                {
+                                    <tr class="bborder">
+                                        <td style="text-align:left; display:none;">@user.UserId</td>
+                                        <td style="height:40px;cursor:pointer;color:darkblue;text-align:left"><a onclick="GetUser(@user.UserId)">@user.Name</a></td>
+                                        <td>@user.AdId</td>
+                                        <td>@user.Email</td>
+                                        <td>@user.MobileNo</td>
+                                        <td>@user.Role</td>
+                                        <td class="col-1">
+                                            <i data-toggle="modal" onclick="delConfirm(@user.UserId)" class="fas fa-trash-alt" style="color:red;cursor:pointer"></i>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script src="~/js/jquery.datatables.js"></script>
+    <script src="~/lib/bootstrap/dist/js/datatables.buttons.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/jszip.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/buttons.html5.min.js"></script>
+    <script>
+
+        $(document).ready(function () {
+            new DataTable('#userTable', {
+                language: {
+                    lengthMenu: 'Show _MENU_' // Customize the length menu to remove "entries"
+                },
+                dom: 'lBfrtip', // Include the Buttons extension in the DataTable
+                buttons: [
+                    {
+                        extend: 'excelHtml5',
+                        text: '<i class="fas fa-file-excel mr-2"></i>Export to Excel',
+                        className: 'btn btn-outline-warning legitRipple buttons-excel',
+                        titleAttr: 'Export to Excel',
+                        exportOptions: {
+                            columns: ':not(:last-child)',
+                            modifier: {
+                                page: 'all' // Export all pages
+                            }
+                        }
+                    }
+                ]
+            });
+
+            $('#userTable_wrapper .row:last-child').hide();
+            $('#dt-length-0').removeClass('form-select form-select-sm').addClass('form-control');
+            // Swapping the search and paging controls
+            var searchDiv = $('.dt-search').detach();
+            var lengthDiv = $('.dt-length').detach();
+
+            $('.col-md-auto.me-auto').append(searchDiv);
+            $('.col-md-auto.ms-auto').append(lengthDiv);
+
+            var filterDiv = document.getElementById('userTable_filter');
+            if (filterDiv) {
+                filterDiv.removeAttribute('class');
+            }
+
+            // Remove the text "Search:" from the label
+            var label = document.querySelector('#userTable_filter label');
+            if (label) {
+                // Remove all text nodes (including any search icon if present) from the label
+                label.childNodes.forEach(function (node) {
+                    if (node.nodeType === Node.TEXT_NODE || (node.nodeType === Node.ELEMENT_NODE && node.tagName === 'I')) {
+                        label.removeChild(node);
+                    }
+                });
+            }
+
+            // Modify the input element
+            var input = document.querySelector('#userTable_filter input[type="search"]');
+            if (input) {
+
+                input.removeAttribute('class'); // Remove the class attribute
+                input.classList.add('filtertxtbox'); // Add the class 'filtertxtbox'
+                input.setAttribute('placeholder', 'Search Users...'); // Set the placeholder
+
+                // Create the search button
+                var searchButton = document.createElement('button');
+                searchButton.id = 'btnSrch';
+                searchButton.type = 'button';
+                searchButton.className = 'btn btn-outline bg-success border-success rounded-round text-primary-800 btn-icon legitRipple';
+                searchButton.innerHTML = '<i class="fa fa-search"></i>';
+
+                // Append the buttons after the input element
+                label.appendChild(searchButton);
+            }
+
+            var inputs = document.getElementsByName('userTable_length');
+            inputs.forEach(function (input) {
+                input.style.border = '0px';
+                input.style.borderBottom = '1px solid #ececec';
+                input.style.height = '35px';
+            });
+
+            $('#MobileNo').keypress(function (e) {
+                var charCode = (e.which) ? e.which : event.keyCode
+                if (String.fromCharCode(charCode).match(/[^0-9]/g))
+                    return false;
+            });
+        });
+
+        function InsertUpdateUser() {
+            Blockloadershow();
+            var errorMsg = "";
+            var test = $("#UserEmail").val();
+            var fields = "";
+
+            if ($("#Adid").val() == '' || $("#Adid").val() == null || $("#Adid").val() == undefined) {
+                fields += " - AdId" + "<br>";
+            }
+
+            if ($("#Name").val() == '' || $("#Name").val() == null || $("#Name").val() == undefined) {
+                fields += " - Name" + "<br>";
+            }
+
+            if ($("#UserEmail").val() == '' || $("#UserEmail").val() == null || $("#UserEmail").val() == undefined) {
+                fields += " - Email" + "<br>";
+            }
+
+            if ($("#MobileNo").val() == '' || $("#MobileNo").val() == null || $("#MobileNo").val() == undefined) {
+                fields += " - Mobile No" + "<br>";
+            }
+
+            if ($("#Designation").val() == '' || $("#Designation").val() == null || $("#Designation").val() == undefined) {
+                fields += " - Designation" + "<br>";
+            }
+
+            if ($("#RoleId").val() == '' || $("#RoleId").val() == null || $("#RoleId").val() == undefined) {
+                fields += " - Role" + "<br>";
+            }
+
+            if (fields != "") {
+                errorMsg = "Please fill following mandatory field(s):" + "<br><br>" + fields;
+            }
+
+            if (errorMsg != "") {
+                Blockloaderhide();
+                showDangerAlert(errorMsg);
+                return false;
+            }
+
+            if (!isEmail($("#UserEmail").val())) {
+                Blockloaderhide();
+                showDangerAlert("Please enter valid email.");
+                return false;
+            }
+
+            var ajaxUrl = '@Url.Action("CreateUser", "Users")';
+
+            if ($("#hdnId").val() != "0"){
+                ajaxUrl = '@Url.Action("UpdateUser", "Users")';
+            }
+
+            var UserViewModel = {
+                UserId: $("#hdnId").val(),
+                Name: $("#Name").val(),
+                RoleId: $("#RoleId").val(),
+                AdId: $("#Adid").val(),
+                Email: $("#UserEmail").val(),
+                Designation: $("#Designation").val(),
+                MobileNo: $("#MobileNo").val(),
+                User_Type: 'Wipro'
+            };
+
+            $.ajax({
+                type: "POST",
+                url: ajaxUrl,
+                data: UserViewModel,
+                success: function (response) {
+                    Blockloaderhide();
+                    if (response.success) {
+                        if ($("#hdnId").val() != "0") {
+                            showSuccessAlert("User updated successfully.");
+                        }
+                        else {
+                            showSuccessAlert("User added  successfully.");
+                        }
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 2500);
+                    }
+                    else {
+                        var errorMessg = "";
+                        for (var error in response.errors) {
+                            errorMessg += error + "\n";
+                        }
+                        if (errorMessg != "") {
+                            showDangerAlert(errorMessg);
+                        }
+                        else {
+                            showDangerAlert(response.message);
+                        }
+                    }
+                },
+                error: function (xhr, ststus, errors) {
+                    Blockloaderhide();
+                    showDangerAlert("An unexpected eror occured, please refresh the page and try again.");
+                }
+            });
+        }
+
+        function GetUser(userId) {
+            $.ajax({
+                url: '@Url.Action("GetUserById", "Users")',
+                type: 'GET',
+                data: { userId: userId },
+                success: function (response) {
+                    $("#hdnId").val(response.userId);
+                    $("#Name").val(response.name);
+                    $("#RoleId").val(response.roleId);
+                    $("#Adid").val(response.adId);
+                    $("#UserEmail").val(response.email);
+                    $("#Designation").val(response.designation);
+                    $("#MobileNo").val(response.mobileNo);
+                    $("#cardTitle").html("<b>Edit User</b>")
+                },
+                error: function () {
+                    showDangerAlert('Error retrieving data.');
+                }
+            });
+        }
+
+        function delConfirm(recid) {
+            PNotify.prototype.options.styling = "bootstrap3";
+            (new PNotify({
+                title: 'Confirmation Needed',
+                text: 'Are you sure to delete? It will not delete if this record is used in transactions.',
+                icon: 'glyphicon glyphicon-question-sign',
+                hide: false,
+                confirm: {
+                    confirm: true
+                },
+                buttons: {
+                    closer: false,
+                    sticker: false
+                },
+                history: {
+                    history: false
+                },
+            })).get().on('pnotify.confirm', function () {
+                $.ajax({
+                    url: '@Url.Action("DeleteUser", "Users")',
+                    type: 'POST',
+                    data: { id: recid },
+                    success: function (response) {
+                        if(!response.success) {
+                            showDangerAlert(response.message);
+                            return false;
+                        }
+                        window.location.reload();
+                    },
+                    error: function () {
+                        showDangerAlert('Error retrieving data.');
+                    }
+                });
+
+            }).on('pnotify.cancel', function () {
+                window.location.reload();
+            });
+        }
+    </script>
+}

@@ -1,0 +1,271 @@
+﻿
+@{
+    ViewData["Title"] = "Third Party Inspection";
+}
+<link href="~/css/fontawesome/styles.min.css" rel="stylesheet" />
+<link href="~/css/tabulator/tabulator.min.css" rel="stylesheet" />
+<link href="~/css/tabulator/tabulator_bootstrap4.min.css" rel="stylesheet" />
+<script src="~/js/jquery.min.js"></script>
+<script src="~/js/jquery.datatables.js"></script>
+<link href="~/css/pnotify.css" rel="stylesheet" />
+<script src="~/js/pnotify.js"></script>
+<script src="~/js/pnotify.confirm.js"></script>
+<script src="~/lib/bootstrap/dist/js/datatables.buttons.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/popupAlert.js"></script>
+<script src="~/lib/bootstrap/dist/js/jszip.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/buttons.html5.min.js"></script>
+<script src="~/js/common.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/litepicker/dist/css/litepicker.css" />
+
+<style>
+    .nav-pills .nav-link {
+        text-align: left;
+        border-radius: 0;
+        border-left: 4px solid transparent;
+        font-weight: 500;
+        width: 100%;
+        padding: 12px;
+        background-color: #fff;
+        color: #333;
+        margin-bottom: 4px;
+    }
+
+        .nav-pills .nav-link.active {
+            background-color: #f4f3f8;
+            border-left: 4px solid #645394;
+            color: #645394;
+            font-weight: bold;
+        }
+
+    .form-control {
+        padding: 0 9px !important;
+        border: 0;
+        border-bottom: 1px solid #cccccc;
+        border-radius: 0px;
+    }
+
+    label {
+        margin-bottom: 0;
+        margin-top: .3rem;
+    }
+
+    .form-group {
+        margin-bottom: 0.5rem; /* Reduce space between each input group */
+    }
+
+    .custome-body {
+        margin-bottom: -17px !important;
+        padding: 0.75rem !important;
+        margin-top: -17px !important;
+    }
+
+    .tabulator .tabulator-header .tabulator-col {
+        background-color: #bec6e1 !important;
+        font-size: 14px;
+        font-weight: 600;
+        border-right: 2px solid #ccc;
+        text-align: center;
+    }
+
+    .tabulator-row .tabulator-cell {
+        padding: 5px 5px;
+        font-size: 14px;
+        height: 30px;
+    }
+
+    .tabulator-cell:hover {
+        color: #4682B4 !important;
+        cursor: pointer !important;
+        font-weight: bold;
+    }
+
+    .calendar-container {
+        cursor: pointer;
+        padding: 10px 15px;
+        width: 100%;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        transition: background-color 0.3s, box-shadow 0.3s;
+        gap: 8px;
+    }
+
+        .calendar-container:hover {
+            background-color: #e3f2fd;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .calendar-container i.fa-calendar {
+            color: #2196f3;
+            font-size: 1.2em;
+            padding-left: 20px;
+        }
+
+        .calendar-container span {
+            color: #4682B4;
+            margin: 0;
+            font-size: 16px;
+        }
+
+    .container__predefined-ranges{
+        font-size : 14px;
+    }
+
+    .month-item {
+        font-size: 14px;
+    }
+
+</style>
+
+<div class="content">
+    <div class="card my-2">
+        <div class="card-body p-2 d-flex justify-content-between align-items-center">
+            <div>
+                <b style="font-size: large;color: #673AB7;">Third Party Inspection</b>
+            </div>
+
+            <div>
+                <button id="SaveButton" type="button" class="btn btn-outline-success legitRipple mr-2" onclick="InsertUpdateThirdParty()">
+                    <i class="fas fa-floppy-disk mr-2"></i>Save
+                </button>
+                <button id="addButton" type="button" class="btn btn-outline-success legitRipple mr-2" onclick="ShowDetail()">
+                    <i class="fas fa-plus mr-2 fa-1x"></i>Add
+                </button>
+                <button id="DashbackButton" class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
+                <button id="backButton" class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div id="Third">
+                        <form method="post" action="/ThirdPartyInspection/Create" enctype="multipart/form-data">
+                            <div class="card w-80">
+                                <div class="card-body">
+                                    <div class="col-12 pt-2">
+                                        <div class="row form-group align-items-center mb-2">
+                                            <div class="col-6 pe-3 d-flex align-items-center">
+                                                <label class="me-3 mb-0 col-4" style="margin-right: 20px;"><b>Inspection Date</b></label>
+                                                <input type="date" name="InspectionDate" id="InspectionDate" class="form-control col-6" required style="flex-grow: 1;" />
+                                                <input type="hidden" id="InspectionID" />
+                                            </div>
+                                            <div class="col-6 pe-3 d-flex align-items-center">
+                                                <label class="me-3 mb-0 col-4" style="margin-right: 20px;"><b>Project Name&nbsp;:</b></label>
+                                                <input type="text" name="ProjectName" id="ProjectName" class="form-control col-6" placeholder="Enter project name" required style="flex-grow: 1;" />
+                                            </div>
+                                        </div>
+
+                                        <div class="row form-group align-items-center mb-2">
+                                            <div class="col-6 pe-3 d-flex align-items-center">
+                                                <label class="me-3 mb-0 col-4" style="margin-right: 20px;"><b>Inspector Name</b></label>
+                                                <input type="text" name="InspName" id="InspName" class="form-control col-6" placeholder="Enter inspector name" required style="flex-grow: 1;" />
+                                            </div>
+                                            <div class="col-6 pe-3 d-flex align-items-center">
+                                                <label class="me-3 mb-0 col-4" style="margin-right: 20px;"><b>Product Code</b></label>
+                                                <input type="text" name="ProductCode" id="ProductCode" class="form-control col-6" placeholder="Enter product code" required style="flex-grow: 1;" />
+                                            </div>
+                                        </div>
+
+                                        <div class="row form-group align-items-center mb-2">
+                                            <div class="col-6 pe-3 d-flex align-items-center">
+                                                <label class="me-3 mb-0 col-4" style="margin-right: 20px;"><b>Product Description</b></label>
+                                                <input type="text" name="ProdDesc" id="ProdDesc" class="form-control col-6" placeholder="Enter product description" required style="flex-grow: 1;" />
+                                            </div>
+                                            <div class="col-6 pe-3 d-flex align-items-center">
+                                                <label class="me-3 mb-0 col-4" style="margin-right: 20px;"><b>LOT Quantity</b></label>
+                                                <input type="text" name="LOTQty" id="LOTQty" class="form-control col-6" placeholder="Enter LOT quantity" required style="flex-grow: 1;" />
+                                            </div>
+                                        </div>
+
+                                        <div class="row form-group align-items-center mb-2">
+                                            <div class="col-6 pe-3 d-flex align-items-center">
+                                                <label class="me-3 mb-0 col-4" style="margin-right: 20px;"><b>Project Value</b></label>
+                                                <input type="text" name="ProjectValue" id="ProjectValue" class="form-control col-6" placeholder="Enter project value" required style="flex-grow: 1;" />
+                                            </div>
+                                            <div class="col-6 pe-3 d-flex align-items-center">
+                                                <label class="me-3 mb-0 col-4" style="margin-right: 20px;"><b>Location</b></label>
+                                                <input type="text" name="Location" id="Location" class="form-control col-6" placeholder="Enter location" required style="flex-grow: 1;" />
+                                            </div>
+                                        </div>
+
+                                        <div class="row form-group align-items-center mb-2">
+                                            <div class="col-6 pe-3 d-flex align-items-center">
+                                                <label class="me-3 mb-0 col-4" style="margin-right: 20px;"><b>Mode</b></label>
+                                                <input type="text" name="Mode" id="Mode" class="form-control col-6" placeholder="Enter mode" required style="flex-grow: 1;" />
+                                            </div>
+                                            <div class="col-6 pe-3 d-flex align-items-center">
+                                                <label class="me-3 mb-0 col-4" style="margin-right: 20px;"><b>First Attempt</b></label>
+                                                <input type="text" name="FirstAttempt" id="FirstAttempt" class="form-control col-6" placeholder="Enter first attempt details" required style="flex-grow: 1;" />
+                                            </div>
+                                        </div>
+
+                                        <div class="row form-group align-items-center mb-2">
+                                            <div class="col-6 pe-3 d-flex align-items-center">
+                                                <label class="me-3 mb-0 col-4" style="margin-right: 20px;"><b>Remark</b></label>
+                                                <textarea name="Remark" id="Remark" class="form-control col-6" placeholder="Enter remark" required style="flex-grow: 1;"></textarea>
+                                            </div>
+                                            <div class="col-6 pe-3 d-flex align-items-center">
+                                                <label class="me-3 mb-0 col-4" style="margin-right: 20px;"><b>Action Plan</b></label>
+                                                <textarea name="ActionPlan" id="ActionPlan" class="form-control col-6" placeholder="Enter action plan" required style="flex-grow: 1;"></textarea>
+                                            </div>
+                                        </div>
+
+                                        <div class="row form-group align-items-center mb-2">
+                                            <div class="col-6 pe-3 d-flex align-items-center">
+                                                <label class="me-3 mb-0 col-4" style="margin-right: 20px;"><b>MOM Date</b></label>
+                                                <input type="date" name="MOMDate" id="MOMDate" class="form-control col-6" required style="flex-grow: 1;" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card w-60" >
+                                    <div class="card-body">
+                                      
+                                        <div class="col-12 d-flex align-items-center">
+                                            <label class="me-3 mb-0 col-2"><b>Attachments (As applicable) </b></label>
+                                            <input type="file" name="AttachmentFiles" id="AttachmentFile" class="form-control col-6" multiple required style="flex-grow: 1; min-width: 0;" />
+                                                    <div id="attachmentLinks" class="file-item"></div>
+
+                                            <!-- Hidden input for remaining attachments -->
+                                            <input type="hidden" id="remainingAttachments" name="RemainingAttachments" value="">
+                                        </div>
+                                        <input type="hidden" id="Attachments" name="Attachments">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div id="customDateTrigger" class="calendar-container">
+                                <i class="fa fa-calendar"></i>
+                                <span id="dateRangeText">Select Date Range</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="ThirdParty_Table" class="mt-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/scripts/ThirdParty/ThirdParty.js" asp-append-version="true"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/litepicker/dist/css/litepicker.css" />
+    <script src="https://cdn.jsdelivr.net/npm/moment/min/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/litepicker/dist/litepicker.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/litepicker/dist/plugins/ranges.js"></script>
+    <script src="~/js/tabulator.js"></script>
+    <script src="~/js/xlsx.min.js"></script>
+}

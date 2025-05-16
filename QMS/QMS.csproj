@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="wwwroot\ThirdPartyAttachments\id\**" />
+    <Content Remove="wwwroot\ThirdPartyAttachments\id\**" />
+    <EmbeddedResource Remove="wwwroot\ThirdPartyAttachments\id\**" />
+    <None Remove="wwwroot\ThirdPartyAttachments\id\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ClosedXML" Version="0.104.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\QMS.Core\QMS.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\CertificationDetail\" />
+    <Folder Include="wwwroot\BISCertificateAttachments\" />
+    <Folder Include="wwwroot\CSOTrackerAttachments\" />
+    <Folder Include="wwwroot\TPTestingReportAttachments\" />
+    <Folder Include="wwwroot\Scripts\ThirdParty\" />
+    <Folder Include="wwwroot\ThirdPartyAttachments\" />
+  </ItemGroup>
+
+</Project>
