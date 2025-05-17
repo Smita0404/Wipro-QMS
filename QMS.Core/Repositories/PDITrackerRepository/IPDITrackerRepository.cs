@@ -11,7 +11,7 @@ namespace QMS.Core.Repositories.PDITrackerRepository
         Task<OperationResult> UpdateAsync(PDITracker entity, bool returnUpdatedRecord = false);
         Task<OperationResult> DeleteAsync(int id);
         Task<List<ProductCodeDetailViewModel>> GetCodeSearchAsync(string search = "");
-        Task<List<ProductCodeDetailViewModel>> GetCodeSelect2OptionsAsync(string search = "");
+        Task<List<DropdownOptionViewModel>> GetCodeSelect2OptionsAsync();
 
     }
 }

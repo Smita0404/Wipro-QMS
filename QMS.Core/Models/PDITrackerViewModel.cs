@@ -12,7 +12,7 @@ namespace QMS.Core.Models
 
         public string? PC { get; set; }
 
-        public DateOnly? DispatchDate { get; set; } // string to handle "dd/MM/yyyy" in frontend
+        public DateTime? DispatchDate { get; set; } // string to handle "dd/MM/yyyy" in frontend
 
         public string? ProductCode { get; set; }
 
@@ -22,7 +22,7 @@ namespace QMS.Core.Models
 
         public string? PONo { get; set; }
 
-        public DateOnly? PDIDate { get; set; }
+        public DateTime? PDIDate { get; set; }
 
         public string? PDIRefNo { get; set; }
 

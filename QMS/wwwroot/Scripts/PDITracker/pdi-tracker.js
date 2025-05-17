@@ -1,5 +1,6 @@
 ﻿var tabledata = [];
 var table = '';
+let productCodeOptions = {};
 $(document).ready(function () {
     document.getElementById('backButton').addEventListener('click', function () {
         window.history.back();
@@ -7,125 +8,6 @@ $(document).ready(function () {
 
     loadData();
 });
-
-function loadData() {
-    Blockloadershow();
-
-    $.ajax({
-        url: '/PDITracker/GetAll',
-        type: 'GET',
-        success: function (data) {
-            if (data && Array.isArray(data)) {
-                console.log(data);
-                OnTabGridLoad(data);
-            } else {
-                showDangerAlert('No data available to load.');
-            }
-            Blockloaderhide();
-        },
-        error: function (xhr, status, error) {
-
-            showDangerAlert('Error retrieving data: ' + error);
-            Blockloaderhide();
-        }
-    });
-}
-// Define a custom editor for Tabulator using Select2
-
-
-function OnTabGridLoad(response) {
-    Blockloadershow();
-    let tabledata = [];
-
-    if (response.length > 0) {
-        $.each(response, function (index, item) {
-            function formatDate(value) {
-                return value ? new Date(value).toLocaleDateString("en-GB") : "";
-            }
-
-            tabledata.push({
-                Sr_No: index + 1,
-                PDIId: item.id,
-                PC: item.pc || "",
-                DispatchDate: formatDate(item.dispatchDate),
-                ProductCode: item.productCode || "",
-                ProductDescription: item.productDescription || "",
-                BatchCodeVendor: item.batchCodeVendor || "",
-                PONo: item.poNo || "",
-                PDIDate: formatDate(item.pdiDate),
-                PDIRefNo: item.pdiRefNo || "",
-                OfferedQty: item.offeredQty,
-                ClearedQty: item.clearedQty,
-                BISCompliance: item.bisCompliance,
-                InspectedBy: item.inspectedBy || "",
-                Remark: item.remark || ""
-            });
-        });
-    }
-
-    var columns = [
-        {
-            title: "Action", field: "Action", frozen: true, hozAlign: "center", headerSort: false,
-            width: 90,
-            headerMenu: headerMenu,
-            formatter: function (cell) {
-                const rowData = cell.getRow().getData();
-                return `<i onclick="delConfirm(${rowData.PDIId})" class="fas fa-trash-alt text-danger" title="Delete" style="cursor:pointer;"></i>`;
-            }
-        },
-        { title: "S.No", field: "Sr_No", frozen: true, hozAlign: "center", headerSort: false, headerMenu: headerMenu, width: 80 },
-        editableColumn("Dispatch Date", "DispatchDate", "date", "center", "input", {}, {}, 120),
-        ////editableColumn("Product Code", "ProductCode", "select2", "center", "input", {}, {
-        ////    values: productCodeOptions
-        ////}, function (cell) {
-        ////    const code = cell.getValue();
-        ////    return productCodeOptions[code] || code;
-        ////}),
-
-        editableColumn("Product Description", "ProductDescription", "input", "left", null, {}, {}, 160),
-        editableColumn("Batch Code (Vendor)", "BatchCodeVendor", "input", "left", null, {}, {}, 140),
-        editableColumn("PO No", "PONo", "input", "left", null, {}, {}, 120),
-        editableColumn("PDI Date", "PDIDate", "date", "center", "input", {}, {}, 120),
-        editableColumn("PDI Ref No", "PDIRefNo", "input", "left", null, {}, {}, 130),
-        editableColumn("Offered Qty", "OfferedQty", "input", "right", null, {}, {}, 110),
-        editableColumn("Cleared Qty", "ClearedQty", "input", "right", null, {}, {}, 110),
-        editableColumn("BIS Compliance", "BISCompliance", "tickCross", "center", null, {}, {}, 130),
-        editableColumn("Inspected By", "InspectedBy", "input", "left", null, {}, {}, 130),
-        editableColumn("Remark", "Remark", "input", "left", null, {}, {}, 180)
-    ];
-
-    table = new Tabulator("#pdi_table", {
-        data: tabledata,
-        layout: "fitDataFill",
-        movableColumns: true,
-        pagination: "local",
-        paginationSize: 10,
-        paginationSizeSelector: [10, 50, 100, 500],
-        paginationCounter: "rows",
-        placeholder: "No data available",
-        columns: columns,
-    });
-
-    table.on("cellEdited", function (cell) {
-        const rowData = cell.getRow().getData();
-        saveEditedRow(rowData);
-    });
-
-    $("#addButton").on("click", function () {
-        const newRow = {
-            PDIId: 0,
-            Sr_No: table.getDataCount() + 1,
-            PC: "", DispatchDate: "", ProductCode: "", ProductDescription: "",
-            BatchCodeVendor: "", PONo: "", PDIDate: "", PDIRefNo: "",
-            OfferedQty: "", ClearedQty: "", BISCompliance: false,
-            InspectedBy: "", Remark: ""
-        };
-        table.addRow(newRow, false);
-    });
-
-    Blockloaderhide();
-}
-
 var headerMenu = function () {
     var menu = [];
     var columns = this.getColumns();
@@ -171,6 +53,187 @@ var headerMenu = function () {
     return menu;
 };
 
+function loadData() {
+    Blockloadershow();
+    $.ajax({
+        url: '/PDITracker/GetProductCodes',
+        type: 'GET',
+        success: function (productCodeData) {
+            if (Array.isArray(productCodeData)) {
+                productCodeOptions = productCodeData.reduce((acc, p) => {
+                    acc[p.value] = p.label;
+                    return acc;
+                }, {});
+            } else {
+                showDangerAlert('Invalid product code data received.');
+                Blockloaderhide();
+                return;
+            }
+
+            // ✅ Now it's valid to place the second AJAX inside this success callback
+            $.ajax({
+                url: '/PDITracker/GetAll',
+                type: 'GET',
+                success: function (data) {
+                    if (data && Array.isArray(data)) {
+                        console.log(data);
+                        OnTabGridLoad(data);
+                    } else {
+                        showDangerAlert('No data available to load.');
+                    }
+                    Blockloaderhide();
+                },
+                error: function (xhr, status, error) {
+                    showDangerAlert('Error retrieving data: ' + error);
+                    Blockloaderhide();
+                }
+            });
+        },
+        error: function () {
+            showDangerAlert('Failed to load product code options.');
+            Blockloaderhide();
+        }
+    });
+}
+
+
+
+function OnTabGridLoad(response) {
+    Blockloadershow();
+    let tabledata = [];
+
+    // Utility function to format date to dd/MM/yyyy
+    function formatDate(value) {
+        return value ? new Date(value).toLocaleDateString("en-GB") : "";
+    }
+
+    // Prepare data
+    if (response.length > 0) {
+        $.each(response, function (index, item) {
+            tabledata.push({
+                Sr_No: index + 1,
+                PDIId: item.id,
+                PC: item.pc || "",
+                DispatchDate: formatDate(item.dispatchDate),
+                ProductCode: item.productCode || "",
+                ProductDescription: item.productDescription || "",
+                BatchCodeVendor: item.batchCodeVendor || "",
+                PONo: item.poNo || "",
+                PDIDate: formatDate(item.pdiDate),
+                PDIRefNo: item.pdiRefNo || "",
+                OfferedQty: item.offeredQty,
+                ClearedQty: item.clearedQty,
+                BISCompliance: item.bisCompliance,
+                InspectedBy: item.inspectedBy || "",
+                Remark: item.remark || ""
+            });
+        });
+    }
+
+    // Define columns
+    const columns = [
+        {
+            title: "Action", field: "Action", frozen: true, hozAlign: "center", headerSort: false,
+            width: 90,
+            headerMenu: headerMenu,
+            formatter: function (cell) {
+                const rowData = cell.getRow().getData();
+                return `<i onclick="delConfirm(${rowData.PDIId})" class="fas fa-trash-alt text-danger" title="Delete" style="cursor:pointer;"></i>`;
+            }
+        },
+        { title: "S.No", field: "Sr_No", frozen: true, hozAlign: "center", headerSort: false, headerMenu: headerMenu, width: 80 },
+        editableColumn("PC", "PC", "input", "left", null, {}, {}, 160),
+           editableColumn("Dispatch Date", "DispatchDate", "date", "center", null, {}, {}, 120),
+        editableColumn("Product Code", "ProductCode", "select2", "center", "input", {}, {
+            values: productCodeOptions
+        }, function (cell) {
+            // Show Vendor Name in the cell, not the code
+            const code = cell.getValue();
+            return productCodeOptions[code] || code;
+        }),
+     
+        editableColumn("Product Description", "ProductDescription", "input", "left", null, {}, {}, 160),
+        editableColumn("Batch Code (Vendor)", "BatchCodeVendor", "input", "left", null, {}, {}, 140),
+       
+        editableColumn("PDI Date", "PDIDate", "date", "center", null, {}, {}, 120),
+        editableColumn("PDI Ref No", "PDIRefNo", "input", "left", null, {}, {}, 130),
+        editableColumn("Offered Qty", "OfferedQty", "input", "right", null, {}, {}, 110),
+        editableColumn("Cleared Qty", "ClearedQty", "input", "right", null, {}, {}, 110),
+        editableColumn("BIS Compliance", "BISCompliance", "tickCross", "center", null, {}, {}, 130),
+        editableColumn("Inspected By", "InspectedBy", "input", "left", null, {}, {}, 130),
+        editableColumn("Remark", "Remark", "input", "left", null, {}, {}, 180)
+    ];
+
+    // Create or replace Tabulator table
+    if (table) {
+        table.replaceData(tabledata);
+    } else {
+        table = new Tabulator("#pdi_table", {
+            data: tabledata,
+            layout: "fitDataFill",
+            movableColumns: true,
+            pagination: "local",
+            paginationSize: 10,
+            paginationSizeSelector: [10, 50, 100, 500],
+            paginationCounter: "rows",
+            placeholder: "No data available",
+            columns: columns
+        });
+
+        // Handle cell edit event
+        table.on("cellEdited", function (cell) {
+            const rowData = cell.getRow().getData();
+            saveEditedRow(rowData);
+        });
+    }
+    $("#addButton").on("click", function () {
+        const newRow = {
+            PDIId: 0,
+            Sr_No: table.getDataCount() + 1,
+            PC: "",
+            DispatchDate: "",
+            ProductCode: "",
+            ProductDescription: "",
+            BatchCodeVendor: "",
+            PONo: "",
+            PDIDate: "",
+            PDIRefNo: "",
+            OfferedQty: "",
+            ClearedQty: "",
+            BISCompliance: false,
+            InspectedBy: "",
+            Remark: ""
+        };
+        table.addRow(newRow, false); // false = add to bottom
+    });
+
+    Blockloaderhide();
+}
+
+
+// Helper functions below — place these outside of OnTabGridLoad
+
+function editableColumn(title, field, editorType = true, align = "center", headerFilterType = "input", headerFilterParams = {}, editorParams = {}, formatter = null, width = null) {
+    const column = {
+        title: title,
+        field: field,
+        editor: editorType,
+        editorParams: editorParams,
+        formatter: formatter,
+        headerFilter: headerFilterType,
+        headerFilterParams: headerFilterParams,
+        headerMenu: headerMenu,
+        hozAlign: align,
+        headerHozAlign: "left"
+    };
+
+    if (width !== null) {
+        column.width = width;
+    }
+
+    return column;
+}
+
 function delConfirm(PDIId) {
     PNotify.prototype.options.styling = "bootstrap3";
     (new PNotify({
@@ -200,33 +263,33 @@ function delConfirm(PDIId) {
         });
     });
 }
-function editableColumn(title, field, editorType = true, align = "center", headerFilterType = "input", headerFilterParams = {}, editorParams = {}, formatter = null) {
-    return {
-        title: title,
-        field: field,
-        editor: editorType,
-        editorParams: editorParams,
-        formatter: formatter,
-        headerFilter: headerFilterType,
-        headerFilterParams: headerFilterParams,
-        headerMenu: headerMenu,
-        hozAlign: align,
-        headerHozAlign: "left"
-    };
-}
-function filterTableByProductCode(value) {
-    $.ajax({
-        url: '/PDITracker/GetFilteredData',
-        method: 'GET',
-        data: { productCode: value },
-        success: function (response) {
-            table.replaceData(response); // Reload data with filtered results
-        },
-        error: function () {
-            alert('Error loading filtered data.');
+Tabulator.extendModule("edit", "editors", {
+    select2: function (cell, onRendered, success, cancel, editorParams) {
+        const values = editorParams.values || {};
+        const select = document.createElement("select");
+        select.style.width = "100%";
+
+        for (let val in values) {
+            let option = document.createElement("option");
+            option.value = val;
+            option.text = values[val];
+            if (val === cell.getValue()) option.selected = true;
+            select.appendChild(option);
         }
-    });
-}
+
+        onRendered(function () {
+            $(select).select2({
+                dropdownParent: document.body,
+                width: 'resolve',
+                placeholder: "Select value"
+            }).on("change", function () {
+                success(select.value);
+            });
+        });
+
+        return select;
+    }
+});
 
 function saveEditedRow(rowData) {
     function emptyToNull(value) {
@@ -235,7 +298,7 @@ function saveEditedRow(rowData) {
 
     // Converts "dd/MM/yyyy" to "yyyy-MM-dd"
     function toIsoDate(value) {
-        if (!value) return null;
+        if (!value) return "";
         const parts = value.split('/');
         if (parts.length === 3) {
             return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
@@ -246,20 +309,19 @@ function saveEditedRow(rowData) {
     const cleanedData = {
         Id: rowData.PDIId || 0,
         PC: rowData.PC || "",
-        DispatchDate: toIsoDate(rowData.DispatchDate),
+        DispatchDate: toIsoDate(rowData.DispatchDate) || null,
         ProductCode: rowData.ProductCode || "",
         ProductDescription: rowData.ProductDescription || "",
         BatchCodeVendor: rowData.BatchCodeVendor || "",
         PONo: rowData.PONo || "",
-        PDIDate: toIsoDate(rowData.PDIDate),
+        PDIDate: toIsoDate(rowData.PDIDate)||null,
         PDIRefNo: rowData.PDIRefNo || "",
         OfferedQty: emptyToNull(rowData.OfferedQty),
         ClearedQty: emptyToNull(rowData.ClearedQty),
-        BISCompliance: rowData.BISCompliance ?? null,
+        BISCompliance: rowData.BISCompliance,
         InspectedBy: rowData.InspectedBy || "",
         Remark: rowData.Remark || ""
     };
-
 
     console.log("Cleaned data:", cleanedData);
 
@@ -273,10 +335,9 @@ function saveEditedRow(rowData) {
         contentType: 'application/json',
         success: function (data) {
             if (data.success) {
-                if (isNew) {
-                    loadData();
-                }
-                //  showSuccessAlert(isNew ? "Created successfully." : "Updated successfully.");
+               if (isNew) {
+                   loadData();
+               }
                 if (isNew && data.id) {
                     rowData.PDIId = data.id;
                 }
