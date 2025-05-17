@@ -117,5 +117,29 @@ namespace QMS.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<JsonResult> GetCodeSearchAsync(string search = "")
+        {
+            try
+            {
+                // Initialize processed search terms
+                string processedSearch = string.Empty;
+
+                if (!string.IsNullOrEmpty(search))
+                {
+                    if (search.Length >= 4)
+                        processedSearch = search.Substring(0, 4); // First 4 characters
+                }
+
+                var productCodeDetailsList = await _vendorRepository.GetCodeSearchAsync(processedSearch);
+
+                return Json(productCodeDetailsList);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
     }
 }
