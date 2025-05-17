@@ -30,13 +30,13 @@ namespace QMS.Core.Repositories.PDITrackerRepository
                 return result.Select(data => new PDITrackerViewModel
                 {
                     Id = data.Id,
-                    DispatchDate = data.DispatchDate.HasValue ? DateOnly.FromDateTime(data.DispatchDate.Value) : (DateOnly?)null,
+                    DispatchDate = data.DispatchDate,
                     PC = data.PC,
                     ProductCode = data.ProductCode,
                     ProductDescription = data.ProductDescription,
                     BatchCodeVendor = data.BatchCodeVendor,
                     PONo = data.PONo,
-                    PDIDate = data.PDIDate.HasValue ? DateOnly.FromDateTime(data.PDIDate.Value) : (DateOnly?)null,
+                    PDIDate = data.PDIDate,
                     PDIRefNo = data.PDIRefNo,
                     OfferedQty = data.OfferedQty,
                     ClearedQty = data.ClearedQty,
@@ -52,6 +52,7 @@ namespace QMS.Core.Repositories.PDITrackerRepository
                 throw;
             }
         }
+
 
 
         public async Task<PDITracker?> GetByIdAsync(int id)
@@ -184,40 +185,23 @@ namespace QMS.Core.Repositories.PDITrackerRepository
                 throw;
             }
         }
-        public async Task<List<ProductCodeDetailViewModel>> GetCodeSelect2OptionsAsync(string search = "")
+        public async Task<List<DropdownOptionViewModel>> GetCodeSelect2OptionsAsync()
         {
-            var parameters = new[] {
-        new SqlParameter("@OldPartNo", search),
-    };
+           
 
-            var sql = @"EXEC sp_GetProductCode_Detail_ByCode @OldPartNo";
-            var result = await _dbContext.ProductCode.FromSqlRaw(sql, parameters).ToListAsync();
+            var sql = @"EXEC sp_GetProductCode_Detail";
+            var result = await _dbContext.ProductCode.FromSqlRaw(sql).ToListAsync();
 
-            return result.Select(data => new ProductCodeDetailViewModel
+            return result.Select(data => new DropdownOptionViewModel
             {
-                PCDetails_Id = data.PCDetails_Id,
-                OldPart_No = data.OldPart_No,
-                Description = data.Description
-            }).ToList();
+                    Label = data.OldPart_No,
+                    Value = data.OldPart_No
+                })
+                .Distinct() 
+                .ToList();
         }
 
        
 
-        //public async Task<bool> CheckDuplicateAsync(string pdiRefNo, int id)
-        //{
-        //    try
-        //    {
-        //        var existing = await _dbContext.PDITracker
-        //            .Where(x => x.PDIRefNo == pdiRefNo && !x.Deleted && x.Id != id)
-        //            .FirstOrDefaultAsync();
-
-        //        return existing != null;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _systemLogService.WriteLog(ex.Message);
-        //        throw;
-        //    }
-        //}
     }
 }

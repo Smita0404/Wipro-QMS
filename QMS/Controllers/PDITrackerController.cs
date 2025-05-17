@@ -99,17 +99,12 @@ namespace QMS.Controllers
                 return Json(new { success = false, message = "Error during update." });
             }
         }
+       
         [HttpGet]
-        public async Task<IActionResult> GetProductCodeOptions(string term)
+        public async Task<IActionResult> GetProductCodes()
         {
-            var items = await _pdiTrackerRepository.GetCodeSelect2OptionsAsync(term ?? "");
-
-            var results = items.Select(x => new {
-                id = x.OldPart_No,
-                text = $"{x.OldPart_No} - {x.Description}"
-            }).ToList();
-
-            return Json(new { results });
+            var productCodes = await _pdiTrackerRepository.GetCodeSelect2OptionsAsync();
+               return Json(productCodes);
         }
 
 
