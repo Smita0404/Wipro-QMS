@@ -51,6 +51,165 @@ function loadData() {
     });
 }
 
+Tabulator.extendModule("edit", "editors", {
+    autocomplete_ajax: function (cell, onRendered, success, cancel, editorParams) {
+        const input = document.createElement("input");
+        input.setAttribute("type", "text");
+        input.style.width = "100%";
+        input.value = cell.getValue() || "";
+
+        let dropdown = null;
+
+        function removeDropdown() {
+            if (dropdown && dropdown.parentNode) {
+                dropdown.parentNode.removeChild(dropdown);
+                dropdown = null;
+            }
+        }
+
+        function fetchSuggestions(query) {
+            $.ajax({
+                url: '/NPITrac/GetCodeSearch',
+                type: 'GET',
+                data: { search: query },
+                success: function (data) {
+                    removeDropdown(); // clear old
+
+                    dropdown = document.createElement("div");
+                    dropdown.className = "autocomplete-dropdown";
+
+                    data.forEach(item => {
+                        const option = document.createElement("div");
+                        option.textContent = item.oldPart_No;
+                        option.className = "autocomplete-option";
+
+                        option.addEventListener("mousedown", function (e) {
+                            e.stopPropagation();
+                            success(item.oldPart_No);
+
+                            const row = cell.getRow();
+                            row.update({ Product_Des: item.description });
+                            removeDropdown();
+                        });
+
+                        dropdown.appendChild(option);
+                    });
+
+                    document.body.appendChild(dropdown);
+                    const rect = input.getBoundingClientRect();
+                    dropdown.style.top = (window.scrollY + rect.bottom) + "px";
+                    dropdown.style.left = (window.scrollX + rect.left) + "px";
+                    dropdown.style.width = rect.width + "px";
+                },
+                error: function () {
+                    console.error("Failed to fetch suggestions.");
+                }
+            });
+        }
+
+        input.addEventListener("input", function () {
+            const val = input.value;
+            if (val.length >= 4) {
+                fetchSuggestions(val);
+            } else {
+                removeDropdown();
+            }
+        });
+
+        input.addEventListener("blur", function () {
+            setTimeout(() => {
+                removeDropdown();
+                success(input.value);
+            }, 150); // delay to allow click
+        });
+
+        return input;
+    }
+});
+
+
+//Tabulator.extendModule("edit", "editors", {
+//    autocomplete_ajax: function (cell, onRendered, success, cancel, editorParams) {
+//        const input = document.createElement("input");
+//        input.setAttribute("type", "text");
+//        input.style.width = "100%";
+//        input.value = cell.getValue() || "";
+
+//        let dropdown;
+
+//        function fetchSuggestions(query) {
+//            $.ajax({
+//                url: '/NPITrac/GetCodeSearch',
+//                type: 'GET',
+//                data: { search: query },
+//                success: function (data) {
+//                    if (dropdown) dropdown.remove();
+
+//                    dropdown = document.createElement("div");
+//                    dropdown.className = "autocomplete-dropdown";
+//                    dropdown.style.position = "absolute";
+//                    dropdown.style.zIndex = 1000;
+//                    dropdown.style.backgroundColor = "#fff";
+//                    dropdown.style.border = "1px solid #ccc";
+//                    dropdown.style.maxHeight = "200px";
+//                    dropdown.style.overflowY = "auto";
+//                    dropdown.style.boxShadow = "0 2px 8px rgba(0,0,0,0.2)";
+//                    dropdown.style.padding = "2px 0";
+//                    dropdown.style.fontFamily = "Arial, sans-serif";
+//                    dropdown.style.fontSize = "14px";
+//                    dropdown.style.borderRadius = "4px";
+//                    dropdown.style.scrollbarWidth = "thin";
+//                    dropdown.style.width = input.offsetWidth + "px";
+
+//                    data.forEach(item => {
+//                        let option = document.createElement("div");
+//                        option.textContent = item;
+//                        option.style.padding = "6px 10px";
+//                        option.style.borderBottom = "1px solid #eee";
+//                        option.style.whiteSpace = "nowrap";
+//                        option.style.cursor = "pointer";
+
+//                        option.addEventListener("mousedown", function (e) {
+//                            e.stopPropagation();
+//                            success(item);
+//                            if (dropdown) dropdown.remove();
+//                        });
+
+//                        dropdown.appendChild(option);
+//                    });
+
+//                    document.body.appendChild(dropdown);
+//                    const rect = input.getBoundingClientRect();
+//                    dropdown.style.top = rect.bottom + window.scrollY + "px";
+//                    dropdown.style.left = rect.left + window.scrollX + "px";
+//                },
+//                error: function () {
+//                    console.error("Autocomplete fetch failed.");
+//                }
+//            });
+//        }
+
+//        input.addEventListener("input", function () {
+//            const val = input.value;
+//            if (val.length >= 4) {
+//                fetchSuggestions(val);
+//            } else if (dropdown) {
+//                dropdown.remove();
+//            }
+//        });
+
+//        input.addEventListener("blur", function () {
+//            setTimeout(() => {
+//                if (dropdown) dropdown.remove();
+//                success(input.value);
+//            }, 200);
+//        });
+
+//        return input;
+//    }
+//});
+
+
 
 // Register custom select2 editor
 Tabulator.extendModule("edit", "editors", {
@@ -130,7 +289,7 @@ var headerMenu = function () {
 
 // Reusable column setup
 function editableColumn(title, field, editorType = true, align = "center", headerFilterType = "input", headerFilterParams = {}, editorParams = {}, formatter = null) {
-    return {
+    let columnDef = {
         title: title,
         field: field,
         editor: editorType,
@@ -142,6 +301,19 @@ function editableColumn(title, field, editorType = true, align = "center", heade
         hozAlign: align,
         headerHozAlign: "left"
     };
+
+    // Set custom width for specific fields
+    if (field === "Product_Code") {
+        columnDef.width = 220;
+        columnDef.minWidth = 220;
+    }
+    else if (field === "Product_Des") {
+        columnDef.width = 290;
+        columnDef.minWidth = 290;
+        columnDef.hozAlign = "left";
+    } 
+
+    return columnDef;
 }
 
 
@@ -226,7 +398,7 @@ function OnTabGridLoad(response) {
                 "Outdoor": "Outdoor"
             }
         }),
-        editableColumn("Product Code", "Product_Code"),
+        editableColumn("Product Code", "Product_Code", "autocomplete_ajax"),
         editableColumn("Product Description", "Product_Des"),
         editableColumn("Wattage", "Wattage"),
         //editableColumn("NPI Category", "NPI_Category"),
@@ -266,6 +438,7 @@ function OnTabGridLoad(response) {
     // // Initialize Tabulator
     table = new Tabulator("#npi_Table", {
         data: tabledata,
+        layout: "fitData", // Add this
         renderHorizontal: "virtual",
         movableColumns: true,
         pagination: "local",
