@@ -34,7 +34,7 @@ body {
     overflow: auto
 }
 
-.content {
+.content1 {
     padding: 1.25rem 1.25rem;
     -ms-flex-positive: 1;
     flex-grow: 1
@@ -473,11 +473,11 @@ body {
     display: inline-block
 }
 
-.sidebar-dark {
-    /*background-color: #3e5a87;*/
-    background-color: #4682B4;
+/*.sidebar-dark {
+    background-color: #3e5a87;
+    background-color: white;
     color: #fff;
-}
+}*/
 
     .sidebar-dark .sidebar-mobile-toggler {
         color: rgba(255,255,255,.9);
@@ -502,11 +502,11 @@ body {
     }
 
     .sidebar-dark .nav-sidebar .nav-link, .sidebar-light .card[class*=bg-]:not(.bg-light):not(.bg-white):not(.bg-transparent) .nav-sidebar .nav-link {
-        color: rgba(255,255,255,.9)
+       color:black;
     }
 
         .sidebar-dark .nav-sidebar .nav-link:not(.disabled):hover, .sidebar-light .card[class*=bg-]:not(.bg-light):not(.bg-white):not(.bg-transparent) .nav-sidebar .nav-link:not(.disabled):hover {
-            color: #fff;
+            color: black;
             background-color: rgba(255,255,255,.1)
         }
 
@@ -522,7 +522,7 @@ body {
     }
 
     .sidebar-dark .nav-sidebar > .nav-item-open > .nav-link:not(.disabled), .sidebar-dark .nav-sidebar > .nav-item > .nav-link.active, .sidebar-light .card[class*=bg-]:not(.bg-light):not(.bg-white):not(.bg-transparent) .nav-sidebar > .nav-item-open > .nav-link:not(.disabled), .sidebar-light .card[class*=bg-]:not(.bg-light):not(.bg-white):not(.bg-transparent) .nav-sidebar > .nav-item > .nav-link.active {
-        color: #fff
+        color: black;
     }
 
     .sidebar-dark .nav-sidebar .nav-item-header, .sidebar-light .card[class*=bg-]:not(.bg-light):not(.bg-white):not(.bg-transparent) .nav-sidebar .nav-item-header {
@@ -534,7 +534,7 @@ body {
     }
 
     .sidebar-dark .nav-sidebar > .nav-item-submenu > .nav-group-sub, .sidebar-light .card[class*=bg-]:not(.bg-light):not(.bg-white):not(.bg-transparent) .nav-sidebar > .nav-item-submenu > .nav-group-sub {
-        background-color: rgba(0,0,0,.15)
+        
     }
 
     .sidebar .card[class*=bg-]:not(.bg-light):not(.bg-white):not(.bg-transparent) .nav-sidebar > .nav-item-open > .nav-link:not(.disabled), .sidebar .card[class*=bg-]:not(.bg-light):not(.bg-white):not(.bg-transparent) .nav-sidebar > .nav-item > .nav-link.active, .sidebar-dark[class*=bg-] .nav-sidebar > .nav-item-open > .nav-link:not(.disabled), .sidebar-dark[class*=bg-] .nav-sidebar > .nav-item > .nav-link.active {
