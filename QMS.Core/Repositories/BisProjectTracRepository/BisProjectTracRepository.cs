@@ -99,7 +99,7 @@ namespace QMS.Core.Repositories.BisProjectTracRepository
                     new SqlParameter("@IsDeleted", newRecord.Deleted),
                 };
 
-                var sql = @"EXEC sp_Insert_BIS_Project @Financial_Year,@Mon_Pc,@Nat_Project,@Lea_Model_No,@No_Seri_Add,@Cat_Ref_Lea_Model,@Section,@Section,@Manuf_Location,@CCL_Id,
+                var sql = @"EXEC sp_Insert_BIS_Project @Financial_Year,@Mon_Pc,@Nat_Project,@Lea_Model_No,@No_Seri_Add,@Cat_Ref_Lea_Model,@Section,@Manuf_Location,@CCL_Id,
                         @Lab,@Report_Owner,@Start_Date,@Comp_Date,@Test_Duration,@Submitted_Date,@Received_Date,@Bis_Duration,@Dispatch_Date,@Remark,@CreatedBy,@IsDeleted";
 
                 await _dbContext.Database.ExecuteSqlRawAsync(sql, parameters);
