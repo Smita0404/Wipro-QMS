@@ -41,6 +41,17 @@ namespace QMS.Core.Repositories.DNTrackerRepository
                     Remark = x.Remark,
                     IsDeleted = x.Deleted
                 }).ToList();
+                //if (startDate.HasValue && endDate.HasValue)
+                //{
+                //    result = result
+                //        .Where(x => x.CreatedDate.HasValue &&
+                //                    x.CreatedDate.Value.Date >= startDate.Value.Date &&
+                //                    x.CreatedDate.Value.Date <= endDate.Value.Date)
+                //        .ToList();
+                //}
+
+                //return result;
+            
             }
             catch (Exception ex)
             {
@@ -114,10 +125,12 @@ namespace QMS.Core.Repositories.DNTrackerRepository
                     new SqlParameter("@DQty", entity.DQty ?? (object)DBNull.Value),
                     new SqlParameter("@DRequisitionBy", entity.DRequisitionBy ?? (object)DBNull.Value),
                     new SqlParameter("@Vendor", entity.Vendor ?? (object)DBNull.Value),
-                    new SqlParameter("@Remark", entity.Remark ?? (object)DBNull.Value)
+                    new SqlParameter("@Remark", entity.Remark ?? (object)DBNull.Value),
+                    new SqlParameter("@UpdatedBy", entity.UpdatedBy ?? (object)DBNull.Value),
+            new SqlParameter("@UpdatedDate", entity.UpdatedDate),
                 };
 
-                await _dbContext.Database.ExecuteSqlRawAsync("EXEC sp_Update_DN_Tracker @DNoteId, @DNoteNumber, @DNoteCategory, @ProductCode, @ProductDescription, @Wattage, @DQty, @DRequisitionBy, @Vendor, @Remark", parameters);
+                await _dbContext.Database.ExecuteSqlRawAsync("EXEC sp_Update_DN_Tracker @DNoteId, @DNoteNumber, @DNoteCategory, @ProductCode, @ProductDescription, @Wattage, @DQty, @DRequisitionBy, @Vendor, @Remark,@UpdatedBy,@UpdatedDate", parameters);
                 return new OperationResult { Success = true };
             }
             catch (Exception ex)

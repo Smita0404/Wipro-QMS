@@ -75,26 +75,35 @@ $(document).ready(function () {
 
 function OnThirdPartyGridLoad() {
     Blockloadershow();
+
     $.ajax({
         url: '/ThirdPartyInspection/GetAll',
         type: 'GET',
+        dataType: 'json',
         data: {
             startDate: filterStartDate,
             endDate: filterEndDate
         },
-        success: function (data) {
-            Blockloaderhide();
-            if (data && Array.isArray(data)) {
+    })
+        .done(function (data) {
+            if (Array.isArray(data)) {
+                console.log("Loaded Third-Party data:", data);
                 OnTabGridLoad(data);
             } else {
+                console.warn("Unexpected payload, expected array but got:", data);
                 showDangerAlert('No data available to load.');
+                OnTabGridLoad([]);
             }
-        },
-        error: function (xhr, status, error) {
-            showDangerAlert('Error retrieving data: ' + error);
+        })
+        .fail(function (xhr, status, error) {
+            const msg = `Error retrieving data: ${xhr.status} ${xhr.statusText}\n${xhr.responseText}`;
+            console.error(msg);
+            showDangerAlert(msg);
+            OnTabGridLoad([]);
+        })
+        .always(function () {
             Blockloaderhide();
-        }
-    });
+        });
 }
 
 function updateCert(certId) {
@@ -239,143 +248,125 @@ var headerMenu = function () {
 
 var thirdPartyTable;
 
-function OnTabGridLoad(data) {
-    if (thirdPartyTable) {
-        thirdPartyTable.replaceData(data);
-    } else {
-        thirdPartyTable = new Tabulator("#ThirdParty_Table", {
-            data: data,
-            layout: "fitColumns",
-            movableColumns: true,
-            responsiveLayout: "collapse",
-            pagination: "local",
-            paginationSize: 10,
-            paginationCounter: "rows",
-            paginationSizeSelector: [10, 25, 100, 500, 1200, 2000], 
-            placeholder: "No Data Available",
-            columns: [
-                { title: "Sn", formatter: "rownum", width: 80, headerMenu: headerMenu, frozen: true, headerSort: false, hozAlign: "center" },
-                { title: "ID", field: "inspectionID", width: 80, frozen: true },
-                {
-                    title: "Inspection Date",
-                    field: "inspectionDate",
-                    hozAlign: "center",
-                    headerFilter: "input",
-                    frozen: true,
-                    formatter: function (cell) {
-                        const dateValue = cell.getValue();
-                        if (!dateValue) return "";
-                        const date = new Date(dateValue);
-                        const day = String(date.getDate()).padStart(2, '0');
-                        const month = String(date.getMonth() + 1).padStart(2, '0');
-                        const year = date.getFullYear();
-                        return `${day}-${month}-${year}`;
-                    }
-                },
-             
-                {
-                    title: "Project Name",
-                    field: "projectName",
-                    headerFilter: "input", frozen: true,
-                    formatter: function (cell) {
-                        const rowData = cell.getRow().getData();
-                        const id = rowData.inspectionID;
-                        const name = rowData.projectName?.replace(/'/g, "\\'") || "";
-                        const dataStr = JSON.stringify(rowData).replace(/"/g, '&quot;');
-                        return `<a href="javascript:void(0);" onclick="editThirdParty(JSON.parse('${dataStr}'))">${name}</a>`;
-                    }
-                },
-                { title: "Inspector Name", field: "inspName", headerFilter: "input", frozen: true, headerSort: false },
-                { title: "Product Code", field: "productCode", headerFilter: "input", headerSort: false },
-                { title: "Product Description", field: "prodDesc", headerFilter: "input", headerSort: false },
-                { title: "LOT Quantity", field: "lotQty", hozAlign: "center", headerFilter: "input",  headerSort: false },
-                { title: "Project Value", field: "projectValue", headerFilter: "input", visible: false, headerSort: false },
-                { title: "Location", field: "location", headerFilter: "input", visible: false, headerSort: false },
-                { title: "Mode", field: "mode", headerFilter: "input", visible: false, headerSort: false },
-                { title: "First Attempt", field: "firstAttempt", headerFilter: "input", visible: false, headerSort: false },
-                { title: "Remark", field: "remark", headerFilter: "input", headerSort: false, visible: false},
-                { title: "Action Plan", field: "actionPlan", headerFilter: "input", visible: false, headerSort: false },
-                {
-                    title: "MOM Date",
-                    field: "momDate",
-                    hozAlign: "center",
-                    headerFilter: "input", visible: false, headerSort: false,
-                    formatter: function (cell) {
-                        const dateValue = cell.getValue();
-                        if (!dateValue) return "";
-                        const date = new Date(dateValue);
-                        const day = String(date.getDate()).padStart(2, '0');
-                        const month = String(date.getMonth() + 1).padStart(2, '0');
-                        const year = date.getFullYear();
-                        return `${day}-${month}-${year}`;
-                    }
-                },
-                {
-                    title: "Attachment",
-                    field: "attachment", width: 100, visible: false,
-                    headerSort: false,
-                    formatter: function (cell) {
-                        const attachmentValue = cell.getValue();
-                        if (!attachmentValue) return "";
 
-                        const files = attachmentValue
-                            .split(/[,;]+/)
-                            .map(file => file.trim())
-                            .filter(f => f);
-
-                        return files.map(fullPath => {
-                            // No encodeURIComponent on entire path
-                            return `
-                <a href="/${fullPath}"
-                   target="_blank"
-                   download
-                   title="Download"
-                   style="margin-right:8px; display:inline-block;">
-                   <i class="fas fa-download text-primary" style="font-size:16px;"></i>
-                </a>
-            `;
-                        }).join("");
-                    }
-                }
-,
-                {
-                    title: "Action",
-                    field: "inspectionID",
-                    hozAlign: "center", width: 80,
-                    headerHozAlign: "right", headerSort: false,
-                    formatter: function (cell) {
-                        const id = cell.getValue();
-                        return `
-                            <div style="margin-right:50px">
-                                <i class="fas fa-trash-alt text-danger cert-delete" 
-                                   style="cursor:pointer;font-size: 16px;" 
-                                   title="Delete" 
-                                   onclick="event.stopPropagation(); deleteThirdParty(${id});"></i>
-                            </div>`;
-                    }
-                }
-            ]
-            
-        });
-        // Replace rowClick with cellClick handler
-        thirdPartyTable.on("cellClick", function (e, cell) {
-            let columnField = cell.getColumn().getField();
-            if (columnField !== "Action") {
-                const rowData = cell.getRow().getData();
-                console.log("Cell clicked:", rowData);
-                editThirdParty(rowData);
-            }
-        });
-    }
-}
+// Helper to format dates as YYYY-MM-DD (or change to DD-MM-YYYY as needed)
 function formatDate(dateStr) {
     if (!dateStr) return "";
     const date = new Date(dateStr);
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
-    return `${year}-${month}-${day}`; // or 'dd-mm-yyyy' if needed
+    return `${year}-${month}-${day}`;
 }
+
+function OnTabGridLoad(data) {
+    // Always supply an array to Tabulator
+    const safeData = Array.isArray(data) ? data : [];
+
+    if (thirdPartyTable) {
+        thirdPartyTable.replaceData(safeData);
+    } else {
+        thirdPartyTable = new Tabulator("#ThirdParty_Table", {
+            data: safeData,
+            layout: "fitColumns",
+            movableColumns: true,
+            responsiveLayout: "collapse",
+            pagination: "local",
+            paginationSize: 10,
+            paginationSizeSelector: [10, 25, 100, 500, 1200, 2000],
+            paginationCounter: "rows",
+            placeholder: "No Data Available",
+            columns: [
+                { title: "Sn", formatter: "rownum", width: 80, headerMenu, frozen: true, headerSort: false, hozAlign: "center" },
+                { title: "ID", field: "inspectionID", width: 80, frozen: true, visible: false },
+                {
+                    title: "Action",
+                    field: "action",
+                    hozAlign: "center",
+                    frozen: true,
+                    width: 80,
+                    headerMenu,
+                    headerHozAlign: "right",
+                    headerSort: false,
+                    formatter: cell => {
+                        const id = cell.getRow().getData().inspectionID;
+                        return `
+                            <div style="margin-right:50px">
+                                <i class="fas fa-trash-alt text-danger"
+                                   style="cursor:pointer;font-size:16px;"
+                                   title="Delete"
+                                   onclick="event.stopPropagation(); deleteThirdParty(${id});">
+                                </i>
+                            </div>`;
+                    }
+                },
+                {
+                    title: "Inspection Date",
+                    field: "inspectionDate",
+                    hozAlign: "center",
+                    headerFilter: "input",
+                    frozen: true,
+                    headerMenu,
+                    headerSort: false,
+                    formatter: cell => formatDate(cell.getValue())
+                },
+                { title: "Project Name", field: "projectName", headerMenu, headerFilter: "input", frozen: true },
+                { title: "Inspector Name", field: "inspName", headerMenu, headerFilter: "input", headerSort: false },
+                { title: "Product Code", field: "productCode", headerMenu, headerFilter: "input", headerSort: false },
+                { title: "Product Description", field: "prodDesc", headerMenu, headerFilter: "input", headerSort: false },
+                { title: "LOT Quantity", field: "lotQty", hozAlign: "center", headerMenu, headerFilter: "input", headerSort: false },
+                { title: "Project Value", field: "projectValue", headerMenu, headerFilter: "input", visible: false, headerSort: false },
+                { title: "Location", field: "location", headerMenu, headerFilter: "input", visible: false, headerSort: false },
+                { title: "Mode", field: "mode", headerMenu, headerFilter: "input", visible: false, headerSort: false },
+                { title: "First Attempt", field: "firstAttempt", headerMenu, headerFilter: "input", visible: false, headerSort: false },
+                { title: "Remark", field: "remark", headerMenu, headerFilter: "input", visible: false, headerSort: false },
+                { title: "Action Plan", field: "actionPlan", headerMenu, headerFilter: "input", visible: false, headerSort: false },
+                {
+                    title: "MOM Date",
+                    field: "momDate",
+                    hozAlign: "center",
+                    headerMenu,
+                    headerFilter: "input",
+                    visible: false,
+                    headerSort: false,
+                    formatter: cell => formatDate(cell.getValue())
+                },
+                {
+                    title: "Attachment",
+                    field: "attachment",
+                    width: 100,
+                    visible: false,
+                    headerMenu,
+                    headerSort: false,
+                    formatter: cell => {
+                        const v = cell.getValue();
+                        if (!v) return "";
+                        return v.split(/[,;]+/)
+                            .map(p => p.trim())
+                            .filter(p => p)
+                            .map(p => `
+                                <a href="/${p}"
+                                   target="_blank"
+                                   download
+                                   title="Download"
+                                   style="margin-right:8px;display:inline-block;">
+                                   <i class="fas fa-download text-primary" style="font-size:16px;"></i>
+                                </a>
+                            `).join("");
+                    }
+                }
+            ]
+        });
+
+        // Only open the edit modal when non-action cells are clicked
+        thirdPartyTable.on("cellClick", (e, cell) => {
+            if (cell.getColumn().getField() !== "action") {
+                editThirdParty(cell.getRow().getData());
+            }
+        });
+    }
+}
+
 function editThirdParty(response) {
     //  alert("Edit called for: " + response.projectName);
     $('#Third').show();

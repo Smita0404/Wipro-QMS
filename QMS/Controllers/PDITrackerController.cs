@@ -2,6 +2,7 @@
 using QMS.Core.DatabaseContext;
 using QMS.Core.Models;
 using QMS.Core.Repositories.PDITrackerRepository;
+using QMS.Core.Repositories.VendorRepository;
 using QMS.Core.Services.SystemLogs;
 
 namespace QMS.Controllers
@@ -10,18 +11,41 @@ namespace QMS.Controllers
     {
         private readonly IPDITrackerRepository _pdiTrackerRepository;
         private readonly ISystemLogService _systemLogService;
-
-        public PDITrackerController(IPDITrackerRepository pdiTrackerRepository, ISystemLogService systemLogService)
+        private readonly IVendorRepository _vendorRepository;
+        public PDITrackerController(IPDITrackerRepository pdiTrackerRepository, ISystemLogService systemLogService, IVendorRepository vendorRepository)
         {
             _pdiTrackerRepository = pdiTrackerRepository;
             _systemLogService = systemLogService;
+            _vendorRepository = vendorRepository;
         }
 
         public IActionResult PDITracker()
         {
             return View();
         }
+        [HttpGet]
+        public async Task<JsonResult> GetCodeSearchAsync(string search = "")
+        {
+            try
+            {
+                // Initialize processed search terms
+                string processedSearch = string.Empty;
 
+                if (!string.IsNullOrEmpty(search))
+                {
+                    if (search.Length >= 4)
+                        processedSearch = search.Substring(0, 4); // First 4 characters
+                }
+
+                var productCodeDetailsList = await _vendorRepository.GetCodeSearchAsync(processedSearch);
+
+                return Json(productCodeDetailsList);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
         [HttpGet]
         public async Task<JsonResult> GetAll()
         {

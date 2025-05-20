@@ -20,17 +20,17 @@ namespace QMS.Core.DatabaseContext
         //------------ END overrides --------
 
         public DateTime? InspectionDate { get; set; }
-        public string ProjectName { get; set; }
-        public string InspName { get; set; }
-        public string ProductCode { get; set; }
-        public string ProdDesc { get; set; }
+        public string? ProjectName { get; set; }
+        public string? InspName { get; set; }
+        public string? ProductCode { get; set; }
+        public string? ProdDesc { get; set; }
         public int? LOTQty { get; set; }
-        public string ProjectValue { get; set; }
-        public string Location { get; set; }
-        public string Mode { get; set; }
-        public string FirstAttempt { get; set; }
-        public string Remark { get; set; }
-        public string ActionPlan { get; set; }
+        public string? ProjectValue { get; set; }
+        public string? Location { get; set; }
+        public string? Mode { get; set; }
+        public string? FirstAttempt { get; set; }
+        public string? Remark { get; set; }
+        public string? ActionPlan { get; set; }
         public DateTime? MOMDate { get; set; }
         public string? Attachment { get; set; }
         public string? CreatedBy { get; set; }

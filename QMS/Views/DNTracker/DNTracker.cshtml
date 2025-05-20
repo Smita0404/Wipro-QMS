@@ -5,9 +5,43 @@
 <link href="~/css/fontawesome/styles.min.css" rel="stylesheet" />
 <link href="~/css/tabulator/tabulator.min.css" rel="stylesheet" />
 <link href="~/css/tabulator/tabulator_bootstrap4.min.css" rel="stylesheet" />
+<script src="~/js/jquery.min.js"></script>
+<script src="~/js/jquery.datatables.js"></script>
 <link href="~/css/pnotify.css" rel="stylesheet" />
+<script src="~/js/pnotify.js"></script>
+<script src="~/js/pnotify.confirm.js"></script>
+<script src="~/lib/bootstrap/dist/js/datatables.buttons.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/jszip.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/buttons.html5.min.js"></script>
+<script src="~/js/common.js"></script>
+<script src="~/js/xlsx.min.js"></script>
+@* <link href="https://unpkg.com/tabulator-tables@5.5.0/dist/css/tabulator.min.css" rel="stylesheet"> *@
+<script src="~/lib/bootstrap/dist/js/popupalert.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/litepicker/dist/css/litepicker.css" />
+
 
 <style>
+    .nav-pills .nav-link {
+        text-align: left;
+        border-radius: 0;
+        border-left: 4px solid transparent;
+        font-weight: 500;
+        width: 100%;
+        padding: 12px;
+        background-color: #fff;
+        color: #333;
+        margin-bottom: 4px;
+    }
+
+        .nav-pills .nav-link.active {
+            background-color: #f4f3f8;
+            border-left: 4px solid #645394;
+            color: #645394;
+            font-weight: bold;
+        }
+
     .form-control {
         padding: 0 10px !important;
         border: 0;
@@ -21,12 +55,13 @@
     }
 
     #scrollToTopBtn:hover {
-        background-color: #0056b3;
+        background-color: #0056b3; /* Darker blue */
     }
 
     #scrollToTopBtn {
-        outline: none;
+        outline: none; /* Removes the focus border */
     }
+
 
     .tabulator .tabulator-header .tabulator-col {
         font-size: 14px;
@@ -48,19 +83,77 @@
     }
 
     .form-group {
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.5rem; /* Reduce space between each input group */
     }
 
-    /* Select2 styling inside Tabulator cells */
-    .select2-container--default .select2-selection--single {
-        height: auto !important;
-        padding: 5px !important;
+    .autocomplete-dropdown {
+        position: absolute;
+        z-index: 99999 !important;
+        background: #fff;
+        border: 1px solid #ccc;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        max-height: 200px;
+        overflow-y: auto;
+        border-radius: 4px;
+        font-family: Arial, sans-serif;
+        font-size: 14px;
     }
 
-    .select2-dropdown {
-        z-index: 999999 !important;
+    .autocomplete-option {
+        padding: 6px 10px;
+        border-bottom: 1px solid #eee;
+        cursor: pointer;
+        white-space: nowrap;
     }
+
+        .autocomplete-option:hover {
+            background-color: #f0f0f0;
+        }
+
+    .modal-body {
+        overflow: visible !important; /* required for dropdown to be visible in Bootstrap modal */
+    }
+
+    .calendar-container {
+        cursor: pointer;
+        padding: 10px 15px;
+        width: 100%;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        transition: background-color 0.3s, box-shadow 0.3s;
+        gap: 8px;
+    }
+
+        .calendar-container:hover {
+            background-color: #e3f2fd;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .calendar-container i.fa-calendar {
+            color: #2196f3;
+            font-size: 1.2em;
+            padding-left: 20px;
+        }
+
+        .calendar-container span {
+            color: #4682B4;
+            margin: 0;
+            font-size: 16px;
+        }
+
+    .container__predefined-ranges {
+        font-size: 14px;
+    }
+
+    .month-item {
+        font-size: 14px;
+    }
+
 </style>
+
+
 
 <div class="content">
     <div class="card">
@@ -84,8 +177,16 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
+                  @*   <div class="col-md-4">
+                        <div id="customDateTrigger" class="calendar-container">
+                            <i class="fa fa-calendar"></i>
+                            <span id="dateRangeText">Select Date Range</span>
+                        </div>
+                    </div> *@
                     <div class="chart-container">
+                        
                         <div class="form-group row">
+                           
                             <div id="deviation_note_table_wrapper" style="overflow-x: auto;">
                                 <div id="dn_table"></div>
                             </div>
@@ -99,6 +200,7 @@
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
     <script src="https://unpkg.com/tabulator-tables@5.5.0/dist/js/tabulator.min.js"></script>
     <script src="~/scripts/DNTracker/dn-tracker.js" asp-append-version="true"></script>
 }

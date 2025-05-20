@@ -1,10 +1,10 @@
 ﻿var tabledata = [];
 var table = '';
-let productCodeOptions = {};
 let vendorOptions = {};
-let dnoteCategoryOptions = {};
 
 $(document).ready(function () {
+
+
     document.getElementById('backButton').addEventListener('click', function () {
         window.history.back();
     });
@@ -52,23 +52,24 @@ var headerMenu = function () {
 function loadData() {
     Blockloadershow();
 
-    // Load all dropdown options first (product codes, vendors, categories)
-    $.when(
-        $.ajax({ url: '/DNTracker/GetProductCodes', type: 'GET' }),
-        $.ajax({ url: '/DNTracker/GetVendors', type: 'GET' })
-        
-    ).done(function (productCodesData, vendorsData) {
-        // productCodesData, vendorsData, categoriesData are arrays inside array wrappers because of $.when
-        productCodeOptions = (Array.isArray(productCodesData[0])) ? productCodesData[0].reduce((acc, p) => { acc[p.value] = p.label; return acc; }, {}) : {};
-        vendorOptions = (Array.isArray(vendorsData[0])) ? vendorsData[0].reduce((acc, v) => { acc[v.value] = v.label; return acc; }, {}) : {};
-       
-        // After loading options, load main table data
+    $.ajax({
+        url: '/DNTracker/GetVendor',
+        type: 'GET'
+    }).done(function (vendorData) {
+        if (Array.isArray(vendorData)) {
+            vendorOptions = vendorData.reduce((acc, v) => {
+                acc[v.value] = v.label;
+                return acc;
+            }, {});
+        }
+
+        // Now load the actual Deviation Note data
         $.ajax({
             url: '/DNTracker/GetAll',
             type: 'GET',
             success: function (data) {
                 if (Array.isArray(data)) {
-                    OnTabGridLoad(data);
+                    OnTabGridLoad(data); // load into Tabulator or grid
                 } else {
                     showDangerAlert('No Deviation Note data available.');
                 }
@@ -81,11 +82,86 @@ function loadData() {
         });
 
     }).fail(function () {
-        showDangerAlert('Failed to load dropdown options.');
+        showDangerAlert('Failed to load vendor dropdown options.');
         Blockloaderhide();
     });
 }
 
+Tabulator.extendModule("edit", "editors", {
+    autocomplete_ajax: function (cell, onRendered, success, cancel, editorParams) {
+        const input = document.createElement("input");
+        input.setAttribute("type", "text");
+        input.style.width = "100%";
+        input.value = cell.getValue() || "";
+
+        let dropdown = null;
+
+        function removeDropdown() {
+            if (dropdown && dropdown.parentNode && document.body.contains(dropdown)) {
+                dropdown.parentNode.removeChild(dropdown);
+            }
+            dropdown = null;
+        }
+
+        function fetchSuggestions(query) {
+            $.ajax({
+                url: '/DNTracker/GetCodeSearch',
+                type: 'GET',
+                data: { search: query },
+                success: function (data) {
+                    removeDropdown(); // clear old
+
+                    dropdown = document.createElement("div");
+                    dropdown.className = "autocomplete-dropdown";
+
+                    data.forEach(item => {
+                        const option = document.createElement("div");
+                        option.textContent = item.oldPart_No;
+                        option.className = "autocomplete-option";
+
+                        option.addEventListener("mousedown", function (e) {
+                            e.stopPropagation();
+                            success(item.oldPart_No);
+
+                            const row = cell.getRow();
+                            row.update({ ProductDescription: item.description });
+                            removeDropdown();
+                        });
+
+                        dropdown.appendChild(option);
+                    });
+
+                    document.body.appendChild(dropdown);
+                    const rect = input.getBoundingClientRect();
+                    dropdown.style.top = (window.scrollY + rect.bottom) + "px";
+                    dropdown.style.left = (window.scrollX + rect.left) + "px";
+                    dropdown.style.width = rect.width + "px";
+                },
+                error: function () {
+                    console.error("Failed to fetch suggestions.");
+                }
+            });
+        }
+
+        input.addEventListener("input", function () {
+            const val = input.value;
+            if (val.length >= 4) {
+                fetchSuggestions(val);
+            } else {
+                removeDropdown();
+            }
+        });
+
+        input.addEventListener("blur", function () {
+            setTimeout(() => {
+                removeDropdown();
+                success(input.value);
+            }, 150); // delay to allow click
+        });
+
+        return input;
+    }
+});
 
 function OnTabGridLoad(response) {
     Blockloadershow();
@@ -95,7 +171,7 @@ function OnTabGridLoad(response) {
         $.each(response, function (index, item) {
             tabledata.push({
                 Sr_No: index + 1,
-                DNoteId: item.dNoteId,
+                DNoteId: item.id,
                 DNoteNumber: item.dNoteNumber || "",
                 DNoteCategory: item.dNoteCategory || "",
                 ProductCode: item.productCode || "",
@@ -125,14 +201,8 @@ function OnTabGridLoad(response) {
 
         editableColumn("Category", "DNoteCategory", "input", "center", "input", {}, {}, 130),
 
-        editableColumn("Product Code", "ProductCode", "select2", "center", "input", {}, {
-            values: productCodeOptions
-        }, function (cell) {
-            const val = cell.getValue();
-            return productCodeOptions[val] || val;
-        }, 130),
-
-        editableColumn("Product Description", "ProductDescription", "input", "left", null, {}, {}, 180),
+        editableColumn("Product Code", "ProductCode", "autocomplete_ajax"),
+        editableColumn("Product Description", "ProductDescription"),
 
         editableColumn("Wattage", "Wattage", "input", "center", null, {}, {}, 100),
 
@@ -191,8 +261,8 @@ function OnTabGridLoad(response) {
     Blockloaderhide();
 }
 
-function editableColumn(title, field, editorType = true, align = "center", headerFilterType = "input", headerFilterParams = {}, editorParams = {}, formatter = null, width = null) {
-    const column = {
+function editableColumn(title, field, editorType = true, align = "center", headerFilterType = "input", headerFilterParams = {}, editorParams = {}, formatter = null) {
+    let columnDef = {
         title: title,
         field: field,
         editor: editorType,
@@ -205,11 +275,18 @@ function editableColumn(title, field, editorType = true, align = "center", heade
         headerHozAlign: "left"
     };
 
-    if (width !== null) {
-        column.width = width;
+    // Set custom width for specific fields
+    if (field === "ProductCode") {
+        columnDef.width = 220;
+        columnDef.minWidth = 220;
+    }
+    else if (field === "ProductDescription") {
+        columnDef.width = 290;
+        columnDef.minWidth = 290;
+        columnDef.hozAlign = "left";
     }
 
-    return column;
+    return columnDef;
 }
 
 function delConfirm(DNoteId) {
@@ -288,7 +365,7 @@ function saveEditedRow(rowData) {
         Remark: rowData.Remark || null
     };
 
-    const isNew = cleanedData.Id === 0;
+    const isNew = cleanedData.Id == 0;
     const url = isNew ? '/DNTracker/CreateAsync' : '/DNTracker/UpdateAsync';
 
     $.ajax({
@@ -298,12 +375,13 @@ function saveEditedRow(rowData) {
         contentType: 'application/json',
         success: function (data) {
             if (data.success) {
-                if (isNew && data.id) {
-                    rowData.DNoteId = data.id;
-                }
                 if (isNew) {
                     loadData();
                 }
+                if (isNew && data.id) {
+                    rowData.DNoteId = data.id;
+                }
+                
             } else {
                 showDangerAlert(data.message || (isNew ? "Create failed." : "Update failed."));
             }

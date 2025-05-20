@@ -1,6 +1,5 @@
 ﻿var tabledata = [];
 var table = '';
-let productCodeOptions = {};
 $(document).ready(function () {
     document.getElementById('backButton').addEventListener('click', function () {
         window.history.back();
@@ -55,48 +54,108 @@ var headerMenu = function () {
 
 function loadData() {
     Blockloadershow();
-    $.ajax({
-        url: '/PDITracker/GetProductCodes',
-        type: 'GET',
-        success: function (productCodeData) {
-            if (Array.isArray(productCodeData)) {
-                productCodeOptions = productCodeData.reduce((acc, p) => {
-                    acc[p.value] = p.label;
-                    return acc;
-                }, {});
-            } else {
-                showDangerAlert('Invalid product code data received.');
-                Blockloaderhide();
-                return;
-            }
 
-            // ✅ Now it's valid to place the second AJAX inside this success callback
-            $.ajax({
-                url: '/PDITracker/GetAll',
-                type: 'GET',
-                success: function (data) {
-                    if (data && Array.isArray(data)) {
-                        console.log(data);
-                        OnTabGridLoad(data);
-                    } else {
-                        showDangerAlert('No data available to load.');
-                    }
-                    Blockloaderhide();
-                },
-                error: function (xhr, status, error) {
-                    showDangerAlert('Error retrieving data: ' + error);
-                    Blockloaderhide();
-                }
-            });
-        },
-        error: function () {
-            showDangerAlert('Failed to load product code options.');
+    $.ajax({
+        url: '/PDITracker/GetAll',
+        type: 'GET',
+        dataType: 'json',
+    })
+        .done(function (data) {
+            const safeData = Array.isArray(data) ? data : [];
+            if (safeData.length) {
+                console.log("PDI data:", safeData);
+                OnTabGridLoad(safeData);
+            } else {
+                showDangerAlert('No data available to load.');
+                OnTabGridLoad([]);
+            }
+        })
+        .fail(function (xhr, status, error) {
+            console.error('Error retrieving data:', status, error, xhr.responseText);
+            showDangerAlert('Error retrieving data: ' + (error || status));
+            OnTabGridLoad([]);
+        })
+        .always(function () {
             Blockloaderhide();
-        }
-    });
+        });
 }
 
 
+Tabulator.extendModule("edit", "editors", {
+    autocomplete_ajax: function (cell, onRendered, success, cancel, editorParams) {
+        const input = document.createElement("input");
+        input.setAttribute("type", "text");
+        input.style.width = "100%";
+        input.value = cell.getValue() || "";
+
+        let dropdown = null;
+
+        function removeDropdown() {
+            if (dropdown && dropdown.parentNode && document.body.contains(dropdown)) {
+                dropdown.parentNode.removeChild(dropdown);
+            }
+            dropdown = null;
+        }
+
+        function fetchSuggestions(query) {
+            $.ajax({
+                url: '/PDITracker/GetCodeSearch',
+                type: 'GET',
+                data: { search: query },
+                success: function (data) {
+                    removeDropdown(); // clear old
+
+                    dropdown = document.createElement("div");
+                    dropdown.className = "autocomplete-dropdown";
+
+                    data.forEach(item => {
+                        const option = document.createElement("div");
+                        option.textContent = item.oldPart_No;
+                        option.className = "autocomplete-option";
+
+                        option.addEventListener("mousedown", function (e) {
+                            e.stopPropagation();
+                            success(item.oldPart_No);
+
+                            const row = cell.getRow();
+                            row.update({ ProductDescription: item.description });
+                            removeDropdown();
+                        });
+
+                        dropdown.appendChild(option);
+                    });
+
+                    document.body.appendChild(dropdown);
+                    const rect = input.getBoundingClientRect();
+                    dropdown.style.top = (window.scrollY + rect.bottom) + "px";
+                    dropdown.style.left = (window.scrollX + rect.left) + "px";
+                    dropdown.style.width = rect.width + "px";
+                },
+                error: function () {
+                    console.error("Failed to fetch suggestions.");
+                }
+            });
+        }
+
+        input.addEventListener("input", function () {
+            const val = input.value;
+            if (val.length >= 4) {
+                fetchSuggestions(val);
+            } else {
+                removeDropdown();
+            }
+        });
+
+        input.addEventListener("blur", function () {
+            setTimeout(() => {
+                removeDropdown();
+                success(input.value);
+            }, 150); // delay to allow click
+        });
+
+        return input;
+    }
+});
 
 function OnTabGridLoad(response) {
     Blockloadershow();
@@ -144,15 +203,8 @@ function OnTabGridLoad(response) {
         { title: "S.No", field: "Sr_No", frozen: true, hozAlign: "center", headerSort: false, headerMenu: headerMenu, width: 80 },
         editableColumn("PC", "PC", "input", "left", null, {}, {}, 160),
            editableColumn("Dispatch Date", "DispatchDate", "date", "center", null, {}, {}, 120),
-        editableColumn("Product Code", "ProductCode", "select2", "center", "input", {}, {
-            values: productCodeOptions
-        }, function (cell) {
-            // Show Vendor Name in the cell, not the code
-            const code = cell.getValue();
-            return productCodeOptions[code] || code;
-        }),
-     
-        editableColumn("Product Description", "ProductDescription", "input", "left", null, {}, {}, 160),
+        editableColumn("Product Code", "ProductCode", "autocomplete_ajax"),
+        editableColumn("Product Description", "ProductDescription"),
         editableColumn("Batch Code (Vendor)", "BatchCodeVendor", "input", "left", null, {}, {}, 140),
        
         editableColumn("PDI Date", "PDIDate", "date", "center", null, {}, {}, 120),
@@ -213,8 +265,8 @@ function OnTabGridLoad(response) {
 
 // Helper functions below — place these outside of OnTabGridLoad
 
-function editableColumn(title, field, editorType = true, align = "center", headerFilterType = "input", headerFilterParams = {}, editorParams = {}, formatter = null, width = null) {
-    const column = {
+function editableColumn(title, field, editorType = true, align = "center", headerFilterType = "input", headerFilterParams = {}, editorParams = {}, formatter = null) {
+    let columnDef = {
         title: title,
         field: field,
         editor: editorType,
@@ -227,11 +279,18 @@ function editableColumn(title, field, editorType = true, align = "center", heade
         headerHozAlign: "left"
     };
 
-    if (width !== null) {
-        column.width = width;
+    // Set custom width for specific fields
+    if (field === "ProductCode") {
+        columnDef.width = 220;
+        columnDef.minWidth = 220;
+    }
+    else if (field === "ProductDescription") {
+        columnDef.width = 290;
+        columnDef.minWidth = 290;
+        columnDef.hozAlign = "left";
     }
 
-    return column;
+    return columnDef;
 }
 
 function delConfirm(PDIId) {

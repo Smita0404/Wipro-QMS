@@ -2,6 +2,7 @@
 using QMS.Core.DatabaseContext;
 using QMS.Core.Models;
 using QMS.Core.Repositories.DNTrackerRepository;
+using QMS.Core.Repositories.VendorRepository;
 using QMS.Core.Services.SystemLogs;
 
 namespace QMS.Controllers
@@ -10,11 +11,12 @@ namespace QMS.Controllers
     {
         private readonly IDNTrackerRepository _deviationNoteRepository;
         private readonly ISystemLogService _systemLogService;
-
-        public DNTrackerController(IDNTrackerRepository deviationNoteRepository, ISystemLogService systemLogService)
+        private readonly IVendorRepository _vendorRepository;
+        public DNTrackerController(IDNTrackerRepository deviationNoteRepository, ISystemLogService systemLogService, IVendorRepository vendorRepository)
         {
             _deviationNoteRepository = deviationNoteRepository;
             _systemLogService = systemLogService;
+            _vendorRepository = vendorRepository;
         }
 
         public IActionResult DNTracker()
@@ -97,7 +99,29 @@ namespace QMS.Controllers
                 return Json(new { success = false, message = "Error during update." });
             }
         }
+        [HttpGet]
+        public async Task<JsonResult> GetCodeSearchAsync(string search = "")
+        {
+            try
+            {
+                // Initialize processed search terms
+                string processedSearch = string.Empty;
 
+                if (!string.IsNullOrEmpty(search))
+                {
+                    if (search.Length >= 4)
+                        processedSearch = search.Substring(0, 4); // First 4 characters
+                }
+
+                var productCodeDetailsList = await _vendorRepository.GetCodeSearchAsync(processedSearch);
+
+                return Json(productCodeDetailsList);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
         [HttpPost]
         public async Task<JsonResult> Delete(int id)
         {
@@ -113,7 +137,7 @@ namespace QMS.Controllers
             }
         }
         [HttpGet]
-        public async Task<IActionResult> GetVendors()
+        public async Task<IActionResult> GetVendor()
         {
             try
             {
@@ -126,12 +150,12 @@ namespace QMS.Controllers
                 return StatusCode(500, "Error retrieving vendor dropdown.");
             }
         }
-        [HttpGet]
-        public async Task<IActionResult> GetProductCodes()
-        {
-            var productCodes = await _deviationNoteRepository.GetProductCodeAsync();
-            return Json(productCodes);
-        }
+        //[HttpGet]
+        //public async Task<IActionResult> GetProductCodes()
+        //{
+        //    var productCodes = await _deviationNoteRepository.GetProductCodeAsync();
+        //    return Json(productCodes);
+        //}
 
     }
 }
