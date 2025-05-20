@@ -1,24 +1,26 @@
 ﻿var tabledata = [];
 var table = '';
+let vendorOptions = {};
+
 $(document).ready(function () {
+
+
     document.getElementById('backButton').addEventListener('click', function () {
         window.history.back();
     });
 
     loadData();
 });
+
 var headerMenu = function () {
     var menu = [];
     var columns = this.getColumns();
 
     for (let column of columns) {
-
-        //create checkbox element using font awesome icons
         let icon = document.createElement("i");
         icon.classList.add("fas");
         icon.classList.add(column.isVisible() ? "fa-check-square" : "fa-square");
 
-        //build label
         let label = document.createElement("span");
         let title = document.createElement("span");
 
@@ -27,17 +29,12 @@ var headerMenu = function () {
         label.appendChild(icon);
         label.appendChild(title);
 
-        //create menu item
         menu.push({
             label: label,
             action: function (e) {
-                //prevent menu closing
                 e.stopPropagation();
-
-                //toggle current column visibility
                 column.toggle();
 
-                //change menu item icon
                 if (column.isVisible()) {
                     icon.classList.remove("fa-square");
                     icon.classList.add("fa-check-square");
@@ -56,30 +53,39 @@ function loadData() {
     Blockloadershow();
 
     $.ajax({
-        url: '/PDITracker/GetAll',
-        type: 'GET',
-        dataType: 'json',
-    })
-        .done(function (data) {
-            const safeData = Array.isArray(data) ? data : [];
-            if (safeData.length) {
-                console.log("PDI data:", safeData);
-                OnTabGridLoad(safeData);
-            } else {
-                showDangerAlert('No data available to load.');
-                OnTabGridLoad([]);
-            }
-        })
-        .fail(function (xhr, status, error) {
-            console.error('Error retrieving data:', status, error, xhr.responseText);
-            showDangerAlert('Error retrieving data: ' + (error || status));
-            OnTabGridLoad([]);
-        })
-        .always(function () {
-            Blockloaderhide();
-        });
-}
+        url: '/DNTracker/GetVendor',
+        type: 'GET'
+    }).done(function (vendorData) {
+        if (Array.isArray(vendorData)) {
+            vendorOptions = vendorData.reduce((acc, v) => {
+                acc[v.value] = v.label;
+                return acc;
+            }, {});
+        }
 
+        // Now load the actual Deviation Note data
+        $.ajax({
+            url: '/DNTracker/GetAll',
+            type: 'GET',
+            success: function (data) {
+                if (Array.isArray(data)) {
+                    OnTabGridLoad(data); // load into Tabulator or grid
+                } else {
+                    showDangerAlert('No Deviation Note data available.');
+                }
+                Blockloaderhide();
+            },
+            error: function () {
+                showDangerAlert('Error loading deviation note data.');
+                Blockloaderhide();
+            }
+        });
+
+    }).fail(function () {
+        showDangerAlert('Failed to load vendor dropdown options.');
+        Blockloaderhide();
+    });
+}
 
 Tabulator.extendModule("edit", "editors", {
     autocomplete_ajax: function (cell, onRendered, success, cancel, editorParams) {
@@ -99,7 +105,7 @@ Tabulator.extendModule("edit", "editors", {
 
         function fetchSuggestions(query) {
             $.ajax({
-                url: '/PDITracker/GetCodeSearch',
+                url: '/DNTracker/GetCodeSearch',
                 type: 'GET',
                 data: { search: query },
                 success: function (data) {
@@ -161,35 +167,24 @@ function OnTabGridLoad(response) {
     Blockloadershow();
     let tabledata = [];
 
-    // Utility function to format date to dd/MM/yyyy
-    function formatDate(value) {
-        return value ? new Date(value).toLocaleDateString("en-GB") : "";
-    }
-
-    // Prepare data
     if (response.length > 0) {
         $.each(response, function (index, item) {
             tabledata.push({
                 Sr_No: index + 1,
-                PDIId: item.id,
-                PC: item.pc || "",
-                DispatchDate: formatDate(item.dispatchDate),
+                DNoteId: item.id,
+                DNoteNumber: item.dNoteNumber || "",
+                DNoteCategory: item.dNoteCategory || "",
                 ProductCode: item.productCode || "",
                 ProductDescription: item.productDescription || "",
-                BatchCodeVendor: item.batchCodeVendor || "",
-                PONo: item.poNo || "",
-                PDIDate: formatDate(item.pdiDate),
-                PDIRefNo: item.pdiRefNo || "",
-                OfferedQty: item.offeredQty,
-                ClearedQty: item.clearedQty,
-                BISCompliance: item.bisCompliance,
-                InspectedBy: item.inspectedBy || "",
+                Wattage: item.wattage || "",
+                DQty: item.dQty || null,
+                DRequisitionBy: item.dRequisitionBy || "",
+                Vendor: item.vendor || "",
                 Remark: item.remark || ""
             });
         });
     }
 
-    // Define columns
     const columns = [
         {
             title: "Action", field: "Action", frozen: true, hozAlign: "center", headerSort: false,
@@ -197,30 +192,38 @@ function OnTabGridLoad(response) {
             headerMenu: headerMenu,
             formatter: function (cell) {
                 const rowData = cell.getRow().getData();
-                return `<i onclick="delConfirm(${rowData.PDIId})" class="fas fa-trash-alt text-danger" title="Delete" style="cursor:pointer;"></i>`;
+                return `<i onclick="delConfirm(${rowData.DNoteId})" class="fas fa-trash-alt text-danger" title="Delete" style="cursor:pointer;"></i>`;
             }
         },
-        { title: "S.No", field: "Sr_No", frozen: true, hozAlign: "center", headerSort: false, headerMenu: headerMenu, width: 80 },
-        editableColumn("PC", "PC", "input", "left", null, {}, {}, 160),
-           editableColumn("Dispatch Date", "DispatchDate", "date", "center", null, {}, {}, 120),
+        { title: "S.No", field: "Sr_No", frozen: true, hozAlign: "center", headerSort: false, headerMenu: headerMenu, width: 70 },
+
+        editableColumn("DNote Number", "DNoteNumber", "input", "left", "input", {}, {}, 150),
+
+        editableColumn("Category", "DNoteCategory", "input", "center", "input", {}, {}, 130),
+
         editableColumn("Product Code", "ProductCode", "autocomplete_ajax"),
         editableColumn("Product Description", "ProductDescription"),
-        editableColumn("Batch Code (Vendor)", "BatchCodeVendor", "input", "left", null, {}, {}, 140),
-       
-        editableColumn("PDI Date", "PDIDate", "date", "center", null, {}, {}, 120),
-        editableColumn("PDI Ref No", "PDIRefNo", "input", "left", null, {}, {}, 130),
-        editableColumn("Offered Qty", "OfferedQty", "input", "right", null, {}, {}, 110),
-        editableColumn("Cleared Qty", "ClearedQty", "input", "right", null, {}, {}, 110),
-        editableColumn("BIS Compliance", "BISCompliance", "tickCross", "center", null, {}, {}, 130),
-        editableColumn("Inspected By", "InspectedBy", "input", "left", null, {}, {}, 130),
-        editableColumn("Remark", "Remark", "input", "left", null, {}, {}, 180)
+
+        editableColumn("Wattage", "Wattage", "input", "center", null, {}, {}, 100),
+
+        editableColumn("Quantity", "DQty", "input", "right", null, {}, {}, 90),
+
+        editableColumn("Requisition By", "DRequisitionBy", "input", "left", null, {}, {}, 150),
+
+        editableColumn("Vendor", "Vendor", "select2", "center", "input", {}, {
+            values: vendorOptions
+        }, function (cell) {
+            const val = cell.getValue();
+            return vendorOptions[val] || val;
+        }, 130),
+
+        editableColumn("Remark", "Remark", "input", "left", null, {}, {}, 200)
     ];
 
-    // Create or replace Tabulator table
     if (table) {
         table.replaceData(tabledata);
     } else {
-        table = new Tabulator("#pdi_table", {
+        table = new Tabulator("#dn_table", {
             data: tabledata,
             layout: "fitDataFill",
             movableColumns: true,
@@ -232,38 +235,31 @@ function OnTabGridLoad(response) {
             columns: columns
         });
 
-        // Handle cell edit event
         table.on("cellEdited", function (cell) {
             const rowData = cell.getRow().getData();
             saveEditedRow(rowData);
         });
     }
-    $("#addButton").on("click", function () {
+
+    $("#addButton").off("click").on("click", function () {
         const newRow = {
-            PDIId: 0,
+            DNoteId: 0,
             Sr_No: table.getDataCount() + 1,
-            PC: "",
-            DispatchDate: "",
+            DNoteNumber: "",
+            DNoteCategory: "",
             ProductCode: "",
             ProductDescription: "",
-            BatchCodeVendor: "",
-            PONo: "",
-            PDIDate: "",
-            PDIRefNo: "",
-            OfferedQty: "",
-            ClearedQty: "",
-            BISCompliance: false,
-            InspectedBy: "",
+            Wattage: "",
+            DQty: null,
+            DRequisitionBy: "",
+            Vendor: "",
             Remark: ""
         };
-        table.addRow(newRow, false); // false = add to bottom
+        table.addRow(newRow, false); // add to bottom
     });
 
     Blockloaderhide();
 }
-
-
-// Helper functions below — place these outside of OnTabGridLoad
 
 function editableColumn(title, field, editorType = true, align = "center", headerFilterType = "input", headerFilterParams = {}, editorParams = {}, formatter = null) {
     let columnDef = {
@@ -293,11 +289,11 @@ function editableColumn(title, field, editorType = true, align = "center", heade
     return columnDef;
 }
 
-function delConfirm(PDIId) {
+function delConfirm(DNoteId) {
     PNotify.prototype.options.styling = "bootstrap3";
     (new PNotify({
         title: 'Confirm Deletion',
-        text: 'Are you sure you want to delete this PDI?',
+        text: 'Are you sure you want to delete this Deviation Note?',
         icon: 'fa fa-question-circle',
         hide: false,
         confirm: { confirm: true },
@@ -305,9 +301,9 @@ function delConfirm(PDIId) {
         history: { history: false }
     })).get().on('pnotify.confirm', function () {
         $.ajax({
-            url: '/PDITracker/Delete',
+            url: '/DNTracker/Delete',
             type: 'POST',
-            data: { id: PDIId },
+            data: { id: DNoteId },
             success: function (data) {
                 if (data.success) {
                     showSuccessAlert("Deleted successfully.");
@@ -322,6 +318,7 @@ function delConfirm(PDIId) {
         });
     });
 }
+
 Tabulator.extendModule("edit", "editors", {
     select2: function (cell, onRendered, success, cancel, editorParams) {
         const values = editorParams.values || {};
@@ -355,37 +352,21 @@ function saveEditedRow(rowData) {
         return value === "" ? null : value;
     }
 
-    // Converts "dd/MM/yyyy" to "yyyy-MM-dd"
-    function toIsoDate(value) {
-        if (!value) return "";
-        const parts = value.split('/');
-        if (parts.length === 3) {
-            return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
-        }
-        return value;
-    }
-
     const cleanedData = {
-        Id: rowData.PDIId || 0,
-        PC: rowData.PC || "",
-        DispatchDate: toIsoDate(rowData.DispatchDate) || null,
-        ProductCode: rowData.ProductCode || "",
-        ProductDescription: rowData.ProductDescription || "",
-        BatchCodeVendor: rowData.BatchCodeVendor || "",
-        PONo: rowData.PONo || "",
-        PDIDate: toIsoDate(rowData.PDIDate)||null,
-        PDIRefNo: rowData.PDIRefNo || "",
-        OfferedQty: emptyToNull(rowData.OfferedQty),
-        ClearedQty: emptyToNull(rowData.ClearedQty),
-        BISCompliance: rowData.BISCompliance,
-        InspectedBy: rowData.InspectedBy || "",
-        Remark: rowData.Remark || ""
+        Id: rowData.DNoteId || 0,
+        DNoteNumber: rowData.DNoteNumber || "",
+        DNoteCategory: rowData.DNoteCategory || null,
+        ProductCode: rowData.ProductCode || null,
+        ProductDescription: rowData.ProductDescription || null,
+        Wattage: rowData.Wattage || null,
+        DQty: emptyToNull(rowData.DQty),
+        DRequisitionBy: rowData.DRequisitionBy || null,
+        Vendor: rowData.Vendor || null,
+        Remark: rowData.Remark || null
     };
 
-    console.log("Cleaned data:", cleanedData);
-
-    const isNew = cleanedData.Id === 0;
-    const url = isNew ? '/PDITracker/CreateAsync' : '/PDITracker/UpdateAsync';
+    const isNew = cleanedData.Id == 0;
+    const url = isNew ? '/DNTracker/CreateAsync' : '/DNTracker/UpdateAsync';
 
     $.ajax({
         url: url,
@@ -394,17 +375,18 @@ function saveEditedRow(rowData) {
         contentType: 'application/json',
         success: function (data) {
             if (data.success) {
-               if (isNew) {
-                   loadData();
-               }
-                if (isNew && data.id) {
-                    rowData.PDIId = data.id;
+                if (isNew) {
+                    loadData();
                 }
+                if (isNew && data.id) {
+                    rowData.DNoteId = data.id;
+                }
+                
             } else {
                 showDangerAlert(data.message || (isNew ? "Create failed." : "Update failed."));
             }
         },
-        error: function (xhr, status, error) {
+        error: function (xhr) {
             showDangerAlert(xhr.responseText || "Error saving record.");
         }
     });
