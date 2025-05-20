@@ -65,13 +65,9 @@ namespace QMS.Controllers
                 if (ModelState.IsValid)
                 {
                     var operationResult = new OperationResult();
-<<<<<<< HEAD
-                    //bool existingResult = await _bisProjectRepository.CheckDuplicate(model.Name.Trim(), 0);
-                    bool existingResult = false;
-=======
+
                     bool existingResult = await _bisProjectRepository.CheckDuplicate(model.Nat_Project.Trim(), 0);
-                    //bool existingResult = false;
->>>>>>> b4ed558d9ddf8c4101a3055d8a617e49702139e3
+
                     if (!existingResult)
                     {
                         model.CreatedDate = DateTime.Now;
