@@ -197,11 +197,12 @@ function initializeBISCertificateTable(data) {
         });
 
         BISCertificateTable.on("cellClick", function (e, cell) {
-            $('#BIScertificateModalTitle').html('<strong>Edit BIS Certificate</strong>');
-            $('#BISsaveBtn').html('<i class="fas fa-pen-to-square mr-2"></i>Update');
-            $('#BISCertificateModal').modal('show');
+           
             const column = cell.getColumn().getField();
             if (column !== "action" && column !== "fileName") {
+                $('#BIScertificateModalTitle').html('<strong>Edit BIS Certificate</strong>');
+                $('#BISsaveBtn').html('<i class="fas fa-pen-to-square mr-2"></i>Update');
+                $('#BISCertificateModal').modal('show');
                 const rowData = cell.getRow().getData();
                 $('#Id').val(rowData.id || '');
                 $('#BIScertificateID').val(rowData.certificateDetail || '');

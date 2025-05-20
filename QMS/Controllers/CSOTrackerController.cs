@@ -2,6 +2,7 @@
 using QMS.Core.DatabaseContext;
 using QMS.Core.Models;
 using QMS.Core.Repositories.CSOTrackerRepository;
+using QMS.Core.Repositories.VendorRepository;
 using QMS.Core.Services.SystemLogs;
 
 namespace QMS.Controllers
@@ -10,13 +11,13 @@ namespace QMS.Controllers
     {
         private readonly ICSOTrackerRepository _csoTrackerRepository;
         private readonly ISystemLogService _systemLogService;
-       
+        private readonly IVendorRepository _vendorRepository;
 
-        public CSOTrackerController(ICSOTrackerRepository csoTrackerRepository, ISystemLogService systemLogService)
+        public CSOTrackerController(ICSOTrackerRepository csoTrackerRepository, ISystemLogService systemLogService, IVendorRepository vendorRepository)
         {
             _csoTrackerRepository = csoTrackerRepository;
             _systemLogService = systemLogService;
-           
+            _vendorRepository = vendorRepository;
         }
 
         public IActionResult CSOTracker()
@@ -108,6 +109,7 @@ namespace QMS.Controllers
                
 
                 record.AttachmentCAPAReport = relativePath;
+                record.Id = csoId;
                 var updateResult = await _csoTrackerRepository.UpdateAsync(record);
 
                 if (!updateResult.Success)
@@ -153,7 +155,29 @@ namespace QMS.Controllers
                 return Json(new { success = false, message = "Error during update." });
             }
         }
+        [HttpGet]
+        public async Task<JsonResult> GetCodeSearchAsync(string search = "")
+        {
+            try
+            {
+                // Initialize processed search terms
+                string processedSearch = string.Empty;
 
+                if (!string.IsNullOrEmpty(search))
+                {
+                    if (search.Length >= 4)
+                        processedSearch = search.Substring(0, 4); // First 4 characters
+                }
+
+                var productCodeDetailsList = await _vendorRepository.GetCodeSearchAsync(processedSearch);
+
+                return Json(productCodeDetailsList);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
         [HttpPost]
         public async Task<JsonResult> Delete(int id)
         {

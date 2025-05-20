@@ -30,6 +30,81 @@ function loadData() {
         }
     });
 }
+Tabulator.extendModule("edit", "editors", {
+    autocomplete_ajax: function (cell, onRendered, success, cancel, editorParams) {
+        const input = document.createElement("input");
+        input.setAttribute("type", "text");
+        input.style.width = "100%";
+        input.value = cell.getValue() || "";
+
+        let dropdown = null;
+
+        function removeDropdown() {
+            if (dropdown && dropdown.parentNode && document.body.contains(dropdown)) {
+                dropdown.parentNode.removeChild(dropdown);
+            }
+            dropdown = null;
+        }
+
+        function fetchSuggestions(query) {
+            $.ajax({
+                url: '/CSOTracker/GetCodeSearch',
+                type: 'GET',
+                data: { search: query },
+                success: function (data) {
+                    removeDropdown(); // clear old
+
+                    dropdown = document.createElement("div");
+                    dropdown.className = "autocomplete-dropdown";
+
+                    data.forEach(item => {
+                        const option = document.createElement("div");
+                        option.textContent = item.oldPart_No;
+                        option.className = "autocomplete-option";
+
+                        option.addEventListener("mousedown", function (e) {
+                            e.stopPropagation();
+                            success(item.oldPart_No);
+
+                            const row = cell.getRow();
+                            row.update({ ProductDescription: item.description });
+                            removeDropdown();
+                        });
+
+                        dropdown.appendChild(option);
+                    });
+
+                    document.body.appendChild(dropdown);
+                    const rect = input.getBoundingClientRect();
+                    dropdown.style.top = (window.scrollY + rect.bottom) + "px";
+                    dropdown.style.left = (window.scrollX + rect.left) + "px";
+                    dropdown.style.width = rect.width + "px";
+                },
+                error: function () {
+                    console.error("Failed to fetch suggestions.");
+                }
+            });
+        }
+
+        input.addEventListener("input", function () {
+            const val = input.value;
+            if (val.length >= 4) {
+                fetchSuggestions(val);
+            } else {
+                removeDropdown();
+            }
+        });
+
+        input.addEventListener("blur", function () {
+            setTimeout(() => {
+                removeDropdown();
+                success(input.value);
+            }, 150); // delay to allow click
+        });
+
+        return input;
+    }
+});
 
 function OnTabGridLoad(response) {
     Blockloadershow();
@@ -90,6 +165,11 @@ function OnTabGridLoad(response) {
                 return;
             }
             const csoId = cell.getRow().getData().CSOId;
+            if (!csoId || csoId === 0) {
+                alert("Please save the record before uploading a file.");
+                cancel();
+                return;
+            }
             uploadCAPAFile(csoId, file);
             cancel();  // Close editor immediately as upload is async
         });
@@ -119,8 +199,8 @@ function OnTabGridLoad(response) {
         editableColumn("Class A/B", "ClassAB", "list", "center", "list", {
             values: { "A": "A", "B": "B" }
         }, { values: { "A": "A", "B": "B" } }, 130),
-        editableColumn("Product Cat Ref", "ProductCatRef", "input", "left", "input", {}, {}, 130),
-        editableColumn("Product Description", "ProductDescription", "input", "left", null, {}, {}, 160),
+        editableColumn("Product Cat Ref", "ProductCatRef", "autocomplete_ajax"),
+        editableColumn("Product Description", "ProductDescription"),
         editableColumn("Source Of CSO", "SourceOfCSO", "input", "left", null, {}, {}, 130),
         editableColumn("Internal/External", "InternalExternal", "list", "center", "list", {
             values: { "Internal": "Internal", "External": "External" }
@@ -212,6 +292,10 @@ function uploadCAPAFile(csoId, file) {
         success: function (response) {
             if (response.success) {
                 showSuccessAlert("File uploaded and record updated!");
+                //const row = table.getRow(response.csoId);
+                //if (row) {
+                //    row.update({ AttachmentCAPAReport: response.filePath });
+                //}// Ensure server returns updated path
             }
             else { showDangerAlert(response.message) }
             // Reload data or update the row's AttachmentCAPAReport value
@@ -298,7 +382,7 @@ function delConfirm(csoId) {
     });
 }
 function editableColumn(title, field, editorType = true, align = "center", headerFilterType = "input", headerFilterParams = {}, editorParams = {}, formatter = null) {
-    return {
+    let columnDef = {
         title: title,
         field: field,
         editor: editorType,
@@ -310,6 +394,19 @@ function editableColumn(title, field, editorType = true, align = "center", heade
         hozAlign: align,
         headerHozAlign: "left"
     };
+
+    // Set custom width for specific fields
+    if (field === "ProductCatRef") {
+        columnDef.width = 220;
+        columnDef.minWidth = 220;
+    }
+    else if (field === "ProductDescription") {
+        columnDef.width = 290;
+        columnDef.minWidth = 290;
+        columnDef.hozAlign = "left";
+    }
+
+    return columnDef;
 }
 function saveEditedRow(rowData) {
     function emptyToNull(value) {

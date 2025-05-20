@@ -574,66 +574,97 @@
                 <div class="row">
                         <div class="col-md-12">
                             <div class="form-group row" style="margin: 5px;">
-                                <label class="col-lg-5 col-form-label Ph" style="padding-top: 10px;">Certificate</label>
+                                <label class="col-lg-4 col-form-label Ph" style="padding-top: 10px;">Certificate</label>
                                 <div class="Ph" style="padding-top: 10px;">:</div>
-                                <div class="col-6 Ph">
+                                <div class="col-lg-7">
                                    
                                     <select class="form-control form-control-border txt Ph" id="certificateID" required>
                                         <!-- Options will be populated dynamically -->
                                     </select>
                                 </div>
                             </div>
+                    @* <div class="form-group row" style="margin: 5px;">
+                        <label class="col-lg-5 col-form-label Ph" style="padding-top: 10px;">
+                            Product Code
+                        </label>
+                        <div class="Ph" style="padding-top: 10px;">:</div>
+                        <div class="col-4 Ph">
+                            <input type="text" id="productCodeInput" class="form-control form-control-border txt Ph" placeholder="Enter Product code…" autocomplete="off" required />
+                        </div>
+                        <div class="col-2">
+                            <input name="sear_Code" id="sear_Code" class="form-control" placeholder="Search Code" oninput="handleSearch(this)" style="text-transform: uppercase;margin-top: -17px;" />
+                        </div>
+                    </div> *@
+
                             <div class="form-group row" style="margin: 5px;">
-                                <label class="col-lg-5 col-form-label Ph" style="padding-top: 10px;">
+                                <!-- Label -->
+                                <label class="col-lg-4 col-form-label Ph" style="padding-top: 10px;">
                                     Product Code
                                 </label>
-                                <div class="Ph" style="padding-top: 10px;">:</div>
-                                <div class="col-4 Ph">
-                                    <input type="text" id="productCodeInput" class="form-control form-control-border txt Ph" placeholder="Enter Product code…" autocomplete="off" required />
-                                </div>
-                                <div class="col-2">
-                                    <input name="sear_Code" id="sear_Code" class="form-control" placeholder="Search Code" oninput="handleSearch(this)" style="text-transform: uppercase;margin-top: -17px;" />
+
+                                <!-- Colon -->
+                                <div class="col-lg-0.5 text-end pe-2" style="padding-top: 10px;">:</div>
+
+                                <!-- Inputs Column -->
+                                <div class="col-lg-7 Ph">
+                                    <div class="row">
+
+
+                                        <!-- Search Code Input -->
+                                        <div class="col-md-5">
+                                            <label for="BISsear_Code" class="sr-only">Search Code</label>
+                                            <input type="text"
+                                                   name="sear_Code"
+                                                   id="sear_Code"
+                                                   class="form-control"
+                                                   placeholder="Search Code"
+                                                   aria-label="Search Code"
+                                                   oninput="handleSearch(this)"
+                                                   style="text-transform: uppercase;" />
+
+                                        </div>
+                                        <!-- Product Code Input -->
+                                        <div class="col-md-7">
+                                            <input type="text"
+                                                   id="productCodeInput"
+                                                   class="form-control form-control-border txt"
+                                                   placeholder="Enter Product Code…"
+                                                   aria-label="Product Code"
+                                                   autocomplete="off"
+                                                   required />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
-                          @*   <div class="form-group row" style="margin: 5px;">
-                                <label class="col-lg-5 col-form-label Ph" style="padding-top: 10px;">Vendor</label>
-                                <div class="Ph" style="padding-top: 10px;">:</div>
-                                <div class="col-6 Ph">
-                                    <select class="form-control form-control-border txt Ph" id="vendorID" required>
-                                        <!-- Options will be populated dynamically -->
-                                    </select>
-                                </div>
-                            </div>
- *@
                             <div class="form-group row" style="margin: 5px;">
-                                <label class="col-lg-5 col-form-label Ph" style="padding-top: 10px;">Issue Date</label>
+                                <label class="col-lg-4 col-form-label Ph" style="padding-top: 10px;">Issue Date</label>
                                 <div class="Ph" style="padding-top: 10px;">:</div>
-                                <div class="col-6 Ph">
+                                <div class="col-lg-7">
                                     <input type="date" class="form-control form-control-border txt Ph" id="issueDate" required />
                                 </div>
                             </div>
 
                             <div class="form-group row" style="margin: 5px;">
-                                <label class="col-lg-5 col-form-label Ph" style="padding-top: 10px;">Expiry Date</label>
+                                <label class="col-lg-4 col-form-label Ph" style="padding-top: 10px;">Expiry Date</label>
                                 <div class="Ph" style="padding-top: 10px;">:</div>
-                                <div class="col-6 Ph">
+                                <div class="col-lg-7">
                                     <input type="date" class="form-control form-control-border txt Ph" id="expiryDate" required />
                                 </div>
                             </div>
 
                             <div class="form-group row" style="margin: 5px;">
-                                <label class="col-lg-5 col-form-label Ph" style="padding-top: 10px;">Remarks</label>
+                                <label class="col-lg-4 col-form-label Ph" style="padding-top: 10px;">Remarks</label>
                                 <div class="Ph" style="padding-top: 10px;">:</div>
-                                <div class="col-6 Ph">
+                                <div class="col-lg-7">
                                     <textarea class="form-control form-control-border txt Ph" id="remarks"></textarea>
                                 </div>
                             </div>
 
                             <div class="form-group row" style="margin: 5px;">
-                                <label class="col-lg-5 col-form-label Ph" style="padding-top: 10px;">Certificate Upload</label>
+                                <label class="col-lg-4 col-form-label Ph" style="padding-top: 10px;">Certificate Upload</label>
                                 <div class="Ph" style="padding-top: 10px;">:</div>
-                                <div class="col-6 Ph">
+                                <div class="col-lg-7">
                                     <input type="file" class="form-control form-control-border txt Ph" id="certUpload" required />
                                     <div id="attachmentLinks" class="file-item"></div>
 
@@ -674,56 +705,86 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group row" style="margin: 5px;">
-                                <label class="col-lg-5 col-form-label Ph" style="padding-top: 10px;">Third Party Testing Report</label>
+                                <label class="col-lg-4 col-form-label Ph" style="padding-top: 10px;">Third Party Testing Report</label>
                                 <div class="Ph" style="padding-top: 10px;">:</div>
-                                <div class="col-6 Ph">
+                                <div class="col-lg-7">
                                     <select class="form-control form-control-border txt Ph" id="TPTReportID" required>
                                         <!-- Options will be populated dynamically -->
                                     </select>
                                 </div>
                             </div>
 
+                       
                             <div class="form-group row" style="margin: 5px;">
-                                <label class="col-lg-5 col-form-label Ph" style="padding-top: 10px;">Product Code</label>
-                                <div class="Ph" style="padding-top: 10px;">:</div>
-                                <div class="col-6 Ph">
-                                    <input type="text"
-                                           id="tptr_productCodeInput"
-                                           class="form-control form-control-border txt Ph"
-                                           placeholder="Enter Product code…"
-                                           autocomplete="off"
-                                           required />
+                                <!-- Label -->
+                                <label class="col-lg-4 col-form-label Ph" style="padding-top: 10px;">
+                                    Product Code
+                                </label>
+
+                                <!-- Colon -->
+                                <div class="col-lg-0.5" style="padding-top: 10px;">:</div>
+
+                                <!-- Inputs Column -->
+                                <div class="col-lg-7 Ph">
+                                    <div class="row">
+
+
+                                        <!-- Search Code Input -->
+                                        <div class="col-md-6">
+                                            <label for="TPTRsear_Code" class="sr-only">Search Code</label>
+                                            <input type="text"
+                                                   name="TPTRsear_Code"
+                                                   id="TPTRsear_Code"
+                                                   class="form-control"
+                                                   placeholder="Search Code"
+                                                   aria-label="Search Code"
+                                                   oninput="handleSearch(this)"
+                                                   style="text-transform: uppercase;" />
+
+                                        </div>
+                                        <!-- Product Code Input -->
+                                        <div class="col-md-6">
+                                            <input type="text"
+                                                   id="tptr_productCodeInput"
+                                                   class="form-control form-control-border txt"
+                                                   placeholder="Enter Product Code…"
+                                                   aria-label="Product Code"
+                                                   autocomplete="off"
+                                                   required />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
+
                             <div class="form-group row" style="margin: 5px;">
-                                <label class="col-lg-5 col-form-label Ph" style="padding-top: 10px;">Issue Date</label>
+                                <label class="col-lg-4 col-form-label Ph" style="padding-top: 10px;">Issue Date</label>
                                 <div class="Ph" style="padding-top: 10px;">:</div>
-                                <div class="col-6 Ph">
+                                <div class="col-lg-7">
                                     <input type="date" class="form-control form-control-border txt Ph" id="TPTRissueDate" required />
                                 </div>
                             </div>
 
                             <div class="form-group row" style="margin: 5px;">
-                                <label class="col-lg-5 col-form-label Ph" style="padding-top: 10px;">Expiry Date</label>
+                                <label class="col-lg-4 col-form-label Ph" style="padding-top: 10px;">Expiry Date</label>
                                 <div class="Ph" style="padding-top: 10px;">:</div>
-                                <div class="col-6 Ph">
+                                <div class="col-lg-7">
                                     <input type="date" class="form-control form-control-border txt Ph" id="TPTRexpiryDate" required />
                                 </div>
                             </div>
 
                             <div class="form-group row" style="margin: 5px;">
-                                <label class="col-lg-5 col-form-label Ph" style="padding-top: 10px;">Remarks</label>
+                                <label class="col-lg-4 col-form-label Ph" style="padding-top: 10px;">Remarks</label>
                                 <div class="Ph" style="padding-top: 10px;">:</div>
-                                <div class="col-6 Ph">
+                                <div class="col-lg-7">
                                     <textarea class="form-control form-control-border txt Ph" id="TPTRremarks"></textarea>
                                 </div>
                             </div>
 
                             <div class="form-group row" style="margin: 5px;">
-                                <label class="col-lg-5 col-form-label Ph" style="padding-top: 10px;">Report Upload</label>
+                                <label class="col-lg-4 col-form-label Ph" style="padding-top: 10px;">Report Upload</label>
                                 <div class="Ph" style="padding-top: 10px;">:</div>
-                                <div class="col-6 Ph">
+                                <div class="col-lg-7">
                                     <input type="file" class="form-control form-control-border txt Ph" id="reportUpload" required />
                                     <div id="tptr_attachmentLinks" class="file-item"></div>
 

@@ -26,6 +26,7 @@ namespace QMS.Core.DatabaseContext
         public DbSet<VenBISCertificate> VenBISCertificates { get; set; }
         public DbSet<CSOTracker> CSOTracker { get; set; }
         public DbSet<PDITracker> PDITracker { get; set; }
+        public DbSet<DNTracker> DeviationNote { get; set; }
         public class InspectionResult
         {
             public int InspectionID { get; set; }
