@@ -429,10 +429,10 @@ function OnTabGridLoad(response) {
         editableColumn("Validation Rep No", "Validation_Rep_No"),
         editableColumn("Customer Comp", "Customer_Comp"),
         editableColumn("Remark", "Remark"),
-        editableColumn("Created By", "CreatedBy"),
-        editableColumn("Updated By", "UpdatedBy"),
-        editableColumn("Updated Date", "UpdatedDate", "input", "left"),
-        editableColumn("Created Date", "CreatedDate", "input", "left")
+        //editableColumn("Created By", "CreatedBy"),
+        //editableColumn("Updated By", "UpdatedBy"),
+        //editableColumn("Updated Date", "UpdatedDate", "input", "left"),
+        //editableColumn("Created Date", "CreatedDate", "input", "left")
     );
 
     // // Initialize Tabulator
@@ -448,10 +448,15 @@ function OnTabGridLoad(response) {
         dataEmpty: "<div style='text-align: center; font-size: 1rem; color: gray;'>No data available</div>", // Placeholder message
         columns: columns,
 
-        cellEdited: function (cell) {
-            const rowData = cell.getRow().getData();
-            saveEditedRow(rowData); // Auto-save on edit
-        }
+        //cellEdited: function (cell) {
+        //    const rowData = cell.getRow().getData();
+        //    InsertUpdateNpiTracker(rowData); // Auto-save on edit
+        //}
+    });
+
+    table.on("cellEdited", function (cell) {
+        const rowData = cell.getRow().getData();
+        InsertUpdateNpiTracker(rowData);
     });
 
     //table.on("cellClick", function (e, cell) {
@@ -483,6 +488,73 @@ function OnTabGridLoad(response) {
 }
 
 
+function InsertUpdateNpiTracker(rowData) {
+    debugger;
+    Blockloadershow();
+    var errorMsg = "";
+    var fields = "";
+
+    console.log(rowData);
+    //if ($("#Name").val() == '' || $("#Name").val() == null || $("#Name").val() == undefined) {
+    //    fields += " - Name" + "<br>";
+    //}
+
+    if (fields != "") {
+        errorMsg = "Please fill following mandatory field(s):" + "<br><br>" + fields;
+    }
+
+    if (errorMsg != "") {
+        Blockloaderhide();
+        showDangerAlert(errorMsg);
+        return false;
+    }
+
+    var ajaxUrl = "";
+    if (rowData.Id != 0) {
+        ajaxUrl = '/NPITrac/Update';
+    }
+    else {
+        ajaxUrl = '/NPITrac/Create';
+    }
+
+    var Model = {
+        Id: rowData.Id,
+        PC: rowData.PC,
+        Vendor: rowData.Vendor,
+        Prod_Category: rowData.Prod_Category,
+        Product_Code: rowData.Product_Code,
+        Product_Des: rowData.Product_Des,
+        Wattage: rowData.Wattage,
+        NPI_Category: rowData.NPI_Category,
+        Offered_Date: rowData.Offered_Date,
+        Released_Date: rowData.Released_Date,
+        Releasded_Day: rowData.Releasded_Day,
+        Validation_Rep_No: rowData.Validation_Rep_No,
+        Customer_Comp: rowData.Customer_Comp,
+        Remark: rowData.Remark
+    };
+
+    $.ajax({
+        url: ajaxUrl, 
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(Model),
+        success: function (response) {
+            if (response.success) {
+                showSuccessAlert("Row saved successfully.");
+                setTimeout(function () {
+                    window.location.reload();
+                }, 2500);
+            } else {
+                showDangerAlert("Failed to save row: " + response.message);
+            }
+        },
+        error: function (xhr, status, error) {
+            showDangerAlert("Error saving row: " + error);
+        }
+    });
+}
+
 function delConfirm(recid) {
     debugger;
     PNotify.prototype.options.styling = "bootstrap3";
@@ -503,12 +575,12 @@ function delConfirm(recid) {
         },
     })).get().on('pnotify.confirm', function () {
         $.ajax({
-            url: '/BisProjectTrac/Delete',
+            url: '/NPITrac/Delete',
             type: 'POST',
             data: { id: recid },
             success: function (data) {
                 if (data.success == true) {
-                    showSuccessAlert("Bis Projecet Deleted successfully.");
+                    showSuccessAlert("NPI Tracker Detail Deleted successfully.");
                     setTimeout(function () {
                         window.location.reload();
                     }, 2500);

@@ -12,7 +12,7 @@ namespace QMS.Core.Models
 
         public string? PC { get; set; }
 
-        public DateTime? DispatchDate { get; set; } // string to handle "dd/MM/yyyy" in frontend
+        public DateTime? DispatchDate { get; set; } 
 
         public string? ProductCode { get; set; }
 
