@@ -246,7 +246,7 @@ namespace QMS.Core.Repositories.BisProjectTracRepository
                 int? existingId = null;
 
                 IQueryable<int> query = _dbContext.BisProject_Tracker
-                    .Where(x => x.Deleted == false && x.Cat_Ref_Lea_Model.ToString() == searchText)
+                    .Where(x => x.Deleted == false && x.Nat_Project.ToString() == searchText)
                     .Select(x => x.Id);
 
                 // Add additional condition if Id is not 0
@@ -254,7 +254,7 @@ namespace QMS.Core.Repositories.BisProjectTracRepository
                 {
                     query = _dbContext.BisProject_Tracker
                         .Where(x => x.Deleted == false &&
-                               x.Cat_Ref_Lea_Model.ToString() == searchText
+                               x.Nat_Project.ToString() == searchText
                                && x.Id != Id)
                         .Select(x => x.Id);
                 }
