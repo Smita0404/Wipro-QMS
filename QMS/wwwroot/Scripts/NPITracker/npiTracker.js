@@ -337,19 +337,19 @@ function OnTabGridLoad(response) {
             tabledata.push({
                 Sr_No: index + 1,
                 Id: item.id,
-                PC: item.PC,
-                Vendor: item.Vendor,
-                Prod_Category: item.Prod_Category,
-                Product_Code: item.Product_Code,
-                Product_Des: item.Product_Des,
-                Wattage: item.Wattage,
-                NPI_Category: item.NPI_Category,
-                Offered_Date: formatDate(item.Offered_Date),
-                Released_Date: formatDate(item.Released_Date),
-                Releasded_Day: item.Releasded_Day,
-                Validation_Rep_No: item.Validation_Rep_No,
-                Customer_Comp: item.Customer_Comp,
-                Remark: item.Remark,
+                PC: item.pc,
+                Vendor: item.vendor,
+                Prod_Category: item.prod_Category,
+                Product_Code: item.poduct_Code,
+                Product_Des: item.product_Des,
+                Wattage: item.wattage,
+                NPI_Category: item.nPI_Category,
+                Offered_Date: formatDate(item.offered_Date),
+                Released_Date: formatDate(item.released_Date),
+                Releasded_Day: item.releasded_Day,
+                Validation_Rep_No: item.validation_Rep_No,
+                Customer_Comp: item.customer_Comp,
+                Remark: item.remark,
                 CreatedBy: item.createdBy,
                 UpdatedBy: item.updatedBy,
                 UpdatedDate: formatDate(item.updatedDate),
@@ -487,7 +487,6 @@ function OnTabGridLoad(response) {
     Blockloaderhide();
 }
 
-
 function InsertUpdateNpiTracker(rowData) {
     debugger;
     Blockloadershow();
@@ -517,31 +516,32 @@ function InsertUpdateNpiTracker(rowData) {
         ajaxUrl = '/NPITrac/Create';
     }
 
-    var Model = {
-        Id: rowData.Id,
-        PC: rowData.PC,
-        Vendor: rowData.Vendor,
-        Prod_Category: rowData.Prod_Category,
-        Product_Code: rowData.Product_Code,
-        Product_Des: rowData.Product_Des,
-        Wattage: rowData.Wattage,
-        NPI_Category: rowData.NPI_Category,
-        Offered_Date: rowData.Offered_Date,
-        Released_Date: rowData.Released_Date,
-        Releasded_Day: rowData.Releasded_Day,
-        Validation_Rep_No: rowData.Validation_Rep_No,
-        Customer_Comp: rowData.Customer_Comp,
-        Remark: rowData.Remark
+    var data = {
+        Id: rowData.Id || 0,
+        PC: rowData.PC || "",
+        Vendor: rowData.Vendor || "",
+        Prod_Category: rowData.Prod_Category || "",
+        Product_Code: rowData.Product_Code || "",
+        Product_Des: rowData.Product_Des || "",
+        Wattage: rowData.Wattage || "",
+        NPI_Category: rowData.NPI_Category || "",
+        Offered_Date: rowData.Offered_Date || null,
+        Released_Date: rowData.Released_Date || null,
+        Releasded_Day: rowData.Releasded_Day || "",
+        Validation_Rep_No: rowData.Validation_Rep_No || "",
+        Customer_Comp: rowData.Customer_Comp || "",
+        Remark: rowData.Remark || ""
     };
 
     $.ajax({
         url: ajaxUrl, 
         type: 'POST',
         contentType: 'application/json',
-        data: JSON.stringify(Model),
+        data: JSON.stringify(data),
         success: function (response) {
+            Blockloaderhide();
             if (response.success) {
-                showSuccessAlert("Row saved successfully.");
+                //showSuccessAlert("Row saved successfully.");
                 setTimeout(function () {
                     window.location.reload();
                 }, 2500);

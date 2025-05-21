@@ -39,7 +39,7 @@ namespace QMS.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> CreateAsync([FromBody] NPITracker model)
+        public async Task<JsonResult> CreateAsync([FromBody]NPITracker model)
         {
             try
             {
@@ -79,7 +79,7 @@ namespace QMS.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> UpdateAsync(NPITracker model)
+        public async Task<JsonResult> UpdateAsync([FromBody] NPITracker model)
         {
             if (ModelState.IsValid)
             {
