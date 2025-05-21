@@ -60,7 +60,7 @@ namespace QMS.Core.DatabaseContext
 
         public DateTime? CreatedDate { get; set; }
 
-        public string? UpdateBy { get; set; }
+        public string? UpdatedBy { get; set; }
 
         public DateTime? UpdatedDate { get; set; }
        

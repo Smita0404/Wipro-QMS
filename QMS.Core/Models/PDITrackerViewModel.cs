@@ -38,11 +38,11 @@ namespace QMS.Core.Models
 
         public string? CreatedBy { get; set; }
 
-        public string? CreatedDate { get; set; }
+        public DateTime? CreatedDate { get; set; }
 
-        public string? UpdateBy { get; set; }
+        public string? UpdatedBy { get; set; }
 
-        public string? UpdatedDate { get; set; }
+        public DateTime? UpdatedDate { get; set; }
 
         public bool? IsDelete { get; set; }
     }

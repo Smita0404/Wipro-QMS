@@ -1,6 +1,59 @@
 ﻿var tabledata = [];
-var table = '';
+var table = ''; let vendorOptions = {};
+let filterStartDate = moment().startOf('week').format('YYYY-MM-DD');
+let filterEndDate = moment().endOf('week').format('YYYY-MM-DD');
+
 $(document).ready(function () {
+    $('#dateRangeText').text(
+        moment(filterStartDate).format('MMMM D, YYYY') + ' - ' + moment(filterEndDate).format('MMMM D, YYYY')
+    );
+
+    // Initialize Litepicker and store reference
+    const picker = new Litepicker({
+        element: document.getElementById('customDateTrigger'),
+        singleMode: false,
+        format: 'DD-MM-YYYY',
+        numberOfMonths: 2,
+        numberOfColumns: 2,
+        dropdowns: {
+            minYear: 2020,
+            maxYear: null,
+            months: true,
+            years: true
+        },
+        plugins: ['ranges'],
+        setup: (picker) => {
+            picker.on('selected', (start, end) => {
+                filterStartDate = start.format('YYYY-MM-DD');
+                filterEndDate = end.format('YYYY-MM-DD');
+                $('#dateRangeText').text(`${start.format('MMMM D, YYYY')} - ${end.format('MMMM D, YYYY')}`);
+                loadData();
+            });
+
+            picker.on('clear', () => {
+                filterStartDate = "";
+                filterEndDate = "";
+                $('#dateRangeText').text("Select Date Range");
+                loadData();
+            });
+        },
+        ranges: {
+            Today: [moment(), moment()],
+            Yesterday: [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+            'This Month': [moment().startOf('month'), moment().endOf('month')],
+            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        },
+        startDate: moment().startOf('week').format('DD-MM-YYYY'),
+        endDate: moment().endOf('week').format('DD-MM-YYYY')
+    });
+
+    // 🔑 Ensure calendar opens on click
+    $('#customDateTrigger').on('click', function () {
+        picker.show();
+    });
+
     document.getElementById('backButton').addEventListener('click', function () {
         window.history.back();
     });
@@ -54,30 +107,47 @@ var headerMenu = function () {
 
 function loadData() {
     Blockloadershow();
-
     $.ajax({
-        url: '/PDITracker/GetAll',
-        type: 'GET',
-        dataType: 'json',
-    })
-        .done(function (data) {
-            const safeData = Array.isArray(data) ? data : [];
-            if (safeData.length) {
-                console.log("PDI data:", safeData);
-                OnTabGridLoad(safeData);
-            } else {
-                showDangerAlert('No data available to load.');
+        url: '/PDITracker/GetVendor',
+        type: 'GET'
+    }).done(function (vendorData) {
+        if (Array.isArray(vendorData)) {
+            vendorOptions = vendorData.reduce((acc, v) => {
+                acc[v.value] = v.label;
+                return acc;
+            }, {});
+        }
+
+        // Nested AJAX call to get actual data after vendorOptions is populated
+        $.ajax({
+            url: '/PDITracker/GetAll',
+            type: 'GET',
+            dataType: 'json',
+            data: {
+                startDate: filterStartDate,
+                endDate: filterEndDate
+            },
+        })
+            .done(function (data) {
+                const safeData = Array.isArray(data) ? data : [];
+                if (safeData.length) {
+                    console.log("PDI data:", safeData);
+                    OnTabGridLoad(safeData);
+                } else {
+                    showDangerAlert('No data available to load.');
+                    OnTabGridLoad([]);
+                }
+            })
+            .fail(function (xhr, status, error) {
+                console.error('Error retrieving data:', status, error, xhr.responseText);
+                showDangerAlert('Error retrieving data: ' + (error || status));
                 OnTabGridLoad([]);
-            }
-        })
-        .fail(function (xhr, status, error) {
-            console.error('Error retrieving data:', status, error, xhr.responseText);
-            showDangerAlert('Error retrieving data: ' + (error || status));
-            OnTabGridLoad([]);
-        })
-        .always(function () {
-            Blockloaderhide();
-        });
+            })
+            .always(function () {
+                Blockloaderhide();
+            });
+
+    }); 
 }
 
 
@@ -184,7 +254,11 @@ function OnTabGridLoad(response) {
                 ClearedQty: item.clearedQty,
                 BISCompliance: item.bisCompliance,
                 InspectedBy: item.inspectedBy || "",
-                Remark: item.remark || ""
+                Remark: item.remark || "",
+                UpdatedDate: item.updatedDate || "",
+                CreatedDate: item.createdDate || "",
+                CreatedBy: item.createdBy || "",
+                UpdatedBy: item.updatedBy || ""
             });
         });
     }
@@ -201,19 +275,57 @@ function OnTabGridLoad(response) {
             }
         },
         { title: "S.No", field: "Sr_No", frozen: true, hozAlign: "center", headerSort: false, headerMenu: headerMenu, width: 80 },
-        editableColumn("PC", "PC", "input", "left", null, {}, {}, 160),
-           editableColumn("Dispatch Date", "DispatchDate", "date", "center", null, {}, {}, 120),
+      
+        editableColumn("Dispatch Date", "DispatchDate", "date", "center", null, {}, {}, 120),
+        editableColumn("PC", "PC", "input", "center", null, {}, {}, 160),
         editableColumn("Product Code", "ProductCode", "autocomplete_ajax"),
         editableColumn("Product Description", "ProductDescription"),
-        editableColumn("Batch Code (Vendor)", "BatchCodeVendor", "input", "left", null, {}, {}, 140),
-       
+       // editableColumn("Batch Code (Vendor)", "BatchCodeVendor", "input", "center", null, {}, {}, 140),
+        editableColumn("Batch Code(Vendor)", "BatchCodeVendor", "select2", "center", "input", {}, {
+            values: vendorOptions
+        }, function (cell) {
+            const val = cell.getValue();
+            return vendorOptions[val] || val;
+        }, 130),
         editableColumn("PDI Date", "PDIDate", "date", "center", null, {}, {}, 120),
-        editableColumn("PDI Ref No", "PDIRefNo", "input", "left", null, {}, {}, 130),
-        editableColumn("Offered Qty", "OfferedQty", "input", "right", null, {}, {}, 110),
-        editableColumn("Cleared Qty", "ClearedQty", "input", "right", null, {}, {}, 110),
+        editableColumn("PDI Ref No", "PDIRefNo", "input", "center", null, {}, {}, 130),
+        editableColumn("Offered Qty", "OfferedQty", "input", "center", null, {}, {}, 110),
+        editableColumn("Cleared Qty", "ClearedQty", "input", "center", null, {}, {}, 110),
         editableColumn("BIS Compliance", "BISCompliance", "tickCross", "center", null, {}, {}, 130),
-        editableColumn("Inspected By", "InspectedBy", "input", "left", null, {}, {}, 130),
-        editableColumn("Remark", "Remark", "input", "left", null, {}, {}, 180)
+        editableColumn("Inspected By", "InspectedBy", "input", "center", null, {}, {}, 130),
+        editableColumn("Remark", "Remark", "input", "center", null, {}, {}, 180),
+        {
+            title: "Created By", field: "CreatedBy",
+            hozAlign: "center",
+            headerSort: false,
+            headerMenu: headerMenu,
+            width: 100,
+            visible: false
+        },
+        {
+            title: "Created Date", field: "CreatedDate",
+            hozAlign: "center",
+            headerSort: false,
+            headerMenu: headerMenu,
+            width: 100,
+            visible: false
+        },
+        {
+            title: "Updated By", field: "UpdatedBy",
+            hozAlign: "center",
+            headerSort: false,
+            headerMenu: headerMenu,
+            width: 100,
+            visible: false
+        },
+        {
+            title: "Updated Date", field: "UpdatedDate",
+            hozAlign: "center",
+            headerSort: false,
+            headerMenu: headerMenu,
+            width: 100,
+            visible: false
+        }
     ];
 
     // Create or replace Tabulator table
@@ -242,8 +354,8 @@ function OnTabGridLoad(response) {
         const newRow = {
             PDIId: 0,
             Sr_No: table.getDataCount() + 1,
-            PC: "",
-            DispatchDate: "",
+           
+            DispatchDate: "", PC: "",
             ProductCode: "",
             ProductDescription: "",
             BatchCodeVendor: "",

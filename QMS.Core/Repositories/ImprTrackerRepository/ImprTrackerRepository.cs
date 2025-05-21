@@ -22,13 +22,23 @@ namespace QMS.Core.Repositories.ImprTrackerRepository
             _systemLogService = systemLogService;
         }
 
-        public async Task<List<ImprovementTrackerViewModel>> GetListAsync()
+        public async Task<List<ImprovementTrackerViewModel>> GetListAsync(DateTime? startDate = null, DateTime? endDate = null)
         {
             try
             {
                 var result = await _dbContext.ImprovementTracker
                     .FromSqlRaw("EXEC sp_Get_ImprovementTracker")
                     .ToListAsync();
+
+                // Apply date filtering before projecting to view models
+                if (startDate.HasValue && endDate.HasValue)
+                {
+                    result = result
+                        .Where(x => x.StartDate.HasValue &&
+                                    x.StartDate.Value.Date >= startDate.Value.Date &&
+                                    x.StartDate.Value.Date <= endDate.Value.Date)
+                        .ToList();
+                }
 
                 return result.Select(x => new ImprovementTrackerViewModel
                 {

@@ -11,12 +11,10 @@
 <script src="~/js/pnotify.js"></script>
 <script src="~/js/pnotify.confirm.js"></script>
 <script src="~/lib/bootstrap/dist/js/datatables.buttons.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/popupAlert.js"></script>
 <script src="~/lib/bootstrap/dist/js/jszip.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/buttons.html5.min.js"></script>
 <script src="~/js/common.js"></script>
-<script src="~/js/xlsx.min.js"></script>
-<script src="~/lib/bootstrap/dist/js/popupalert.js"></script>
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/litepicker/dist/css/litepicker.css" />
 
@@ -169,7 +167,14 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
+                    <div class="col-md-4">
+                    <div id="customDateTrigger" class="calendar-container">
+                        <i class="fa fa-calendar"></i>
+                        <span id="dateRangeText">Select Date Range</span>
+                    </div></div>
                     <div class="chart-container">
+                        <div class="form-group row"></div>
+                        <div class="form-group row"></div>
                         <div class="form-group row">
                           
                                 <div id="impr_tracker_table"></div>
@@ -183,7 +188,13 @@
 </div>
 
 @section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script src="https://unpkg.com/tabulator-tables@5.5.0/dist/js/tabulator.min.js"></script>
+    
     <script src="~/scripts/ImprTracker/impr-tracker.js" asp-append-version="true"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/litepicker/dist/css/litepicker.css" />
+    <script src="https://cdn.jsdelivr.net/npm/moment/min/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/litepicker/dist/litepicker.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/litepicker/dist/plugins/ranges.js"></script>
+    <script src="~/js/tabulator.js"></script>
+    <script src="~/js/xlsx.min.js"></script>
 }
+

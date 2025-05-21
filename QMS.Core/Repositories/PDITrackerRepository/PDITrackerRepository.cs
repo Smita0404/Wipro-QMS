@@ -18,15 +18,34 @@ namespace QMS.Core.Repositories.PDITrackerRepository
             _dbContext = dbContext;
             _systemLogService = systemLogService;
         }
-
-        public async Task<List<PDITrackerViewModel>> GetListAsync()
+        public async Task<List<DropdownOptionViewModel>> GetVendorDropdownAsync()
+        {
+            return await _dbContext.Vendor
+                .Where(v => !v.Deleted)
+                .Select(v => new DropdownOptionViewModel
+                {
+                    Label = v.Name,
+                    Value = v.Vendor_Code
+                })
+                .Distinct()
+                .ToListAsync();
+        }
+        public async Task<List<PDITrackerViewModel>> GetListAsync(DateTime? startDate = null, DateTime? endDate = null)
         {
             try
             {
                 var result = await _dbContext.PDITracker
                     .FromSqlRaw("EXEC sp_Get_PDI_Tracker")
                     .ToListAsync();
-
+                // Apply date filtering before projecting to view models
+                if (startDate.HasValue && endDate.HasValue)
+                {
+                    result = result
+                        .Where(x => x.DispatchDate.HasValue &&
+                                    x.DispatchDate.Value.Date >= startDate.Value.Date &&
+                                    x.DispatchDate.Value.Date <= endDate.Value.Date)
+                        .ToList();
+                }
                 return result.Select(data => new PDITrackerViewModel
                 {
                     Id = data.Id,
@@ -43,7 +62,11 @@ namespace QMS.Core.Repositories.PDITrackerRepository
                     BISCompliance = data.BISCompliance,
                     InspectedBy = data.InspectedBy,
                     Remark = data.Remark,
-                    IsDelete = data.Deleted
+                    IsDelete = data.Deleted,
+                    CreatedBy = data.CreatedBy,
+                    CreatedDate = data.CreatedDate,
+                    UpdatedBy = data.UpdatedBy,
+                    UpdatedDate = data.UpdatedDate
                 }).ToList();
             }
             catch (Exception ex)
@@ -91,11 +114,12 @@ namespace QMS.Core.Repositories.PDITrackerRepository
                     new SqlParameter("@BISCompliance", entity.BISCompliance ?? (object)DBNull.Value),
                     new SqlParameter("@InspectedBy", entity.InspectedBy ?? (object)DBNull.Value),
                     new SqlParameter("@Remark", entity.Remark ?? (object)DBNull.Value),
+                     new SqlParameter("@CreatedBy", entity.CreatedBy ?? (object)DBNull.Value),
                    new SqlParameter("@IsDeleted", entity.Deleted)
                 };
 
                 await _dbContext.Database.ExecuteSqlRawAsync(
-                    "EXEC sp_Insert_PDITracker @DispatchDate, @PC, @ProductCode, @ProductDescription, @BatchCodeVendor, @PONo, @PDIDate, @PDIRefNo, @OfferedQty, @ClearedQty, @BISCompliance, @InspectedBy, @Remark, @IsDeleted",
+                    "EXEC sp_Insert_PDITracker @DispatchDate, @PC, @ProductCode, @ProductDescription, @BatchCodeVendor, @PONo, @PDIDate, @PDIRefNo, @OfferedQty, @ClearedQty, @BISCompliance, @InspectedBy, @Remark,@CreatedBy, @IsDeleted",
                     parameters
                 );
 
@@ -128,11 +152,12 @@ namespace QMS.Core.Repositories.PDITrackerRepository
                     new SqlParameter("@BISCompliance", entity.BISCompliance ?? (object)DBNull.Value),
                     new SqlParameter("@InspectedBy", entity.InspectedBy ?? (object)DBNull.Value),
                     new SqlParameter("@Remark", entity.Remark ?? (object)DBNull.Value),
-                   
+                     new SqlParameter("@UpdatedBy", entity.UpdatedBy ?? (object)DBNull.Value)
+
                 };
 
                 await _dbContext.Database.ExecuteSqlRawAsync(
-                    "EXEC sp_Update_PDITracker @PDIId, @DispatchDate, @PC, @ProductCode, @ProductDescription, @BatchCodeVendor, @PONo, @PDIDate, @PDIRefNo, @OfferedQty, @ClearedQty, @BISCompliance, @InspectedBy, @Remark",
+                    "EXEC sp_Update_PDITracker @PDIId, @DispatchDate, @PC, @ProductCode, @ProductDescription, @BatchCodeVendor, @PONo, @PDIDate, @PDIRefNo, @OfferedQty, @ClearedQty, @BISCompliance, @InspectedBy, @Remark,@UpdatedBy",
                     parameters
                 );
 

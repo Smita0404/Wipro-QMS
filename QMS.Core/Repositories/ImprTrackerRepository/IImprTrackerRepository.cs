@@ -8,7 +8,7 @@ namespace QMS.Core.Repositories.ImprTrackerRepository
 {
     public interface IImprTrackerRepository
     {
-        Task<List<ImprovementTrackerViewModel>> GetListAsync();
+        Task<List<ImprovementTrackerViewModel>> GetListAsync(DateTime? startDate = null, DateTime? endDate = null);
         Task<OperationResult> CreateAsync(ImprovementTracker improvementTracker, bool returnCreatedRecord = false);
         Task<OperationResult> UpdateAsync(ImprovementTracker improvementTracker, bool returnUpdatedRecord = false);
         Task<OperationResult> DeleteAsync(int id);

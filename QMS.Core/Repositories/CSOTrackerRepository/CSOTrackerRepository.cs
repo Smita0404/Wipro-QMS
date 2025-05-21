@@ -20,12 +20,19 @@ namespace QMS.Core.Repositories.CSOTrackerRepository
             _systemLogService = systemLogService;
         }
 
-        public async Task<List<CSOTrackerViewModel>> GetListAsync()
+        public async Task<List<CSOTrackerViewModel>> GetListAsync(DateTime? startDate = null, DateTime? endDate = null)
         {
             try
             {
                 var result = await _dbContext.CSOTracker.FromSqlRaw("EXEC sp_Get_CSO_Tracker").ToListAsync();
-
+                if (startDate.HasValue && endDate.HasValue)
+                {
+                    result = result
+                        .Where(x => x.CSOLogDate.HasValue &&
+                                    x.CSOLogDate.Value.Date >= startDate.Value.Date &&
+                                    x.CSOLogDate.Value.Date <= endDate.Value.Date)
+                        .ToList();
+                }
                 return result.Select(data => new CSOTrackerViewModel
                 {
                     CSOId = data.Id,
@@ -45,7 +52,11 @@ namespace QMS.Core.Repositories.CSOTrackerRepository
                     PreventiveAction = data.PreventiveAction,
                     CSOsClosureDate = data.CSOsClosureDate,
                     Aging = data.Aging,
-                    AttachmentCAPAReport = data.AttachmentCAPAReport
+                    AttachmentCAPAReport = data.AttachmentCAPAReport,
+                    CreatedBy = data.CreatedBy,
+                    CreatedDate = data.CreatedDate,
+                    UpdatedBy = data.UpdatedBy,
+                    UpdatedDate = data.UpdatedDate
                 }).ToList();
             }
             catch (Exception ex)
@@ -115,10 +126,11 @@ namespace QMS.Core.Repositories.CSOTrackerRepository
                     new SqlParameter("@CSOsClosureDate", entity.CSOsClosureDate ?? (object)DBNull.Value),
                     new SqlParameter("@Aging", entity.Aging ?? (object)DBNull.Value),
                     new SqlParameter("@AttachmentCAPAReport", entity.AttachmentCAPAReport ?? (object)DBNull.Value),
+                     new SqlParameter("@CreatedBy", entity.CreatedBy ?? (object)DBNull.Value),
                     new SqlParameter("@IsDeleted", entity.Deleted)
                 };
 
-                await _dbContext.Database.ExecuteSqlRawAsync("EXEC sp_Insert_CSOTracker @CSOLogDate, @CSONo, @ClassAB, @ProductCatRef, @ProductDescription, @SourceOfCSO, @InternalExternal, @PKDBatchCode, @ProblemStatement, @SuppliedQty, @FailedQty, @RootCause, @CorrectiveAction, @PreventiveAction, @CSOsClosureDate, @Aging, @AttachmentCAPAReport, @IsDeleted", parameters);
+                await _dbContext.Database.ExecuteSqlRawAsync("EXEC sp_Insert_CSOTracker @CSOLogDate, @CSONo, @ClassAB, @ProductCatRef, @ProductDescription, @SourceOfCSO, @InternalExternal, @PKDBatchCode, @ProblemStatement, @SuppliedQty, @FailedQty, @RootCause, @CorrectiveAction, @PreventiveAction, @CSOsClosureDate, @Aging, @AttachmentCAPAReport,@CreatedBy, @IsDeleted", parameters);
 
                 return new OperationResult { Success = true };
             }
@@ -152,10 +164,11 @@ namespace QMS.Core.Repositories.CSOTrackerRepository
                     new SqlParameter("@PreventiveAction", entity.PreventiveAction ?? (object)DBNull.Value),
                     new SqlParameter("@CSOsClosureDate", entity.CSOsClosureDate ?? (object)DBNull.Value),
                     new SqlParameter("@Aging", entity.Aging ?? (object)DBNull.Value),
-                    new SqlParameter("@AttachmentCAPAReport", entity.AttachmentCAPAReport ?? (object)DBNull.Value)
+                    new SqlParameter("@AttachmentCAPAReport", entity.AttachmentCAPAReport ?? (object)DBNull.Value),
+                       new SqlParameter("@UpdatedBy", entity.UpdatedBy ?? (object)DBNull.Value)
                 };
 
-                await _dbContext.Database.ExecuteSqlRawAsync("EXEC sp_Update_CSOTracker @CSOId, @CSOLogDate, @CSONo, @ClassAB, @ProductCatRef, @ProductDescription, @SourceOfCSO, @InternalExternal, @PKDBatchCode, @ProblemStatement, @SuppliedQty, @FailedQty, @RootCause, @CorrectiveAction, @PreventiveAction, @CSOsClosureDate, @Aging, @AttachmentCAPAReport", parameters);
+                await _dbContext.Database.ExecuteSqlRawAsync("EXEC sp_Update_CSOTracker @CSOId, @CSOLogDate, @CSONo, @ClassAB, @ProductCatRef, @ProductDescription, @SourceOfCSO, @InternalExternal, @PKDBatchCode, @ProblemStatement, @SuppliedQty, @FailedQty, @RootCause, @CorrectiveAction, @PreventiveAction, @CSOsClosureDate, @Aging, @AttachmentCAPAReport,@UpdatedBy", parameters);
 
                 return new OperationResult { Success = true };
             }

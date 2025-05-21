@@ -31,9 +31,9 @@ namespace QMS.Controllers
         }
 
         [HttpGet]
-        public async Task<JsonResult> GetAll()
+        public async Task<JsonResult> GetAll(DateTime? startDate, DateTime? endDate)
         {
-            var list = await _imprTrackerRepository.GetListAsync();
+            var list = await _imprTrackerRepository.GetListAsync(startDate, endDate);
             return Json(list);
         }
 
