@@ -121,6 +121,15 @@
     .form-group {
         margin-bottom: 0.5rem; /* Reduce space between each input group */
     }
+
+    .card-primary.card-outline-tabs > .card-header a.active,
+    .card-primary.card-outline-tabs > .card-header a.active:hover {
+        border-top: 3px solid #007bff;
+    }
+
+    .card-primary.card-outline-tabs > .card-header a:hover {
+        border-top: 3px solid #dee2e6;
+    }
     
 </style>
 
@@ -146,11 +155,10 @@
         </div>
     </div>
 
-    <div class="card">
+    <div class="card card-primary card-outline card-outline-tabs">
         <div class="card-body">
-            <div class="row">
-                <div class="col-2">
-                    <div class="nav flex-column nav-pills" id="v-tabs" role="tablist"  style="border-right:2px double;font-size:14px;">
+            
+                    <div class="nav nav-tabs" id="v-tabs" role="tablist">
                         <a class="nav-link active" id="v-tab1" data-bs-toggle="pill" href="#tab1" role="tab">Vendor Details</a>
                         @if(Model?.Vendor_Code == null || Model?.Vendor_Code == "")
                         {
@@ -558,9 +566,7 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
+       
 <!-- Add Certificate Modal -->
 <div id="certificateModal" class="modal fade" tabindex="-1">
     <div class="modal-dialog modal-md">
