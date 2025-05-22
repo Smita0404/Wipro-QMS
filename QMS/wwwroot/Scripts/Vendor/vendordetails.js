@@ -6,11 +6,11 @@ $(document).ready(function () {
    
     loadCertificateDropdown();
 
-    const inputElement = $("#sear_Code");
+    const inputElement = $("#sear_Certi_Code");
     if (inputElement.length) {
         // Attach the keydown event handler
         inputElement.on('keydown', function (event) {
-            handleSearch(event);
+            handleCertiSearch(event);
         });
     }
 
@@ -23,7 +23,7 @@ $(document).ready(function () {
 
 let searchTimeout; // Timeout variable for debounce
 
-function handleSearch(event) {
+function handleCertiSearch(event) {
     debugger
     if (event.key !== 'Enter') return;
 
@@ -38,11 +38,11 @@ function handleSearch(event) {
     searchTimeout = setTimeout(() => {
         pagedData = {}; // Clear cached data
         // Load data with the processed query
-        fetchRelatedData(searchTerms, event.target);
+        fetchCertiRelatedData(searchTerms, event.target);
     }, 300); // Delay of 300ms
 }
 
-function fetchRelatedData(productCatNo, inputField) {
+function fetchCertiRelatedData(productCatNo, inputField) {
     debugger
     $.ajax({
         url: '/Vendor/GetCodeSearch', // API endpoint
@@ -51,7 +51,7 @@ function fetchRelatedData(productCatNo, inputField) {
         dataType: 'json', // Expected response data type
         success: function (data) {
             if (data && data.length > 0) {
-                displaySuggestions(data, inputField);
+                displayCertiSuggestions(data, inputField);
             } else {
                 showDangerAlert('No data found for the entered Product Cat No.');
             }
@@ -64,7 +64,7 @@ function fetchRelatedData(productCatNo, inputField) {
 
 
 // Function to display suggestions in a dropdown
-function displaySuggestions(data, inputField) {
+function displayCertiSuggestions(data, inputField) {
     debugger
     // Create a dropdown container
     const dropdown = document.createElement('div');
@@ -75,15 +75,15 @@ function displaySuggestions(data, inputField) {
     dropdown.style.zIndex = 1000;
     dropdown.style.overflowY = 'auto'; // Enable vertical scrolling
     dropdown.style.maxHeight = '300px'; // Set a fixed height for the dropdown
-    dropdown.style.width = '175px'; // Set a fixed height for the dropdown
+    dropdown.style.width = '190px'; // Set a fixed height for the dropdown
     dropdown.style.boxShadow = '0px 4px 6px rgba(0, 0, 0, 0.1)'; // Add some shadow for better visibility
 
     // Position the dropdown relative to the input field
-    const parentContainer = inputField.closest('.form-group') || inputField.parentElement;
-    parentContainer.style.position = 'relative';
+    const rect = inputField.getBoundingClientRect(); 
+    //parentContainer.style.position = 'relative';
 
-    dropdown.style.top = `${parentContainer.bottom + window.scrollY}px`;
-    dropdown.style.left = `${parentContainer.left + window.scrollX}px`;
+    //dropdown.style.top = `${parentContainer.bottom + window.scrollY}px`;
+    //dropdown.style.left = `${parentContainer.left + window.scrollX}px`;
     // dropdown.style.width = `${inputField.offsetWidth}px`;
 
     // Populate dropdown with suggestions
@@ -104,7 +104,7 @@ function displaySuggestions(data, inputField) {
 
         // On clicking a suggestion, set it as the value of the input with ID "NewPart_No"
         option.addEventListener('click', () => {
-            const oldPartNoInput = document.getElementById('productCodeInput');
+            const oldPartNoInput = document.getElementById('certi_productCodeInput');
 
             if (oldPartNoInput) {
                 oldPartNoInput.value = item.oldPart_No;
@@ -121,8 +121,8 @@ function displaySuggestions(data, inputField) {
     });
 
     // Remove existing dropdown if any and append the new one
-    removeExistingDropdown();
-    parentContainer.appendChild(dropdown);
+    removeExistingDropdown(inputField);
+    inputField.parentElement.appendChild(dropdown); // Append dropdown inside the parent element of the input field
 }
 
 // Remove any existing dropdown
