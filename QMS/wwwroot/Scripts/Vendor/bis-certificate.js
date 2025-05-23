@@ -118,20 +118,8 @@ function removeExistingDropdown(inputField) {
     }
 }
 
-// Function to remove any existing dropdowns
-function removeExistingDropdown(inputField) {
-    const existingDropdown = inputField.parentElement.querySelector('.suggestion-dropdown');
-    if (existingDropdown) {
-        existingDropdown.remove();
-    }
-}
-// Remove any existing dropdown
-function removeExistingDropdown() {
-    const existingDropdown = document.querySelector('.suggestion-dropdown');
-    if (existingDropdown) {
-        existingDropdown.remove();
-    }
-}
+
+
 
 // Remove dropdown on outside click
 document.addEventListener('click', function (e) {
@@ -155,14 +143,14 @@ function initializeBISCertificateTable(data) {
             placeholder: "No BIS certificates available",
             columns: [
                 {
-                    title: "Action", field: "action", hozAlign: "center", headerSort: false, width: 90, headerMenu: headerMenu,
+                    title: "Action", field: "action", hozAlign: "center",  width:120, headerMenu: headerMenu,
                     formatter: function (cell) {
                         const rowData = cell.getRow().getData();
                         return `<i class="fas fa-trash-alt text-danger" style="cursor:pointer;" title="Delete" onclick="deleteBISCertificate(${rowData.id})"></i>`;
                     }
                 },
                 {
-                    title: "Attachment", field: "fileName", hozAlign: "center", headerSort: false, headerMenu: headerMenu,
+                    title: "Attachment", field: "fileName", hozAlign: "center",  visible: false, headerMenu: headerMenu,
                     formatter: function (cell) {
                         const value = cell.getValue();
                         if (!value) return "";
@@ -174,22 +162,54 @@ function initializeBISCertificateTable(data) {
                         ).join(" ");
                     }
                 },
-                { title: "Sn", formatter: "rownum", width: 90, hozAlign: "center", headerSort: false, headerMenu: headerMenu },
-                { title: "ID", field: "id", visible: false, headerSort: false, headerMenu: headerMenu },
-                { title: "BIS Certificate", field: "certificateDetail", headerFilter: "input", headerSort: false, headerMenu: headerMenu },
-                { title: "Product Code", field: "productCode", headerFilter: "input", headerSort: false, headerMenu: headerMenu },
-                { title: "Section", field: "bisSection", headerFilter: "input", visible: false, headerSort: false, headerMenu: headerMenu },
-                { title: "R Number", field: "rNumber", headerFilter: "input", visible: false, headerSort: false, headerMenu: headerMenu },
-                { title: "Model No", field: "modelNo", headerFilter: "input", headerSort: false, headerMenu: headerMenu },
+                { title: "Sn", formatter: "rownum", width: 90, hozAlign: "center",  headerMenu: headerMenu },
+                { title: "ID", field: "id", visible: false, headerMenu: headerMenu },
+                { title: "BIS Certificate", field: "certificateDetail", hozAlign: "center", headerFilter: "input",  headerMenu: headerMenu },
+                { title: "Product Code", field: "productCode", hozAlign: "center", headerFilter: "input", headerMenu: headerMenu },
+                { title: "Section", field: "bisSection", hozAlign: "center", headerFilter: "input", visible: false,  headerMenu: headerMenu },
+                { title: "R Number", field: "rNumber", hozAlign: "center", headerFilter: "input", visible: false,  headerMenu: headerMenu },
+                { title: "Model No", field: "modelNo", hozAlign: "center", headerFilter: "input",  headerMenu: headerMenu },
                 {
                     title: "Issue Date", field: "issueDate", hozAlign: "center", formatter: dateFormatter,
-                    headerFilter: "input", headerSort: false, headerMenu: headerMenu
+                    headerFilter: "input",  headerMenu: headerMenu
                 },
                 {
                     title: "Expiry Date", field: "expiryDate", hozAlign: "center", formatter: dateFormatter,
-                    headerFilter: "input", headerSort: false, headerMenu: headerMenu
+                    headerFilter: "input",  headerMenu: headerMenu
                 },
-                { title: "Remarks", field: "remarks", headerSort: false, headerMenu: headerMenu }
+                { title: "Remarks", field: "remarks",  hozAlign: "center", headerMenu: headerMenu },
+                {
+                    title: "Created By", field: "createdBy",
+                    hozAlign: "center",
+                    headerSort: false,
+                    headerMenu: headerMenu,
+                    width: 100,
+                    visible: false
+                },
+                {
+                    title: "Created Date", field: "createdDate",
+                    hozAlign: "center",
+                    headerSort: false,
+                    headerMenu: headerMenu,
+                    width: 100,
+                    visible: false
+                },
+                {
+                    title: "Updated By", field: "updatedBy",
+                    hozAlign: "center",
+                    headerSort: false,
+                    headerMenu: headerMenu,
+                    width: 100,
+                    visible: false
+                },
+                {
+                    title: "Updated Date", field: "updatedDate",
+                    hozAlign: "center",
+                    headerSort: false,
+                    headerMenu: headerMenu,
+                    width: 100,
+                    visible: false
+                }
             ]
 
 
@@ -353,24 +373,24 @@ function InsertUpdateVendorBIS(e) {
         showDangerAlert("BIS Certificate is required.");
         return;
     }
-    if (productCode === "") {
-        showDangerAlert("Product Code is required.");
-        return;
-    }
-    if (issueDate === "") {
-        showDangerAlert("Issue Date is required.");
-        return;
-    }
-    if (expiryDate === "") {
-        showDangerAlert("Expiry Date is required.");
-        return;
-    }
+    //if (productCode === "") {
+    //    showDangerAlert("Product Code is required.");
+    //    return;
+    //}
+    //if (issueDate === "") {
+    //    showDangerAlert("Issue Date is required.");
+    //    return;
+    //}
+    //if (expiryDate === "") {
+    //    showDangerAlert("Expiry Date is required.");
+    //    return;
+    //}
 
-    // Additional validation for date fields (optional)
-    if (new Date(issueDate) > new Date(expiryDate)) {
-        showDangerAlert("Expiry Date cannot be earlier than Issue Date.");
-        return;
-    }
+    //// Additional validation for date fields (optional)
+    //if (new Date(issueDate) > new Date(expiryDate)) {
+    //    showDangerAlert("Expiry Date cannot be earlier than Issue Date.");
+    //    return;
+    //}
 
     // Prepare form data
     let formData = new FormData();

@@ -8,20 +8,20 @@ namespace QMS.Core.Models
 
         public int VendorCertID { get; set; }
 
-        [Required(ErrorMessage = "Product Code is required.")]
+       
         [Display(Name = "Product Code")]
         public string? ProductCode { get; set; }
 
-        [Required(ErrorMessage = "Vendor ID is required.")]
+      
         [Display(Name = "Vendor")]
-        public int VendorID { get; set; }
+        public int? VendorID { get; set; }
 
         [Display(Name = "Issue Date")]
-        [DataType(DataType.Date)]
+       
         public DateTime? IssueDate { get; set; }
 
         [Display(Name = "Expiry Date")]
-        [DataType(DataType.Date)]
+      
         public DateTime? ExpiryDate { get; set; }
 
         [Display(Name = "Certificate File")]
@@ -41,8 +41,8 @@ namespace QMS.Core.Models
 
         [Display(Name = "Updated Date")]
         public DateTime? UpdatedDate { get; set; }
-        [Display(Name = "certificateID")]
-        public int CertificateID { get; set; }
+       
+        public int? CertificateID { get; set; }
         [Display(Name = "Certificate Name")]
         public string? CertificateName { get; set; }
 

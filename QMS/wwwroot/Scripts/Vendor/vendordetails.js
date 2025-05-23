@@ -304,14 +304,14 @@ function InsertUpdateVendorcert(event) {
 
     // Validation
     const errors = [];
-    if (!vendorID) errors.push("Vendor ID is required.");
+   /* if (!vendorID) errors.push("Vendor ID is required.");*/
     if (!vendorCode) errors.push("Vendor Code is required.");
-    if (!certificateMasterId) errors.push("Please select a certificate.");
-    if (!productCode) errors.push("Product Code is required.");
-    if (!issueDate) errors.push("Issue Date is required.");
-    if (!expiryDate) errors.push("Expiry Date is required.");
-    if (new Date(issueDate) > new Date(expiryDate)) errors.push("Issue Date cannot be after Expiry Date.");
-    if (!remarks) errors.push("Remarks are required.");
+    //if (!certificateMasterId) errors.push("Please select a certificate.");
+    //if (!productCode) errors.push("Product Code is required.");
+    //if (!issueDate) errors.push("Issue Date is required.");
+    //if (!expiryDate) errors.push("Expiry Date is required.");
+    //if (new Date(issueDate) > new Date(expiryDate)) errors.push("Issue Date cannot be after Expiry Date.");
+    //if (!remarks) errors.push("Remarks are required.");
 
     const fileInput = $('#certUpload')[0];
     if (isInsert && fileInput.files.length === 0) {
@@ -445,7 +445,7 @@ function initializeCertificateTable(data) {
                     title: "Action",
                     field: "action",
                     hozAlign: "center",
-                    headerHozAlign: "center",
+                    headerHozAlign: "center", headerMenu: headerMenu,
                     formatter: function (cell) {
                         const rowData = cell.getRow().getData();
                         return `
@@ -454,20 +454,20 @@ function initializeCertificateTable(data) {
                                onclick="deleteCertificateVedn(${rowData.vendorCertID})"></i>`;
                     }
                 },
-                { title: "ID", field: "vendorCertID", headerFilter: "input", visible: false },
-                { title: "Certificate", field: "certificateID", headerFilter: "input", visible: false },
-                { title: "Certificate", field: "certificateName", headerFilter: "input" },
-                { title: "Product Code", field: "productCode", headerFilter: "input" },
-                { title: "Vendor", field: "vendorCode", headerFilter: "input" },
+                { title: "ID", field: "vendorCertID", headerMenu: headerMenu, headerFilter: "input", visible: false },
+                { title: "Certificate", field: "certificateID", headerMenu: headerMenu, headerFilter: "input", hozAlign: "center", visible: false },
+                { title: "Certificate", field: "certificateName", hozAlign: "center", headerMenu: headerMenu, headerFilter: "input" },
+                { title: "Product Code", field: "productCode", headerMenu: headerMenu, hozAlign: "center", headerFilter: "input" },
+                { title: "Vendor", field: "vendorCode", headerMenu: headerMenu, hozAlign: "center", headerFilter: "input", visible: false },
                 {
                     title: "Issue Date",
                     field: "issueDate",
-                    formatter: dateFormatter,
+                    formatter: dateFormatter, headerMenu: headerMenu, headerFilter: "input", 
                     hozAlign: "center"
                 },
                 {
                     title: "Expiry Date",
-                    field: "expiryDate",
+                    field: "expiryDate", headerMenu: headerMenu, headerFilter: "input", 
                     formatter: dateFormatter,
                     hozAlign: "center"
                 },
@@ -475,8 +475,8 @@ function initializeCertificateTable(data) {
                 {
                     title: "Attachment",
                     field: "certUpload",
-                    hozAlign: "center",
-                    headerHozAlign: "center",
+                    hozAlign: "center", headerMenu: headerMenu,
+                    headerHozAlign: "center", visible: false,
                     formatter: function (cell) {
                         const value = cell.getValue();
                         if (!value) return "";
@@ -488,6 +488,37 @@ function initializeCertificateTable(data) {
                         ).join(" ");
                     },
                     headerSort: false
+                }, {
+                    title: "Created By", field: "createdBy",
+                    hozAlign: "center",
+                    headerSort: false,
+                    headerMenu: headerMenu,
+                    width: 100,
+                    visible: false
+                },
+                {
+                    title: "Created Date", field: "createdDate",
+                    hozAlign: "center",
+                    headerSort: false,
+                    headerMenu: headerMenu,
+                    width: 100,
+                    visible: false
+                },
+                {
+                    title: "Updated By", field: "updatedBy",
+                    hozAlign: "center",
+                    headerSort: false,
+                    headerMenu: headerMenu,
+                    width: 100,
+                    visible: false
+                },
+                {
+                    title: "Updated Date", field: "updatedDate",
+                    hozAlign: "center",
+                    headerSort: false,
+                    headerMenu: headerMenu,
+                    width: 100,
+                    visible: false
                 }
             ]
         });

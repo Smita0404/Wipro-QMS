@@ -11,11 +11,11 @@ namespace QMS.Core.Models
     {
         public int ID { get; set; }
 
-        [Required]
+       
         [Display(Name = "Product Code")]
         public string? ProductCode { get; set; }
 
-        [Required]
+       
         [Display(Name = "Vendor ID")]
         public int? VendorID { get; set; }
 
@@ -34,11 +34,11 @@ namespace QMS.Core.Models
         [Display(Name = "Remarks")]
         public string? Remarks { get; set; }
 
-        [DataType(DataType.Date)]
+       
         [Display(Name = "Issue Date")]
         public DateTime? IssueDate { get; set; }
 
-        [DataType(DataType.Date)]
+      
         [Display(Name = "Expiry Date")]
         public DateTime? ExpiryDate { get; set; }
 

@@ -6,7 +6,7 @@ namespace QMS.Core.Repositories.DNTrackerRepository
 {
     public interface IDNTrackerRepository
     {
-        Task<List<DNTrackerViewModel>> GetListAsync();
+        Task<List<DNTrackerViewModel>> GetListAsync(DateTime? startDate = null, DateTime? endDate = null);
         Task<DNTracker?> GetByIdAsync(int id);
         Task<OperationResult> CreateAsync(DNTracker entity);
         Task<OperationResult> UpdateAsync(DNTracker entity);

@@ -4,6 +4,7 @@ using QMS.Core.DatabaseContext;
 using QMS.Core.Models;
 using QMS.Core.Repositories.Shared;
 using QMS.Core.Services.SystemLogs;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace QMS.Core.Repositories.DNTrackerRepository
 {
@@ -19,14 +20,23 @@ namespace QMS.Core.Repositories.DNTrackerRepository
             _log = log;
         }
 
-        public async Task<List<DNTrackerViewModel>> GetListAsync()
+        public async Task<List<DNTrackerViewModel>> GetListAsync(DateTime? startDate = null, DateTime? endDate = null)
         {
             try
             {
                 var result = await _dbContext.DeviationNote
                     .FromSqlRaw("EXEC sp_Get_DN_Tracker")
                     .ToListAsync();
+                if (startDate.HasValue && endDate.HasValue)
+                {
+                    result = result
+                        .Where(x => x.CreatedDate.HasValue &&
+                                    x.CreatedDate.Value.Date >= startDate.Value.Date &&
+                                    x.CreatedDate.Value.Date <= endDate.Value.Date)
+                        .ToList();
+                }
 
+               
                 return result.Select(x => new DNTrackerViewModel
                 {
                     Id = x.Id,
@@ -39,18 +49,13 @@ namespace QMS.Core.Repositories.DNTrackerRepository
                     DRequisitionBy = x.DRequisitionBy,
                     Vendor = x.Vendor,
                     Remark = x.Remark,
-                    IsDeleted = x.Deleted
+                    IsDeleted = x.Deleted,
+                    CreatedBy = x.CreatedBy,
+                    CreatedDate = x.CreatedDate,
+                    UpdatedBy = x.UpdatedBy,
+                    UpdatedDate = x.UpdatedDate
                 }).ToList();
-                //if (startDate.HasValue && endDate.HasValue)
-                //{
-                //    result = result
-                //        .Where(x => x.CreatedDate.HasValue &&
-                //                    x.CreatedDate.Value.Date >= startDate.Value.Date &&
-                //                    x.CreatedDate.Value.Date <= endDate.Value.Date)
-                //        .ToList();
-                //}
-
-                //return result;
+               
             
             }
             catch (Exception ex)
@@ -127,7 +132,7 @@ namespace QMS.Core.Repositories.DNTrackerRepository
                     new SqlParameter("@Vendor", entity.Vendor ?? (object)DBNull.Value),
                     new SqlParameter("@Remark", entity.Remark ?? (object)DBNull.Value),
                     new SqlParameter("@UpdatedBy", entity.UpdatedBy ?? (object)DBNull.Value),
-            new SqlParameter("@UpdatedDate", entity.UpdatedDate),
+            new SqlParameter("@UpdatedDate", entity.UpdatedDate)
                 };
 
                 await _dbContext.Database.ExecuteSqlRawAsync("EXEC sp_Update_DN_Tracker @DNoteId, @DNoteNumber, @DNoteCategory, @ProductCode, @ProductDescription, @Wattage, @DQty, @DRequisitionBy, @Vendor, @Remark,@UpdatedBy,@UpdatedDate", parameters);

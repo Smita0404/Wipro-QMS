@@ -160,27 +160,44 @@ function InsertUpdateVendorReport(event) {
     const remarks = $('#TPTRremarks').val().trim();
 
     // Collect validation errors
-    let validationErrors = [];
-
-    if (!vendorCode) validationErrors.push("Vendor Code is required.");
-    if (!reportID) validationErrors.push("Please select a Third Party Report.");
-    if (!productCode) validationErrors.push("Product Code is required.");
-    if (!issueDate) validationErrors.push("Issue Date is required.");
-    if (!expiryDate) validationErrors.push("Expiry Date is required.");
-    if (new Date(issueDate) > new Date(expiryDate)) validationErrors.push("Issue Date cannot be after Expiry Date.");
-    if (!remarks) validationErrors.push("Remarks are required.");
-
-    // File validation (only for insert)
-    const isInsert = $('#tptr_Id').val() == "";
-    const fileInput = $('#reportUpload')[0];
-    if (isInsert && fileInput.files.length === 0) {
-        validationErrors.push("Report file is required.");
-    }
-
-    if (validationErrors.length > 0) {
-        showDangerAlert(validationErrors.join("<br>"));
+    // Validate required fields
+    if (vendorCode === "") {
+        showDangerAlert("Vendor Code is required.");
         return;
     }
+    //if (reportID === "") {
+    //    showDangerAlert("Please select a Third Party Report.");
+    //    return;
+    //}
+    //if (productCode === "") {
+    //    showDangerAlert("Product Code is required.");
+    //    return;
+    //}
+    //if (issueDate === "") {
+    //    showDangerAlert("Issue Date is required.");
+    //    return;
+    //}
+    //if (expiryDate === "") {
+    //    showDangerAlert("Expiry Date is required.");
+    //    return;
+    //}
+    //if (new Date(issueDate) > new Date(expiryDate)) {
+    //    showDangerAlert("Issue Date cannot be after Expiry Date.");
+    //    return;
+    //}
+    //if (remarks === "") {
+    //    showDangerAlert("Remarks are required.");
+    //    return;
+    //}
+
+    // File validation (only for insert)
+    const isInsert = $('#tptr_Id').val() === "";
+    const fileInput = $('#reportUpload')[0];
+    if (isInsert && fileInput.files.length === 0) {
+        showDangerAlert("Report file is required.");
+        return;
+    }
+
 
     // All validations passed — prepare form data
     const formData = new FormData();
@@ -298,6 +315,7 @@ function initializeTPTReportTable(data) {
     if (TPTReportTable) {
         TPTReportTable.replaceData(data); // Replace data if the table is already initialized
     } else {
+      
         TPTReportTable = new Tabulator("#TPTReportTable", {
             data: data,
             layout: "fitColumns",
@@ -312,9 +330,9 @@ function initializeTPTReportTable(data) {
                 { title: "Sn", formatter: "rownum", width: 90, headerSort: false, headerMenu: headerMenu, frozen: true, hozAlign: "center" },
                 {
                     title: "Action",
-                    field: "action", headerSort: false,
-                    hozAlign: "center",
-                    headerHozAlign: "center", width: 90,
+                    field: "action",
+                    hozAlign: "center", headerMenu: headerMenu,
+                    headerHozAlign: "center", width: 120,
                     formatter: function (cell) {
                         const rowData = cell.getRow().getData();
                         return `
@@ -323,28 +341,29 @@ function initializeTPTReportTable(data) {
                                onclick="deleteTPTReportVedn(${rowData.id})"></i>`;
                     }
                 },
-                { title: "ID", field: "id", headerFilter: "input" ,visible:false},
-               // { title: "TPTReport Detail", field: "TPTReportName", headerFilter: "input" },
-                { title: "Product Code", field: "productCode", headerFilter: "input" },
-                { title: "Vendor", field: "vendorCode", headerFilter: "input", headerSort: false },
+                { title: "ID", field: "id", headerFilter: "input", headerMenu: headerMenu, visible:false},
+                {
+                    title: "Third Party Testing Report", field: "certificateName", headerFilter: "input" },
+                { title: "Product Code", field: "productCode", headerMenu: headerMenu, hozAlign: "center", headerFilter: "input" },
+                { title: "Vendor", field: "vendorCode", headerMenu: headerMenu, headerFilter: "input", headerSort: false, visible: false },
                 {
                     title: "Issue Date",
                     field: "issueDate",
-                    formatter: dateFormatter,
-                    hozAlign: "center"
+                    formatter: dateFormatter, headerMenu: headerMenu,
+                    hozAlign: "center", headerFilter: "input"
                 },
                 {
                     title: "Expiry Date",
                     field: "expiryDate",
-                    formatter: dateFormatter,
-                    hozAlign: "center"
+                    formatter: dateFormatter, headerMenu: headerMenu,
+                    hozAlign: "center", headerFilter: "input"
                 },
                 /*{ title: "Remarks", field: "remarks" },*/
                 {
                     title: "Attachment",
                     field: "reportFileName",
-                    hozAlign: "center",
-                    headerHozAlign: "center",
+                    hozAlign: "center", headerMenu: headerMenu,
+                    headerHozAlign: "center", 
                     formatter: function (cell) {
                         const value = cell.getValue();
                         if (!value) return "";
@@ -355,7 +374,38 @@ function initializeTPTReportTable(data) {
                              </a>`
                         ).join(" ");
                     },
-                    headerSort: false
+                    
+                }, {
+                    title: "Created By", field: "createdBy",
+                    hozAlign: "center",
+                    headerSort: false,
+                    headerMenu: headerMenu,
+                    width: 100,
+                    visible: false
+                },
+                {
+                    title: "Created Date", field: "createdDate",
+                    hozAlign: "center",
+                    headerSort: false,
+                    headerMenu: headerMenu,
+                    width: 100,
+                    visible: false
+                },
+                {
+                    title: "Updated By", field: "updatedBy",
+                    hozAlign: "center",
+                    headerSort: false,
+                    headerMenu: headerMenu,
+                    width: 100,
+                    visible: false
+                },
+                {
+                    title: "Updated Date", field: "updatedDate",
+                    hozAlign: "center",
+                    headerSort: false,
+                    headerMenu: headerMenu,
+                    width: 100,
+                    visible: false
                 }
             ]
         });

@@ -26,9 +26,9 @@ namespace QMS.Controllers
         }
 
         [HttpGet]
-        public async Task<JsonResult> GetAll()
+        public async Task<JsonResult> GetAll(DateTime? startDate, DateTime? endDate)
         {
-            var csoList = await _csoTrackerRepository.GetListAsync();
+            var csoList = await _csoTrackerRepository.GetListAsync(startDate, endDate);
             return Json(csoList);
         }
 

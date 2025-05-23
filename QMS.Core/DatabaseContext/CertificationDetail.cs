@@ -23,8 +23,6 @@ namespace QMS.Core.DatabaseContext
         [StringLength(50)]
         public string? ProductCode { get; set; }
 
-        
-
         [Column("IssueDate")]
         public DateTime? IssueDate { get; set; }
 
@@ -49,15 +47,15 @@ namespace QMS.Core.DatabaseContext
         public string? UpdatedBy { get; set; }
 
         [Column("Remarks")]
-        [StringLength(255)]
+       
         public string? Remarks { get; set; }
         [Column("VendorCode")]
         public string? VendorCode { get; set; }
         [Column("CertificateMasterId ")]
-        public int CertificateMasterId { get; set; }
-        public virtual CertificateMaster? CertificateMaster { get; set; }
+        public int? CertificateMasterId { get; set; }
+       public virtual CertificateMaster? CertificateMaster { get; set; }
         [Column("VendorID")]
-        public int VendorID { get; set; }
-        public virtual Vendor? Vendor { get; set; }
+        public int? VendorID { get; set; }
+       //public virtual Vendor? Vendor { get; set; }
     }
 }

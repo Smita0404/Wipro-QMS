@@ -60,12 +60,11 @@
         margin-top: -17px !important;
     }
 
-    .tabulator .tabulator-header .tabulator-col {
-        background-color: #bec6e1 !important;
+   .tabulator .tabulator-header .tabulator-col {
         font-size: 14px;
+        background-color: #D6E4F0;
         font-weight: 600;
-        border-right: 2px solid #ccc;
-        text-align: center;
+        border-right: 1px solid #ccc;
     }
 
     .tabulator-row .tabulator-cell {
@@ -245,15 +244,16 @@
                             </div>
                         </form>
                     </div>
-                    <div class="row">
+                    <div class="row" id="divcustomDate">
                         <div class="col-md-4">
                             <div id="customDateTrigger" class="calendar-container">
                                 <i class="fa fa-calendar"></i>
                                 <span id="dateRangeText">Select Date Range</span>
                             </div>
                         </div>
+                    </div> <div id="TP_table_wrapper" style="overflow-x: auto;">
+                        <div id="ThirdParty_Table" class="col-12"></div>
                     </div>
-                    <div id="ThirdParty_Table" class="mt-3"></div>
                 </div>
             </div>
         </div>

@@ -10,7 +10,7 @@ namespace QMS.Core.Repositories.CSOTrackerRepository
 {
     public interface ICSOTrackerRepository
     {
-        Task<List<CSOTrackerViewModel>> GetListAsync();
+        Task<List<CSOTrackerViewModel>> GetListAsync(DateTime? startDate = null, DateTime? endDate = null);
         Task<CSOTracker?> GetByIdAsync(int id);
         Task<OperationResult> CreateAsync(CSOTracker entity, bool returnCreatedRecord = false);
         Task<OperationResult> UpdateAsync(CSOTracker entity, bool returnUpdatedRecord = false);

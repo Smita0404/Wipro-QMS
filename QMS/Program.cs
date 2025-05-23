@@ -15,6 +15,8 @@ using QMS.Core.Repositories.NPITrackerRepository;
 using QMS.Core.Repositories.CSOTrackerRepository;
 using QMS.Core.Repositories.PDITrackerRepository;
 using QMS.Core.Repositories.DNTrackerRepository;
+using QMS.Core.Repositories.ImprTrackerRepository;
+using QMS.Core.Repositories.KaizenTrackerRepository;
 
 var builder = WebApplication.CreateBuilder(args);// Configure database connection.
 var connstring = builder.Configuration.GetConnectionString("DbConnectionString");
@@ -38,6 +40,8 @@ builder.Services.AddTransient<INPITrackerRepository, NPITrackerRepository>();
 builder.Services.AddTransient<IPDITrackerRepository, PDITrackerRepository>();
 builder.Services.AddTransient<ICSOTrackerRepository, CSOTrackerRepository>();
 builder.Services.AddTransient<IDNTrackerRepository, DNTrackerRepository>();
+builder.Services.AddTransient<IImprTrackerRepository, ImprTrackerRepository>();
+builder.Services.AddTransient<IKaizenTrackerRepository, KaizenTrackerRepository>();
 
 //
 

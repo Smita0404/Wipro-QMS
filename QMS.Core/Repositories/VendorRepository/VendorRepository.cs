@@ -67,8 +67,7 @@ namespace QMS.Core.Repositories.VendorRepository
         }
         public async Task<CertificationDetail> CertGetByIdAsync(int id)
         {
-            return await _dbContext.CertificationDetails
-                .FirstOrDefaultAsync(x => x.Id == id && x.Deleted == false);
+            return await _dbContext.CertificationDetails.FirstOrDefaultAsync(x => x.Id == id && x.Deleted == false);
         }
 
         public async Task<OperationResult> CreateAsync(Vendor newRecord, bool returnCreatedRecord = false)
@@ -601,12 +600,12 @@ namespace QMS.Core.Repositories.VendorRepository
         {
             if (cert.Id == 0)
             {
-                cert.CreatedDate = DateTime.Now;
+                //cert.CreatedDate = DateTime.Now;
                 await _dbContext.VenBISCertificates.AddAsync(cert);
             }
             else
             {
-                cert.UpdatedDate = DateTime.Now;
+              //  cert.UpdatedDate = DateTime.Now;
                 _dbContext.VenBISCertificates.Update(cert);
             }
 

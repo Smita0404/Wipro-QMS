@@ -47,9 +47,9 @@ namespace QMS.Controllers
             }
         }
         [HttpGet]
-        public async Task<JsonResult> GetAll()
+        public async Task<JsonResult> GetAll(DateTime? startDate, DateTime? endDate)
         {
-            var list = await _pdiTrackerRepository.GetListAsync();
+            var list = await _pdiTrackerRepository.GetListAsync(startDate, endDate);
             return Json(list);
         }
 
@@ -108,7 +108,7 @@ namespace QMS.Controllers
                     return Json(new { success = false, message = "Invalid update data" });
 
                 model.UpdatedDate = DateTime.Now;
-                model.UpdateBy = HttpContext.Session.GetString("FullName");
+                model.UpdatedBy = HttpContext.Session.GetString("FullName");
 
                 var result = await _pdiTrackerRepository.UpdateAsync(model);
 
@@ -145,6 +145,20 @@ namespace QMS.Controllers
             {
                 _systemLogService.WriteLog(ex.Message);
                 return Json(new { success = false, message = "Error occurred while deleting PDI tracker." });
+            }
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetVendor()
+        {
+            try
+            {
+                var vendorList = await _pdiTrackerRepository.GetVendorDropdownAsync();
+                return Json(vendorList);
+            }
+            catch (Exception ex)
+            {
+                _systemLogService.WriteLog(ex.Message);
+                return StatusCode(500, "Error retrieving vendor dropdown.");
             }
         }
         [HttpGet]
