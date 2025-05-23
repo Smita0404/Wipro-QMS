@@ -263,7 +263,8 @@ function OnTabGridLoad(response) {
         editableColumn("Product Code", "ProductCode", "autocomplete_ajax"),
         editableColumn("Product Description", "ProductDescription"),
 
-        editableColumn("Wattage", "Wattage", "input", "center", "input", {}, {}, 130),
+        editableColumn("Wattage", "Wattage", "input", "center", "input", {}, {}, 100),
+
 
         editableColumn("Quantity", "DQty", "input", "center", "input", {}, {}, 130),
 

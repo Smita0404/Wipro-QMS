@@ -12,13 +12,13 @@
     <link href="~/css/icomoon/styles.min.css" rel="stylesheet" asp-append-version="true" />
     <link href="~/css/fontawesome/styles.min.css" rel="stylesheet" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link href="~/css/bootstrap.min.css" rel="stylesheet" asp-append-version="true" />
+    @* <link href="~/css/bootstrap.min.css" rel="stylesheet" asp-append-version="true" /> *@
     <link href="~/css/bootstrap_limitless.min.css" rel="stylesheet" asp-append-version="true" />
     <link href="~/css/colors.min.css" rel="stylesheet" asp-append-version="true" />
     <link href="~/css/components.min.css" rel="stylesheet" asp-append-version="true" />
     <link href="~/css/layout.min.css" rel="stylesheet" asp-append-version="true" />
     <link href="~/lib/fontawesome/css/all.min.css" rel="stylesheet" asp-append-version="true" />
-
+    <link href="~/css/all.min.css" rel="stylesheet" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function () {
@@ -50,11 +50,11 @@
 
     <style type="text/css">
         .menu-active {
-            background-color: #fff !important;
-            color: black !important;
+            background-color: #eee !important;
+            color: #0c83ff !important;
             font-weight: bold;
             font-size: small;
-            border-radius: 8px;
+        
         }
 
         .nav-group-sub {
@@ -81,11 +81,12 @@
             margin-left: 13px;
         }
 
+       
     </style>
 </head>
 <body>
     <!-- Main navbar -->
-    <div class="navbar navbar-expand-md navbar-dark navbar-static">
+    <div class="navbar navbar-dark navbar-expand-lg navbar-static">
         <div class="d-md-none">
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-mobile">
                 <i class="icon-tree5"></i>
@@ -104,7 +105,7 @@
                 </li>
 
                 <div class="navbar-brand">
-                    <span class="h5"><strong>QMS Module </strong></span><span id="versionSpan" onclick="" style="font-size: 14px; margin-left:8px; font-weight:500">Version - 1.0.0 25/04/2025</span>
+                    <span class="h5"><strong>Quality Management System(QMS) </strong></span><span id="versionSpan" onclick="" style="font-size: 14px; margin-left:8px; font-weight:500">Version - 1.0.0 25/04/2025</span>
                     @* <i id="verbtn" class="fas fa-info" onclick=""></i> *@
                 </div>
 
@@ -161,15 +162,20 @@
             </div>
             <!-- /sidebar mobile toggler -->
             <!-- Sidebar content -->
-            <div class="sidebar-content">
+            <div class="sidebar-content" style=" border: 1px solid #4682B4;
+        border-radius: 10px;
+        padding: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background-color: #f9f9f9;">
                 <!-- User menu -->
-                <div class="sidebar-user">
+               @*  <div class="sidebar-user">
                     <div class="card-body text-center bg-white p-3 border-right">
                         <a>
                             <img id="imglogo" name="imglogo" src="~/images/wipro-logo.png" class="img-fluid  shadow-0 " alt="" />
                         </a>
                     </div>
                 </div>
+                <hr style="border: 1px solid #ccc;" /> *@
                 <!-- /user menu -->
                 <!-- Main navigation -->
                 <div class="card card-sidebar-mobile">
@@ -180,75 +186,79 @@
                             {
 
                                 <li class="nav-item">
-                                    <a asp-controller="Dashboard" asp-action="Index" class="nav-link" title="Dashboard" id="Dashboard">
-                                        <i class="icon-home4"></i>
+                                    <a asp-controller="Dashboard" asp-action="Index" class="nav-link"style="font-size:20px;" title="Dashboard" id="Dashboard">
+                                        <i class="icon-home4" style="color:#F44336;padding-top:7px;"></i>
                                         <span>Dashboard</span>
                                     </a>
                                 </li>
 
                                 <li class="nav-item nav-item-submenu">
-                                    <a href="#" class="nav-link" title="Vendor Management" id="Vendor_Manag"><i class="fas fa-regular fa-people-roof"></i> <span>Vendor Management</span></a>
-                                    <ul class="nav nav-group-sub" data-submenu-title="Vendor Management">
+                                    <a href="#" class="nav-link" title="Vendor Management" id="Vendor_Manag"><i class="fas fa-regular fa-people-roof" style="color:#388E3C;"></i> <span>Vendor Management</span></a>
+                                    <ul class="nav nav-group-sub " data-submenu-title="Vendor Management">
 
                                         <li class="nav-item">
                                             <a asp-controller="Vendor" asp-action="Vendor" class="nav-link" title="Vendor Details" id="Vendor_Det">
-                                                <i class="fas fa-regular fa-user"></i>
+                                                <i class="fas fa-regular fa-user" style="color:#42A5F5;"></i>
                                                 <span>Vendor Details</span>
                                             </a>
                                         </li>
 
                                         <li class="nav-item">
                                             <a asp-controller="" asp-action="" class="nav-link" title="Third Party Certifications" id="ThirdPartyCertificate">
-                                                <i class="fas fa-regular fa-microchip"></i>
+                                                <i class="fas fa-regular fa-microchip" style="color:blue;"></i>
                                                 <span>Products</span>
                                             </a>
                                         </li>
 
                                         <li class="nav-item">
+
                                             <a asp-controller="" asp-action="" class="nav-link" title="Vendor Certifications" id="Vendor_Certi">
-                                                <i class="fas fa-regular fa-file-image"></i>
+                                                <i class="fas fa-regular fa-file-image" style="color:#cb4335;"></i>
+
                                                 <span>Vendor Certifications</span>
                                             </a>
                                         </li>
 
                                         <li class="nav-item">
                                             <a asp-controller="" asp-action="" class="nav-link" title="Documentation & Testing" id="Doc_Test">
-                                                <i class="fas fa-regular fa-book"></i>
+                                                <i class="fas fa-regular fa-book" style="color:#884ea0;"></i>
                                                 <span>Documentation & Testing</span>
                                             </a>
                                         </li>
 
                                         <li class="nav-item">
                                             <a asp-controller="" asp-action="" class="nav-link" title="Validation Reports" id="Valid_Repo">
-                                                <i class="fas fa-regular fa-file-contract"></i>
+                                                <i class="fas fa-regular fa-file-contract" style="color:#ca6f1e;"></i>
                                                 <span>Validation Reports</span>
                                             </a>
                                         </li>
 
                                         <li class="nav-item">
+
                                             <a asp-controller="" asp-action="" class="nav-link" title="Third Party Testing with Number" id="Thi_Party_Testing">
-                                                <i class="fas fa-regular fa-square-check"></i>
+                                                <i class="fas fa-regular fa-square-check" style="color:#90CAF9;"></i>
+
                                                 <span>Third Party Testing with Number</span>
                                             </a>
                                         </li>
 
                                         <li class="nav-item">
                                             <a asp-controller="" asp-action="" class="nav-link" title="Internal Testing" id="Inter_Testing">
-                                                <i class="fas fa-regular fa-newspaper"></i>
+                                                <i class="fas fa-regular fa-newspaper" style="color:#841e76;"></i>
                                                 <span>Internal Testing</span>
                                             </a>
                                         </li>
 
                                         <li class="nav-item">
                                             <a asp-controller="ThirdPartyInspection" asp-action="Create" class="nav-link" title="Third Party Inspection" id="Third_Inspec">
-                                                <i class="fas fa-regular fa-rectangle-list"></i>
+                                                <i class="fas fa-regular fa-rectangle-list" style="color:#40E0D0;"></i>
                                                 <span>Third Party Inspection</span>
                                             </a>
                                         </li>
 
                                         <li class="nav-item">
                                             <a asp-controller="BisProjectTrac" asp-action="BisProjectTracker" class="nav-link" title="BIS Project Tracker" id="BIS_Proj_Trac">
-                                                <i class="fas fa-regular fa-chart-gantt"></i>
+                                                <i class="fas fa-regular fa-chart-gantt" style="color:#DFFF00;"></i>
                                                 <span>BIS Project Tracker</span>
                                             </a>
                                         </li>
@@ -263,21 +273,21 @@
 
                                         <li class="nav-item">
                                             <a asp-controller="" asp-action="" class="nav-link" title="Supplier Performance Management (SPM)" id="SPM">
-                                                <i class="fas fa-regular fa-chart-bar"></i>
+                                                <i class="fas fa-regular fa-chart-bar" style="color:#a9dfbf;"></i>
                                                 <span>Supplier Performance Management (SPM)</span>
                                             </a>
                                         </li>
 
                                         <li class="nav-item">
                                             <a asp-controller="" asp-action="" class="nav-link" title="SEE Indices" id="SEE_Indi">
-                                                <i class="fas fa-regular fa-clipboard"></i>
+                                                <i class="fas fa-regular fa-clipboard" style="color:#90CAF9;"></i>
                                                 <span>SEE Indices </span>
                                             </a>
                                         </li>
 
                                         <li class="nav-item">
                                             <a asp-controller="" asp-action="" class="nav-link" title="Audit Score" id="Audit_Score">
-                                                <i class="fas fa-regular fa-calendar-days"></i>
+                                                <i class="fas fa-regular fa-calendar-days" style="color:#90CAF9;"></i>
                                                 <span>Audit Score</span>
                                             </a>
                                         </li>
@@ -329,6 +339,92 @@
                                             <a asp-controller="" asp-action="" class="nav-link" title="PDI Authorised Signatory" id="PDI_Signatory">
                                                 <i class="fas fa-regular fa-file-signature"></i>
                                                 <span>PDI Authorised Signatory</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+
+                                </li>
+                                <li class="nav-item nav-item-submenu">
+                                    <a href="#" class="nav-link" title="Services" id="Services"><i class="fas fa-regular fa-users-between-lines"></i> <span>Services</span></a>
+                                    <ul class="nav nav-group-sub" data-submenu-title="Services">
+
+
+
+                                        <li class="nav-item">
+                                            <a asp-controller="#" asp-action="" class="nav-link" title="COPQ" id="COPQ">
+                                                <i class="fas fa-regular fa-clipboard-check"></i>
+                                                <span>COPQ</span>
+                                            </a>
+                                        </li>
+
+                                        <li class="nav-item">
+                                            <a asp-controller="" asp-action="" class="nav-link" title="Customer Complaint" id="Customer_Complaint">
+                                                <i class="fas fa-regular fa-clipboard-check"></i>
+                                                <span>Customer Complaint</span>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a asp-controller="" asp-action="" class="nav-link" title="Services" id="Services">
+                                                <i class="fas fa-regular fa-clipboard-check"></i>
+                                                <span>On time complaint closuret</span>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a asp-controller="" asp-action="" class="nav-link" title="Services" id="Services">
+                                                <i class="fas fa-regular fa-clipboard-check"></i>
+                                                <span>Installed Quality Audit</span>
+                                            </a>
+                                        </li>
+
+                                        <li class="nav-item">
+                                            <a asp-controller="DNTracker" asp-action="DNTracker" class="nav-link" title="Services" id="Services">
+                                                <i class="fas fa-regular fa-clipboard-check"></i>
+                                                <span>Deviation Note Tracker</span>
+                                            </a>
+                                        </li>
+
+
+
+
+                                        <li class="nav-item">
+                                            <a asp-controller="" asp-action="" class="nav-link" title="Lot-wise PDI Report with Remarks" id="Lot-wise_PDI">
+                                                <i class="fas fa-regular fa-file-fragment"></i>
+                                                <span>Continual Improvement tracker</span>
+                                            </a>
+                                        </li>
+
+                                        <li class="nav-item">
+                                            <a asp-controller="PDITracker" asp-action="PDITracker" class="nav-link" title="PDI Tracker" id="PDI_Trac">
+                                                <i class="fas fa-regular fa-file-lines"></i>
+                                                <span>FIFO Tracker Waluj testing</span>
+                                            </a>
+                                        </li>
+
+                                        <li class="nav-item">
+                                            <a asp-controller="" asp-action="" class="nav-link" title="PDI Authorised Signatory" id="PDI_Signatory">
+                                                <i class="fas fa-regular fa-file-signature"></i>
+                                                <span>Outside Lab Payment Tracker</span>
+                                            </a>
+                                        </li>
+                                        
+                                        <li class="nav-item">
+                                            <a asp-controller="" asp-action="" class="nav-link" title="PDI Authorised Signatory" id="PDI_Signatory">
+                                                <i class="fas fa-regular fa-file-signature"></i>
+                                                <span>Supplier Quality Assesment Form</span>
+                                            </a>
+                                        </li>
+                                        
+                                        <li class="nav-item">
+                                            <a asp-controller="" asp-action="" class="nav-link" title="PDI Authorised Signatory" id="PDI_Signatory">
+                                                <i class="fas fa-regular fa-file-signature"></i>
+                                                <span>Customer RCA</span>
+                                            </a>
+                                        </li>
+
+                                        <li class="nav-item">
+                                            <a asp-controller="KaizenTracker" asp-action="KaizenTracker" class="nav-link" title="Kaizen Trackers" id="Kaizen_Tracker">
+                                                <i class="fas fa-regular fa-file-signature"></i>
+                                                <span>Kaizen Tracker</span>
                                             </a>
                                         </li>
                                     </ul>

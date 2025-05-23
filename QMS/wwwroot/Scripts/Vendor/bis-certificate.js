@@ -69,13 +69,13 @@ function displaySuggestions(data, inputField) {
     dropdown.style.zIndex = 1000;
     dropdown.style.overflowY = 'auto'; // Enable vertical scrolling
     dropdown.style.maxHeight = '300px'; // Set a fixed height for the dropdown
-    dropdown.style.width = `${inputField.offsetWidth}px`; // Set the width to match the input field
+    dropdown.style.width = `190px`; // Set the width to match the input field
     dropdown.style.boxShadow = '0px 4px 6px rgba(0, 0, 0, 0.1)'; // Add shadow for better visibility
 
     // Position the dropdown relative to the input field
     const rect = inputField.getBoundingClientRect(); // Get input field position relative to the viewport
-    dropdown.style.top = `${rect.bottom + window.scrollY}px`; // Correct vertical positioning
-    dropdown.style.left = `${rect.left + window.scrollX}px`; // Correct horizontal positioning
+    //dropdown.style.top = `${rect.bottom + window.scrollY}px`; // Correct vertical positioning
+    //dropdown.style.left = `${rect.left + window.scrollX}px`; // Correct horizontal positioning
 
     // Populate dropdown with suggestions
     data.forEach(item => {

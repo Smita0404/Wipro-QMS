@@ -22,7 +22,6 @@ namespace QMS.Core.DatabaseContext
         [StringLength(50)]
         public string? PC { get; set; }
 
-        [DataType(DataType.Date)]
         public DateTime? DispatchDate { get; set; }
 
         [StringLength(100)]
@@ -37,7 +36,6 @@ namespace QMS.Core.DatabaseContext
         [StringLength(100)]
         public string? PONo { get; set; }
 
-        [DataType(DataType.Date)]
         public DateTime? PDIDate { get; set; }
 
         [StringLength(100)]

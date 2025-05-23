@@ -123,81 +123,79 @@ function OnTabGridLoad(response) {
                 CreatedDate: formatDate(item.createdDate),
             });
         });
+    }
 
-        columns.push(
-            {
-                title: "Action",
-                field: "Action",
-                // width: 130,
-                headerMenu: headerMenu,
-                hozAlign: "center",
-                headerHozAlign: "center",
-                formatter: function (cell, formatterParams) {
-                    const rowData = cell.getRow().getData();
-                    let actionButtons = "";
+    columns.push(
+        {
+            title: "Action",
+            field: "Action",
+            // width: 130,
+            headerMenu: headerMenu,
+            hozAlign: "center",
+            headerHozAlign: "center",
+            formatter: function (cell, formatterParams) {
+                const rowData = cell.getRow().getData();
+                let actionButtons = "";
 
-                    actionButtons += `<i data-toggle="modal" onclick="delConfirm(${rowData.Id})" class="fas fa-trash-alt mr-2 fa-1x" title="Delete" style="color:red;cursor:pointer;margin-left: 5px;"></i>`
+                actionButtons += `<i data-toggle="modal" onclick="delConfirm(${rowData.Id})" class="fas fa-trash-alt mr-2 fa-1x" title="Delete" style="color:red;cursor:pointer;margin-left: 5px;"></i>`
 
-                    return actionButtons;
-                }
-            },
-            {
-                title: "SNo", field: "Sr_No", sorter: "number", headerMenu: headerMenu, hozAlign: "center", headerHozAlign: "left"
-            },
-            { title: "Date", field: "CreatedDate", sorter: "date", headerMenu: headerMenu, headerFilter: "input", hozAlign: "left", headerHozAlign: "center" },
-            { title: "Financial Year", field: "Financial_Year", headerMenu: headerMenu, headerFilter: "input", hozAlign: "left", headerHozAlign: "left" },
-            { title: "Month/PC", field: "Mon_PC", headerMenu: headerMenu, headerFilter: "input", hozAlign: "center", headerHozAlign: "center" },
-            { title: "Nature of Project", field: "Nat_Project", headerMenu: headerMenu, headerFilter: "input", hozAlign: "center", headerHozAlign: "center" },
-            { title: "Lead Model Number", field: "Lea_Model_No", sorter: "number", headerMenu: headerMenu, headerFilter: "input", hozAlign: "center", headerHozAlign: "center" },
-            { title: "No of Series Added", field: "No_Seri_Add", sorter: "number", headerMenu: headerMenu, headerFilter: "input", hozAlign: "center", headerHozAlign: "center" },
-            { title: "Cat Reference of Lead Model", field: "Cat_Ref_Lea_Model", sorter: "number", headerMenu: headerMenu, headerFilter: "input", hozAlign: "center", headerHozAlign: "center" },
-            { title: "Section", field: "Section", sorter: "number", headerMenu: headerMenu, headerFilter: "input", hozAlign: "center", headerHozAlign: "center" },
-            { title: "Manufacturing Location", field: "Manuf_Location", sorter: "number", headerMenu: headerMenu, headerFilter: "input", hozAlign: "center", headerHozAlign: "center" },
-            { title: "CCL ID", field: "CCL_Id", sorter: "number", headerMenu: headerMenu, headerFilter: "input", hozAlign: "center", headerHozAlign: "center" },
-            { title: "Lab", field: "Lab", sorter: "number", headerMenu: headerMenu, headerFilter: "input", hozAlign: "center", headerHozAlign: "center" },
-            { title: "Report Owner", field: "Report_Owner", sorter: "number", headerMenu: headerMenu, headerFilter: "input", hozAlign: "center", headerHozAlign: "center" },
-            { title: "Test Start Date", field: "Start_Date", sorter: "date", headerMenu: headerMenu, headerFilter: "input", hozAlign: "left", headerHozAlign: "center" },
-            { title: "Test Complete Date", field: "Comp_Date", sorter: "date", headerMenu: headerMenu, headerFilter: "input", hozAlign: "left", headerHozAlign: "center" },
-            { title: "Test Duration", field: "Test_Duration", sorter: "number", headerMenu: headerMenu, headerFilter: "input", hozAlign: "center", headerHozAlign: "center" },
-            { title: "Bis Submitted Date", field: "Submitted_Date", sorter: "date", headerMenu: headerMenu, headerFilter: "input", hozAlign: "left", headerHozAlign: "center" },
-            { title: "Bis Received Date", field: "Received_Date", sorter: "date", headerMenu: headerMenu, headerFilter: "input", hozAlign: "left", headerHozAlign: "center" },
-            { title: "Bis Duration", field: "Bis_Duration", sorter: "number", headerMenu: headerMenu, headerFilter: "input", hozAlign: "center", headerHozAlign: "center" },
-            { title: "First Dispatch Date", field: "Dispatch_Date", sorter: "date", headerMenu: headerMenu, headerFilter: "input", hozAlign: "left", headerHozAlign: "center" },
-            { title: "User", field: "CreatedBy", headerMenu: headerMenu, headerFilter: "input", hozAlign: "center", headerHozAlign: "center" },
-            { title: "Updated By", field: "UpdatedBy", headerMenu: headerMenu, headerFilter: "input", hozAlign: "center", headerHozAlign: "center", visible: false },
-            { title: "Update Date", field: "UpdatedDate", sorter: "date", headerMenu: headerMenu, headerFilter: "input", hozAlign: "center", headerHozAlign: "center", visible: false },
-        );
-
-        // // Initialize Tabulator
-        table = new Tabulator("#bisProject_Table", {
-            data: tabledata,
-            renderHorizontal: "virtual",
-            movableColumns: true,
-            pagination: "local",
-            paginationSize: 10,
-            paginationSizeSelector: [50, 100, 500, 1500, 2000],
-            paginationCounter: "rows",
-            dataEmpty: "<div style='text-align: center; font-size: 1rem; color: gray;'>No data available</div>", // Placeholder message
-            columns: columns
-        });
-
-        table.on("cellClick", function (e, cell) {
-            let columnField = cell.getColumn().getField();
-
-            if (columnField !== "Action") {
-                let rowData = cell.getRow().getData();
-                showEditBisProject(rowData.Id);
+                return actionButtons;
             }
-        });
+        },
+        {
+            title: "SNo", field: "Sr_No", sorter: "number", headerMenu: headerMenu, hozAlign: "center", headerHozAlign: "left"
+        },
+        { title: "Date", field: "CreatedDate", sorter: "date", headerMenu: headerMenu, headerFilter: "input", hozAlign: "left", headerHozAlign: "center" },
+        { title: "Financial Year", field: "Financial_Year", headerMenu: headerMenu, headerFilter: "input", hozAlign: "left", headerHozAlign: "left" },
+        { title: "Month/PC", field: "Mon_PC", headerMenu: headerMenu, headerFilter: "input", hozAlign: "center", headerHozAlign: "center" },
+        { title: "Nature of Project", field: "Nat_Project", headerMenu: headerMenu, headerFilter: "input", hozAlign: "center", headerHozAlign: "center" },
+        { title: "Lead Model Number", field: "Lea_Model_No", sorter: "number", headerMenu: headerMenu, headerFilter: "input", hozAlign: "center", headerHozAlign: "center" },
+        { title: "No of Series Added", field: "No_Seri_Add", sorter: "number", headerMenu: headerMenu, headerFilter: "input", hozAlign: "center", headerHozAlign: "center" },
+        { title: "Cat Reference of Lead Model", field: "Cat_Ref_Lea_Model", sorter: "number", headerMenu: headerMenu, headerFilter: "input", hozAlign: "center", headerHozAlign: "center" },
+        { title: "Section", field: "Section", sorter: "number", headerMenu: headerMenu, headerFilter: "input", hozAlign: "center", headerHozAlign: "center" },
+        { title: "Manufacturing Location", field: "Manuf_Location", sorter: "number", headerMenu: headerMenu, headerFilter: "input", hozAlign: "center", headerHozAlign: "center" },
+        { title: "CCL ID", field: "CCL_Id", sorter: "number", headerMenu: headerMenu, headerFilter: "input", hozAlign: "center", headerHozAlign: "center" },
+        { title: "Lab", field: "Lab", sorter: "number", headerMenu: headerMenu, headerFilter: "input", hozAlign: "center", headerHozAlign: "center" },
+        { title: "Report Owner", field: "Report_Owner", sorter: "number", headerMenu: headerMenu, headerFilter: "input", hozAlign: "center", headerHozAlign: "center" },
+        { title: "Test Start Date", field: "Start_Date", sorter: "date", headerMenu: headerMenu, headerFilter: "input", hozAlign: "left", headerHozAlign: "center" },
+        { title: "Test Complete Date", field: "Comp_Date", sorter: "date", headerMenu: headerMenu, headerFilter: "input", hozAlign: "left", headerHozAlign: "center" },
+        { title: "Test Duration", field: "Test_Duration", sorter: "number", headerMenu: headerMenu, headerFilter: "input", hozAlign: "center", headerHozAlign: "center" },
+        { title: "Bis Submitted Date", field: "Submitted_Date", sorter: "date", headerMenu: headerMenu, headerFilter: "input", hozAlign: "left", headerHozAlign: "center" },
+        { title: "Bis Received Date", field: "Received_Date", sorter: "date", headerMenu: headerMenu, headerFilter: "input", hozAlign: "left", headerHozAlign: "center" },
+        { title: "Bis Duration", field: "Bis_Duration", sorter: "number", headerMenu: headerMenu, headerFilter: "input", hozAlign: "center", headerHozAlign: "center" },
+        { title: "First Dispatch Date", field: "Dispatch_Date", sorter: "date", headerMenu: headerMenu, headerFilter: "input", hozAlign: "left", headerHozAlign: "center" },
+        { title: "User", field: "CreatedBy", headerMenu: headerMenu, headerFilter: "input", hozAlign: "center", headerHozAlign: "center" },
+        { title: "Updated By", field: "UpdatedBy", headerMenu: headerMenu, headerFilter: "input", hozAlign: "center", headerHozAlign: "center", visible: false },
+        { title: "Update Date", field: "UpdatedDate", sorter: "date", headerMenu: headerMenu, headerFilter: "input", hozAlign: "center", headerHozAlign: "center", visible: false },
+    );
 
-        // Export to Excel on button click
-        // document.getElementById("exportExcel").addEventListener("click", function () {
-        //     table.download("xlsx", "ProductCode_Data.xlsx", { sheetName: "Product Code Data" });
-        // });
-    }
-    else {
-        showDangerAlert('No data available.');
-    }
+    // // Initialize Tabulator
+    table = new Tabulator("#bisProject_Table", {
+        data: tabledata,
+        renderHorizontal: "virtual",
+        movableColumns: true,
+        pagination: "local",
+        paginationSize: 10,
+        paginationSizeSelector: [50, 100, 500, 1500, 2000],
+        paginationCounter: "rows",
+        dataEmpty: "<div style='text-align: center; font-size: 1rem; color: gray;'>No data available</div>", // Placeholder message
+        columns: columns
+    });
+
+    table.on("cellClick", function (e, cell) {
+        let columnField = cell.getColumn().getField();
+
+        if (columnField !== "Action") {
+            let rowData = cell.getRow().getData();
+            showEditBisProject(rowData.Id);
+        }
+    });
+
+    // Export to Excel on button click
+    // document.getElementById("exportExcel").addEventListener("click", function () {
+    //     table.download("xlsx", "ProductCode_Data.xlsx", { sheetName: "Product Code Data" });
+    // });
+
 
     Blockloaderhide();
 }

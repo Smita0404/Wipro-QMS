@@ -258,6 +258,7 @@ namespace QMS.Core.Repositories.VendorRepository
                     Email = data.Email,
                     Address = data.Address,
                     MobileNo = data.MobileNo,
+                    GstNo = data.GstNo,
                     Contact_Persons = data.Contact_Persons,
                     Owner = data.Owner,
                     Owner_Email = data.Owner_Email,

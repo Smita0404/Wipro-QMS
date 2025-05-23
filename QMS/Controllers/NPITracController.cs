@@ -39,17 +39,16 @@ namespace QMS.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> CreateAsync(NPITracker model)
+        public async Task<JsonResult> CreateAsync([FromBody]NPITracker model)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
                     var operationResult = new OperationResult();
-                    //bool existingResult = await _bisProjectRepository.CheckDuplicate(model.Name.Trim(), 0);
-                    bool existingResult = true;
-                    if (!existingResult)
-                    {
+                    //bool existingResult = await _nPITarcRepository.CheckDuplicate(model.Product_Code.Trim(), 0);
+                    //if (!existingResult)
+                    //{
                         model.CreatedDate = DateTime.Now;
                         model.CreatedBy = HttpContext.Session.GetString("FullName");
                         operationResult = await _nPITarcRepository.CreateAsync(model);
@@ -60,14 +59,14 @@ namespace QMS.Controllers
                         }
 
                         return Json(new { success = false, message = "Failed to save npi tracker detail.", id = 0 });
-                    }
-                    else
-                    {
-                        operationResult.Success = false;
-                        operationResult.Message = "Exist";
-                        operationResult.Payload = existingResult;
-                        return Json(operationResult);
-                    }
+                    //}
+                    //else
+                    //{
+                    //    operationResult.Success = false;
+                    //    operationResult.Message = "Exist";
+                    //    operationResult.Payload = existingResult;
+                    //    return Json(operationResult);
+                    //}
                 }
                 var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
                 return Json(new { Success = false, Errors = errors });
@@ -80,7 +79,7 @@ namespace QMS.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> UpdateAsync(NPITracker model)
+        public async Task<JsonResult> UpdateAsync([FromBody] NPITracker model)
         {
             if (ModelState.IsValid)
             {
