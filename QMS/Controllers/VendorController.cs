@@ -473,10 +473,10 @@ namespace QMS.Controllers
                         model.CreatedDate = DateTime.Now;
                         model.CreatedBy = HttpContext.Session.GetString("FullName");
                         model.UpdatedDate = DateTime.Now;
-                        model.UpdatedBy = model.CreatedBy;
+                        model.UpdatedBy = HttpContext.Session.GetString("FullName");
 
-                        // Save the record to the database (insert operation)
-                        var result = await _vendorRepository.CreateOrUpdateBISCertificateAsync(model);
+                    // Save the record to the database (insert operation)
+                    var result = await _vendorRepository.CreateOrUpdateBISCertificateAsync(model);
 
                         if (!result)
                             return Json(new { success = false, message = "Failed to add BIS Certificate." });

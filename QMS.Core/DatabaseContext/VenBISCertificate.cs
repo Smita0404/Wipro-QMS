@@ -18,11 +18,11 @@ namespace QMS.Core.DatabaseContext
         public override bool Deleted { get; set; }
         //------------ END overrides --------
 
-        [Required]
+       
         [Display(Name = "Product Code")]
         public string? ProductCode { get; set; }
 
-        [Required]
+        
         [Display(Name = "Vendor ID")]
         public int? VendorID { get; set; }
 
@@ -41,11 +41,11 @@ namespace QMS.Core.DatabaseContext
         [Display(Name = "Remarks")]
         public string? Remarks { get; set; }
 
-        [DataType(DataType.Date)]
+      
         [Display(Name = "Issue Date")]
         public DateTime? IssueDate { get; set; }
 
-        [DataType(DataType.Date)]
+       
         [Display(Name = "Expiry Date")]
         public DateTime? ExpiryDate { get; set; }
 

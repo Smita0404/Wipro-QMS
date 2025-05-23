@@ -21,8 +21,7 @@ namespace QMS.Core.DatabaseContext
         public override bool Deleted { get; set; }
         //------------ END overrides --------
 
-        [DataType(DataType.Date)]
-        public DateTime? CSOLogDate { get; set; }
+       public DateTime? CSOLogDate { get; set; }
 
         [StringLength(50)]
         public string? CSONo { get; set; }
@@ -61,7 +60,6 @@ namespace QMS.Core.DatabaseContext
         [StringLength(500)]
         public string? PreventiveAction { get; set; }
 
-        [DataType(DataType.Date)]
         public DateTime? CSOsClosureDate { get; set; }
 
         public int? Aging { get; set; }

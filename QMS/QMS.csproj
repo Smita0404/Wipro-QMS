@@ -25,8 +25,8 @@
     <Folder Include="wwwroot\CertificationDetail\" />
     <Folder Include="wwwroot\BISCertificateAttachments\" />
     <Folder Include="wwwroot\CSOTrackerAttachments\" />
+    <Folder Include="wwwroot\KaizenAttachments\" />
     <Folder Include="wwwroot\TPTestingReportAttachments\" />
-    <Folder Include="wwwroot\Scripts\ThirdParty\" />
     <Folder Include="wwwroot\ThirdPartyAttachments\" />
   </ItemGroup>
 

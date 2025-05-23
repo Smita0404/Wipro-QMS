@@ -8,7 +8,6 @@ namespace QMS.Core.Models
     {
         public int CSOId { get; set; }
 
-        [DataType(DataType.Date)]
         public DateTime? CSOLogDate { get; set; }
 
         public string? CSONo { get; set; }
@@ -37,7 +36,7 @@ namespace QMS.Core.Models
 
         public string? PreventiveAction { get; set; }
 
-        [DataType(DataType.Date)]
+      
         public DateTime? CSOsClosureDate { get; set; }
 
         public int? Aging { get; set; }

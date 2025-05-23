@@ -1,6 +1,57 @@
 ﻿var tabledata = [];
 var table = '';
+let filterStartDate = moment().startOf('week').format('YYYY-MM-DD');
+let filterEndDate = moment().endOf('week').format('YYYY-MM-DD');
 $(document).ready(function () {
+    $('#dateRangeText').text(
+        moment(filterStartDate).format('MMMM D, YYYY') + ' - ' + moment(filterEndDate).format('MMMM D, YYYY')
+    );
+
+    // Initialize Litepicker and store reference
+    const picker = new Litepicker({
+        element: document.getElementById('customDateTrigger'),
+        singleMode: false,
+        format: 'DD-MM-YYYY',
+        numberOfMonths: 2,
+        numberOfColumns: 2,
+        dropdowns: {
+            minYear: 2020,
+            maxYear: null,
+            months: true,
+            years: true
+        },
+        plugins: ['ranges'],
+        setup: (picker) => {
+            picker.on('selected', (start, end) => {
+                filterStartDate = start.format('YYYY-MM-DD');
+                filterEndDate = end.format('YYYY-MM-DD');
+                $('#dateRangeText').text(`${start.format('MMMM D, YYYY')} - ${end.format('MMMM D, YYYY')}`);
+                loadData();
+            });
+
+            picker.on('clear', () => {
+                filterStartDate = "";
+                filterEndDate = "";
+                $('#dateRangeText').text("Select Date Range");
+                loadData();
+            });
+        },
+        ranges: {
+            Today: [moment(), moment()],
+            Yesterday: [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+            'This Month': [moment().startOf('month'), moment().endOf('month')],
+            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        },
+        startDate: moment().startOf('week').format('DD-MM-YYYY'),
+        endDate: moment().endOf('week').format('DD-MM-YYYY')
+    });
+
+    
+    $('#customDateTrigger').on('click', function () {
+        picker.show();
+    });
     document.getElementById('backButton').addEventListener('click', function () {
         window.history.back();
     });
@@ -14,6 +65,11 @@ function loadData() {
     $.ajax({
         url: '/CSOTracker/GetAll',
         type: 'GET',
+        dataType: 'json',
+        data: {
+            startDate: filterStartDate,
+            endDate: filterEndDate
+        },
         success: function (data) {
             if (data && Array.isArray(data)) {
                 console.log(data);
@@ -135,7 +191,11 @@ function OnTabGridLoad(response) {
                 PreventiveAction: item.preventiveAction,
                 CSOsClosureDate: formatDate(item.csosClosureDate),
                 Aging: item.aging,
-                AttachmentCAPAReport: item.attachmentCAPAReport
+                AttachmentCAPAReport: item.attachmentCAPAReport,
+                UpdatedDate: item.updatedDate || "",
+                CreatedDate: item.createdDate || "",
+                CreatedBy: item.createdBy || "",
+                UpdatedBy: item.updatedBy || ""
             });
         });
     }
@@ -149,7 +209,7 @@ function OnTabGridLoad(response) {
         //        <button class="btn btn-sm btn-outline-primary upload-btn">Change</button>
         //    `;
         //}
-        return `<button class="btn btn-sm btn-outline-primary upload-btn">Upload</button>`;
+        return `<button class="btn btn-sm btn-outline-primary">Upload</button>`;
     }
 
     // Editor for CAPA Report column (file input)
@@ -194,26 +254,26 @@ function OnTabGridLoad(response) {
         },
         { title: "S.No", field: "Sr_No", frozen: true, hozAlign: "center", headerSort: false, headerMenu: headerMenu, width: 80 },
 
-        editableColumn("CSO Log Date", "CSOLogDate", "date", "left", "input", {}, {}, 120),
-        editableColumn("CSO No", "CSONo", "input", "left", "input", {}, {}, 120),
+        editableColumn("CSO Log Date", "CSOLogDate", "date", "center", "input", {}, {}, 120),
+        editableColumn("CSO No", "CSONo", "input", "center", "input", {}, {}, 120),
         editableColumn("Class A/B", "ClassAB", "list", "center", "list", {
             values: { "A": "A", "B": "B" }
         }, { values: { "A": "A", "B": "B" } }, 130),
         editableColumn("Product Cat Ref", "ProductCatRef", "autocomplete_ajax"),
         editableColumn("Product Description", "ProductDescription"),
-        editableColumn("Source Of CSO", "SourceOfCSO", "input", "left", null, {}, {}, 130),
+        editableColumn("Source Of CSO", "SourceOfCSO", "input", "center", null, {}, {}, 130),
         editableColumn("Internal/External", "InternalExternal", "list", "center", "list", {
             values: { "Internal": "Internal", "External": "External" }
         }, { values: { "Internal": "Internal", "External": "External" } }, 130),
-        editableColumn("PKD Batch Code", "PKDBatchCode", "input", "left", null, {}, {}, 120),
-        editableColumn("Problem Statement", "ProblemStatement", "input", "left", null, {}, {}, 150),
-        editableColumn("Supplied Qty", "SuppliedQty", "input", "left", null, {}, {}, 100),
-        editableColumn("Failed Qty", "FailedQty", "input", "left", null, {}, {}, 100),
-        editableColumn("Root Cause", "RootCause", "input", "left", null, {}, {}, 150),
-        editableColumn("Corrective Action", "CorrectiveAction", "input", "left", null, {}, {}, 150),
-        editableColumn("Preventive Action", "PreventiveAction", "input", "left", null, {}, {}, 150),
-        editableColumn("Closure Date", "CSOsClosureDate", "date", "left", null, {}, {}, 120),
-        editableColumn("Aging", "Aging", "input", "left", null, {}, {}, 80),
+        editableColumn("PKD Batch Code", "PKDBatchCode", "input", "center", null, {}, {}, 120),
+        editableColumn("Problem Statement", "ProblemStatement", "input", "center", null, {}, {}, 150),
+        editableColumn("Supplied Qty", "SuppliedQty", "input", "center", null, {}, {}, 100),
+        editableColumn("Failed Qty", "FailedQty", "input", "center", null, {}, {}, 100),
+        editableColumn("Root Cause", "RootCause", "input", "center", null, {}, {}, 150),
+        editableColumn("Corrective Action", "CorrectiveAction", "input", "center", null, {}, {}, 150),
+        editableColumn("Preventive Action", "PreventiveAction", "input", "center", null, {}, {}, 150),
+        editableColumn("Closure Date", "CSOsClosureDate", "date", "center", null, {}, {}, 120),
+        editableColumn("Aging", "Aging", "input", "center", null, {}, {}, 80),
 
         // CAPA Report column with file upload support
         {
@@ -221,9 +281,9 @@ function OnTabGridLoad(response) {
             field: "AttachmentCAPAReport",
             formatter: fileFormatter,
             editor: fileEditor,
-            hozAlign: "left",
+            hozAlign: "center",
             headerSort: false, headerMenu: headerMenu,
-            width: 180
+            width: 140
         },
         {
             title: "Attachment",
@@ -239,9 +299,40 @@ function OnTabGridLoad(response) {
                 ).join(" ");
             },
            // editor: fileEditor,
-            hozAlign: "left",
+            hozAlign: "center", headerMenu: headerMenu,
             headerSort: false,
-            width: 180
+            width: 120      },
+        {
+            title: "Created By", field: "CreatedBy",
+            hozAlign: "center",
+            headerSort: false,
+            headerMenu: headerMenu,
+            width: 100,
+            visible: false
+        },
+        {
+            title: "Created Date", field: "CreatedDate",
+            hozAlign: "center",
+            headerSort: false,
+            headerMenu: headerMenu,
+            width: 100,
+            visible: false
+        },
+        {
+            title: "Updated By", field: "UpdatedBy",
+            hozAlign: "center",
+            headerSort: false,
+            headerMenu: headerMenu,
+            width: 100,
+            visible: false
+        },
+        {
+            title: "Updated Date", field: "UpdatedDate",
+            hozAlign: "center",
+            headerSort: false,
+            headerMenu: headerMenu,
+            width: 100,
+            visible: false
         }
     ];
 

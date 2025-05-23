@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Deviation Note Tracker";
+    ViewData["Title"] = "Kaizen Tracker";
 }
 
 <!-- CSS files -->
@@ -11,7 +11,6 @@
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/litepicker/dist/css/litepicker.css" />
-
 
 <style>
     .nav-pills .nav-link {
@@ -45,15 +44,6 @@
         margin-top: .3rem;
     }
 
-    #scrollToTopBtn:hover {
-        background-color: #0056b3; /* Darker blue */
-    }
-
-    #scrollToTopBtn {
-        outline: none; /* Removes the focus border */
-    }
-
-
     .tabulator .tabulator-header .tabulator-col {
         font-size: 14px;
         background-color: #D6E4F0;
@@ -71,38 +61,6 @@
         color: #4682B4 !important;
         cursor: pointer !important;
         font-weight: bold;
-    }
-
-    .form-group {
-        margin-bottom: 0.5rem; /* Reduce space between each input group */
-    }
-
-    .autocomplete-dropdown {
-        position: absolute;
-        z-index: 99999 !important;
-        background: #fff;
-        border: 1px solid #ccc;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-        max-height: 200px;
-        overflow-y: auto;
-        border-radius: 4px;
-        font-family: Arial, sans-serif;
-        font-size: 14px;
-    }
-
-    .autocomplete-option {
-        padding: 6px 10px;
-        border-bottom: 1px solid #eee;
-        cursor: pointer;
-        white-space: nowrap;
-    }
-
-        .autocomplete-option:hover {
-            background-color: #f0f0f0;
-        }
-
-    .modal-body {
-        overflow: visible !important; /* required for dropdown to be visible in Bootstrap modal */
     }
 
     .calendar-container {
@@ -134,25 +92,45 @@
             font-size: 16px;
         }
 
-    .container__predefined-ranges {
+    .modal-body {
+        overflow: visible !important;
+    }
+
+    .form-group {
+        margin-bottom: 0.5rem;
+    }
+
+    .autocomplete-dropdown {
+        position: absolute;
+        z-index: 99999 !important;
+        background: #fff;
+        border: 1px solid #ccc;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        max-height: 200px;
+        overflow-y: auto;
+        border-radius: 4px;
+        font-family: Arial, sans-serif;
         font-size: 14px;
     }
 
-    .month-item {
-        font-size: 14px;
+    .autocomplete-option {
+        padding: 6px 10px;
+        border-bottom: 1px solid #eee;
+        cursor: pointer;
+        white-space: nowrap;
     }
 
+        .autocomplete-option:hover {
+            background-color: #f0f0f0;
+        }
 </style>
-
-
 
 <div class="content">
     <div class="card">
         <div class="card-body d-flex justify-content-between align-items-center">
             <div>
-                <b style="font-size: large; color: #4682B4;">Deviation Note Tracker</b>
+                <b style="font-size: large; color: #4682B4;">Kaizen Tracker</b>
             </div>
-
             <div>
                 <button id="addButton" type="button" class="btn btn-outline-success legitRipple mr-2" style="width: 140px; font-size:15px">
                     <i class="fas fa-plus mr-2 fa-1x"></i>Add
@@ -168,7 +146,6 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                 
                     <div class="chart-container">
                         <div class="col-md-4">
                             <div id="customDateTrigger" class="calendar-container">
@@ -176,13 +153,9 @@
                                 <span id="dateRangeText">Select Date Range</span>
                             </div>
                         </div>
-                        <div class="chart-container">
-                            <div class="form-group row"></div>
-                            <div class="form-group row"></div>
-                        <div class="form-group row">
-                           
-                            <div id="deviation_note_table_wrapper" style="overflow-x: auto;">
-                                <div id="dn_table"></div>
+                        <div class="form-group row mt-3">
+                            <div id="kaizen_table_wrapper" style="overflow-x: auto;">
+                                <div id="kaizen_table"></div>
                             </div>
                         </div>
                     </div>
@@ -193,19 +166,12 @@
 </div>
 
 @section Scripts {
-    <!-- jQuery -->
     <script src="~/js/jquery.min.js"></script>
-
-    <!-- jQuery UI (if you use sortable, draggable, etc.) -->
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
-
-    <!-- jQuery BlockUI (for popupalert.js) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.blockUI/2.70/jquery.blockUI.min.js"></script>
 
-    <!-- DataTables core -->
+    <!-- DataTables core & buttons (optional if using only Tabulator) -->
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-
-    <!-- DataTables Buttons extensions -->
     <script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
@@ -229,10 +195,9 @@
     <script src="~/js/pnotify.js"></script>
     <script src="~/js/pnotify.confirm.js"></script>
 
-    <!-- Noty (if used) -->
-    <script src="https://cdn.jsdelivr.net/npm/noty/lib/noty.min.js"></script>
-
     <!-- Popup Alert -->
     <script src="~/lib/bootstrap/dist/js/popupalert.js"></script>
-    <script src="~/scripts/DNTracker/dn-tracker.js" asp-append-version="true"></script>
+
+    <!-- Custom JS for Kaizen Tracker -->
+    <script src="~/scripts/KaizenTracker/kaizen-tracker.js" asp-append-version="true"></script>
 }

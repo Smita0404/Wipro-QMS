@@ -1,16 +1,108 @@
 ﻿var tabledata = [];
 var table = '';
 let vendorOptions = {};
+let filterStartDate = moment().startOf('week').format('YYYY-MM-DD');
+let filterEndDate = moment().endOf('week').format('YYYY-MM-DD');
 
 $(document).ready(function () {
 
+    $('#dateRangeText').text(
+        moment(filterStartDate).format('MMMM D, YYYY') + ' - ' + moment(filterEndDate).format('MMMM D, YYYY')
+    );
 
+    // Initialize Litepicker and store reference
+    const picker = new Litepicker({
+        element: document.getElementById('customDateTrigger'),
+        singleMode: false,
+        format: 'DD-MM-YYYY',
+        numberOfMonths: 2,
+        numberOfColumns: 2,
+        dropdowns: {
+            minYear: 2020,
+            maxYear: null,
+            months: true,
+            years: true
+        },
+        plugins: ['ranges'],
+        setup: (picker) => {
+            picker.on('selected', (start, end) => {
+                filterStartDate = start.format('YYYY-MM-DD');
+                filterEndDate = end.format('YYYY-MM-DD');
+                $('#dateRangeText').text(`${start.format('MMMM D, YYYY')} - ${end.format('MMMM D, YYYY')}`);
+                loadData();
+            });
+
+            picker.on('clear', () => {
+                filterStartDate = "";
+                filterEndDate = "";
+                $('#dateRangeText').text("Select Date Range");
+                loadData();
+            });
+        },
+        ranges: {
+            Today: [moment(), moment()],
+            Yesterday: [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+            'This Month': [moment().startOf('month'), moment().endOf('month')],
+            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        },
+        startDate: moment().startOf('week').format('DD-MM-YYYY'),
+        endDate: moment().endOf('week').format('DD-MM-YYYY')
+    });
+
+
+    $('#customDateTrigger').on('click', function () {
+        picker.show();
+    });
     document.getElementById('backButton').addEventListener('click', function () {
         window.history.back();
     });
 
     loadData();
 });
+function loadData() {
+    Blockloadershow();
+
+    $.ajax({
+        url: '/DNTracker/GetVendor',
+        type: 'GET'
+    }).done(function (vendorData) {
+        if (Array.isArray(vendorData)) {
+            vendorOptions = vendorData.reduce((acc, v) => {
+                acc[v.value] = v.label;
+                return acc;
+            }, {});
+        }
+
+        // Now load the actual Deviation Note data
+        $.ajax({
+            url: '/DNTracker/GetAll',
+            type: 'GET',
+            dataType: 'json',
+            data: {
+                startDate: filterStartDate,
+                endDate: filterEndDate
+            },
+            success: function (data) {
+                if (Array.isArray(data)) {
+                    OnTabGridLoad(data); // load into Tabulator or grid
+                } else {
+                    showDangerAlert('No Deviation Note data available.');
+                }
+                Blockloaderhide();
+            },
+            error: function () {
+                showDangerAlert('Error loading deviation note data.');
+                Blockloaderhide();
+            }
+        });
+
+    }).fail(function () {
+        showDangerAlert('Failed to load vendor dropdown options.');
+        Blockloaderhide();
+    });
+}
 
 var headerMenu = function () {
     var menu = [];
@@ -49,43 +141,6 @@ var headerMenu = function () {
     return menu;
 };
 
-function loadData() {
-    Blockloadershow();
-
-    $.ajax({
-        url: '/DNTracker/GetVendor',
-        type: 'GET'
-    }).done(function (vendorData) {
-        if (Array.isArray(vendorData)) {
-            vendorOptions = vendorData.reduce((acc, v) => {
-                acc[v.value] = v.label;
-                return acc;
-            }, {});
-        }
-
-        // Now load the actual Deviation Note data
-        $.ajax({
-            url: '/DNTracker/GetAll',
-            type: 'GET',
-            success: function (data) {
-                if (Array.isArray(data)) {
-                    OnTabGridLoad(data); // load into Tabulator or grid
-                } else {
-                    showDangerAlert('No Deviation Note data available.');
-                }
-                Blockloaderhide();
-            },
-            error: function () {
-                showDangerAlert('Error loading deviation note data.');
-                Blockloaderhide();
-            }
-        });
-
-    }).fail(function () {
-        showDangerAlert('Failed to load vendor dropdown options.');
-        Blockloaderhide();
-    });
-}
 
 Tabulator.extendModule("edit", "editors", {
     autocomplete_ajax: function (cell, onRendered, success, cancel, editorParams) {
@@ -180,7 +235,11 @@ function OnTabGridLoad(response) {
                 DQty: item.dQty || null,
                 DRequisitionBy: item.dRequisitionBy || "",
                 Vendor: item.vendor || "",
-                Remark: item.remark || ""
+                Remark: item.remark || "",
+                UpdatedDate: item.updatedDate || "",
+                CreatedDate: item.createdDate || "",
+                CreatedBy: item.createdBy || "",
+                UpdatedBy: item.updatedBy || ""
             });
         });
     }
@@ -197,7 +256,7 @@ function OnTabGridLoad(response) {
         },
         { title: "S.No", field: "Sr_No", frozen: true, hozAlign: "center", headerSort: false, headerMenu: headerMenu, width: 70 },
 
-        editableColumn("DNote Number", "DNoteNumber", "input", "left", "input", {}, {}, 150),
+        editableColumn("DNote Number", "DNoteNumber", "input", "center", "input", {}, {}, 150),
 
         editableColumn("Category", "DNoteCategory", "input", "center", "input", {}, {}, 130),
 
@@ -206,9 +265,9 @@ function OnTabGridLoad(response) {
 
         editableColumn("Wattage", "Wattage", "input", "center", "input", {}, {}, 100),
 
-        editableColumn("Quantity", "DQty", "input", "right", "input", {}, {}, 90),
+        editableColumn("Quantity", "DQty", "input", "center", null, {}, {}, 90),
 
-        editableColumn("Requisition By", "DRequisitionBy", "input", "left", "input", {}, {}, 150),
+        editableColumn("Requisition By", "DRequisitionBy", "input", "center", null, {}, {}, 150),
 
         editableColumn("Vendor", "Vendor", "select2", "center", "input", {}, {
             values: vendorOptions
@@ -217,7 +276,39 @@ function OnTabGridLoad(response) {
             return vendorOptions[val] || val;
         }, 130),
 
-        editableColumn("Remark", "Remark", "input", "left", null, {}, {}, 200)
+        editableColumn("Remark", "Remark", "input", "center", null, {}, {}, 200),
+                {
+            title: "Created By", field: "CreatedBy",
+            hozAlign: "center",
+            headerSort: false,
+            headerMenu: headerMenu,
+            width: 100,
+            visible: false
+        },
+        {
+            title: "Created Date", field: "CreatedDate",
+            hozAlign: "center",
+            headerSort: false,
+            headerMenu: headerMenu,
+            width: 100,
+            visible: false
+        },
+        {
+            title: "Updated By", field: "UpdatedBy",
+            hozAlign: "center",
+            headerSort: false,
+            headerMenu: headerMenu,
+            width: 100,
+            visible: false
+        },
+        {
+            title: "Updated Date", field: "UpdatedDate",
+            hozAlign: "center",
+            headerSort: false,
+            headerMenu: headerMenu,
+            width: 100,
+            visible: false
+        }
     ];
 
     if (table) {

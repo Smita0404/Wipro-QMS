@@ -68,7 +68,8 @@ $(document).ready(function () {
     $('#SaveButton').hide();
     $('#DashbackButton').show();
     $('#backButton').hide();
-
+    $('#divcustomDate').show();
+    
     OnThirdPartyGridLoad();
 });
 
@@ -187,7 +188,7 @@ function ShowDetail(id) {
     $('#ThirdParty_Table').hide();
     $('#SaveButton').show();
     $('#DashbackButton').hide();
-    $('#backButton').show();
+    $('#backButton').show(); $('#divcustomDate').hide();
 }
 
 var headerMenu = function () {
@@ -268,14 +269,13 @@ function OnTabGridLoad(data) {
     } else {
         thirdPartyTable = new Tabulator("#ThirdParty_Table", {
             data: safeData,
-            layout: "fitColumns",
+            layout: "fitDataFill",
             movableColumns: true,
-            responsiveLayout: "collapse",
             pagination: "local",
             paginationSize: 10,
-            paginationSizeSelector: [10, 25, 100, 500, 1200, 2000],
+            paginationSizeSelector: [10, 50, 100, 500],
             paginationCounter: "rows",
-            placeholder: "No Data Available",
+            placeholder: "No data available",
             columns: [
                 { title: "Sn", formatter: "rownum", width: 80, headerMenu, frozen: true, headerSort: false, hozAlign: "center" },
                 { title: "ID", field: "inspectionID", width: 80, frozen: true, visible: false },
@@ -371,7 +371,7 @@ function editThirdParty(response) {
     //  alert("Edit called for: " + response.projectName);
     $('#Third').show();
     $('#addButton').hide();
-    $('#ThirdParty_Table').hide();
+    $('#ThirdParty_Table').hide(); $('#divcustomDate').hide();
     $('#SaveButton').show().html('<i class="fas fa-edit mr-2"></i>Update');
     $('#DashbackButton').hide();
     $('#backButton').show();
@@ -477,7 +477,7 @@ function InsertUpdateThirdParty() {
                 $('#SaveButton').hide();
                 $('#DashbackButton').show();
                 $('#backButton').hide();
-
+                $('#divcustomDate').show();
                 OnThirdPartyGridLoad();
 
             } else {
