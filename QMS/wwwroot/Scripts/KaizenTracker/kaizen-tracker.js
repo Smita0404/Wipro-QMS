@@ -195,6 +195,7 @@ function OnTabGridLoad(response) {
                 return `<i onclick="delConfirm(${rowData.Id})" class="fas fa-trash-alt text-danger" title="Delete" style="cursor:pointer;"></i>`;
             }
         },
+        { title: "ID", field: "Id", hozAlign: "center", visible: false },
         { title: "SNo", field: "Sr_No", frozen: true, hozAlign: "center", headerMenu: headerMenu, width: 110 },
 
         editableColumn("Vendor", "Vendor", "select2", "center", null, {}, { values: vendorOptions }, function (cell) {
@@ -243,8 +244,8 @@ function OnTabGridLoad(response) {
         { title: "Created By", field: "CreatedBy", hozAlign: "center", visible: false },
         { title: "Created Date", field: "CreatedDate", hozAlign: "center", visible: false },
         { title: "Updated By", field: "UpdatedBy", hozAlign: "center", visible: false },
-        { title: "Updated Date", field: "UpdatedDate", hozAlign: "center", visible: false },
-         { title: "ID", field: "Id", hozAlign: "center", visible: false }
+        { title: "Updated Date", field: "UpdatedDate", hozAlign: "center", visible: false }
+        
     ];
 
     if (table) {
@@ -268,16 +269,16 @@ function OnTabGridLoad(response) {
         });
     }
 
-    $("#addButton").off("click").on("click", function () {
+    $("#addButton").on("click", function () {
         const newRow = {
             Id: 0,
             Sr_No: table.getDataCount() + 1,
             Vendor: "",
             KaizenTheme: "",
             KMonth: "",
-            Team: "",
-            KaizenFile: "",
-            Remarks: ""
+            Team: "", Remarks: "",
+            KaizenFile: ""
+             /*CreatedBy: "", UpdatedBy: "", UpdatedDate: "", CreatedDate: ""*/
         };
         table.addRow(newRow, false);
     });

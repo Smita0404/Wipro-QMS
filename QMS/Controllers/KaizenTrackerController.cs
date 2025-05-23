@@ -55,7 +55,7 @@ namespace QMS.Controllers
 
                 if (!exists)
                 {
-                  //  model.CreatedDate = DateTime.Now;
+                  // model.CreatedDate = DateTime.Now;
                     model.CreatedBy = HttpContext.Session.GetString("FullName");
 
                     var result = await _kaizenTrackerRepository.CreateAsync(model);
