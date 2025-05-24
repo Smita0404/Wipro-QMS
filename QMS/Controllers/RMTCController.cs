@@ -1,28 +1,23 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using QMS.Core.DatabaseContext;
 using QMS.Core.Models;
-using QMS.Core.Repositories.KaizenTrackerRepository;
-using QMS.Core.Repositories.VendorRepository;
+using QMS.Core.Repositories.RMTCDetailsRepository;
 using QMS.Core.Services.SystemLogs;
 
 namespace QMS.Controllers
 {
-    public class KaizenTrackerController : Controller
+    public class RMTCController : Controller
     {
-        private readonly IKaizenTrackerRepository _kaizenTrackerRepository;
+        private readonly IRMTCDetailsRepository _rmtcRepository;
         private readonly ISystemLogService _systemLogService;
-        private readonly IVendorRepository _vendorRepository;
 
-        public KaizenTrackerController(IKaizenTrackerRepository kaizenTrackerRepository,
-                                       ISystemLogService systemLogService,
-                                       IVendorRepository vendorRepository)
+        public RMTCController(IRMTCDetailsRepository rmtcRepository, ISystemLogService systemLogService)
         {
-            _kaizenTrackerRepository = kaizenTrackerRepository;
+            _rmtcRepository = rmtcRepository;
             _systemLogService = systemLogService;
-            _vendorRepository = vendorRepository;
         }
 
-        public IActionResult KaizenTracker()
+        public IActionResult RMTC()
         {
             return View();
         }
@@ -30,56 +25,61 @@ namespace QMS.Controllers
         [HttpGet]
         public async Task<JsonResult> GetAll(DateTime? startDate, DateTime? endDate)
         {
-            var list = await _kaizenTrackerRepository.GetListAsync(startDate, endDate);
-            return Json(list);
+            try
+            {
+                var list = await _rmtcRepository.GetListAsync(startDate, endDate);
+                return Json(list);
+            }
+            catch (Exception ex)
+            {
+                _systemLogService.WriteLog(ex.Message);
+                return Json(new { success = false, message = "Error fetching RMTC details." });
+            }
         }
 
         [HttpGet]
         public async Task<JsonResult> GetById(int id)
         {
-            var data = await _kaizenTrackerRepository.GetByIdAsync(id);
-            return Json(data);
+            try
+            {
+                var item = await _rmtcRepository.GetByIdAsync(id);
+                return Json(item);
+            }
+            catch (Exception ex)
+            {
+                _systemLogService.WriteLog(ex.Message);
+                return Json(new { success = false, message = "Error fetching record." });
+            }
         }
 
         [HttpPost]
-        [Route("KaizenTracker/CreateAsync")]
-        public async Task<JsonResult> CreateAsync([FromBody] KaizenTracker model)
+        [Route("RMTC/CreateAsync")]
+        public async Task<JsonResult> CreateAsync([FromBody] RMTCDetails model)
         {
             try
             {
                 if (model == null)
                     return Json(new { success = false, message = "Invalid data" });
 
-                // Optional: Add duplication logic
-                bool exists = false;
+                model.CreatedDate = DateTime.Now;
+                model.CreatedBy = HttpContext.Session.GetString("FullName");
 
-                if (!exists)
-                {
-                  // model.CreatedDate = DateTime.Now;
-                    model.CreatedBy = HttpContext.Session.GetString("FullName");
+                var result = await _rmtcRepository.CreateAsync(model);
+                if (result.Success)
+                    return Json(new { success = true, message = "Saved successfully.", id = result.ObjectId });
 
-                    var result = await _kaizenTrackerRepository.CreateAsync(model);
-
-                    if (result.Success)
-                        return Json(new { success = true, message = "Saved successfully.", id = result.ObjectId });
-
-                    return Json(new { success = false, message = "Failed to save.", id = 0 });
-                }
-                else
-                {
-                    return Json(new { success = false, message = "Duplicate entry." });
-                }
+                return Json(new { success = false, message = "Failed to save." });
             }
             catch (Exception ex)
             {
                 _systemLogService.WriteLog(ex.Message);
-                return Json(new { success = false, message = "Error occurred while saving." });
+                return Json(new { success = false, message = ex.Message });
             }
         }
 
         [HttpPost]
-        [Route("KaizenTracker/UpdateAsync")]
-        public async Task<JsonResult> UpdateAsync([FromBody] KaizenTracker model)
+        [Route("RMTC/UpdateAsync")]
+        public async Task<JsonResult> UpdateAsync([FromBody] RMTCDetails model)
         {
             try
             {
@@ -89,8 +89,7 @@ namespace QMS.Controllers
                 model.UpdatedDate = DateTime.Now;
                 model.UpdatedBy = HttpContext.Session.GetString("FullName");
 
-                var result = await _kaizenTrackerRepository.UpdateAsync(model);
-
+                var result = await _rmtcRepository.UpdateAsync(model);
                 if (result.Success)
                     return Json(new { success = true, message = "Updated successfully." });
 
@@ -102,10 +101,9 @@ namespace QMS.Controllers
                 return Json(new { success = false, message = "Error during update." });
             }
         }
-
         [HttpPost]
-        [Route("KaizenTracker/UploadFile")]
-        public async Task<IActionResult> UploadFile(IFormFile file, int kId)
+        [Route("RMTC/UploadFile")]
+        public async Task<IActionResult> UploadFile(IFormFile file, int Id)
         {
             if (file == null || file.Length == 0)
                 return BadRequest(new { message = "No file uploaded." });
@@ -115,11 +113,11 @@ namespace QMS.Controllers
                 const long MaxFileSize = 5 * 1024 * 1024;
                 var allowedExtensions = new[] { ".pdf", ".jpg", ".jpeg", ".png" };
 
-                var record = await _kaizenTrackerRepository.GetByIdAsync(kId);
+                var record = await _rmtcRepository.GetByIdAsync(Id);
                 if (record == null)
-                    return NotFound(new { message = "Kaizen record not found." });
+                    return NotFound(new { message = "record not found." });
 
-                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "KaizenAttachments");
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "RMTCAttachments");
                 if (!Directory.Exists(uploadsFolder))
                     Directory.CreateDirectory(uploadsFolder);
 
@@ -131,7 +129,7 @@ namespace QMS.Controllers
                     return Json(new { success = false, message = $"File type not allowed: {file.FileName}" });
 
                 var uniqueFileName = $"{record.Vendor}_{DateTime.Now:yyyyMMddHHmmssfff}{ext}";
-                string relativePath = Path.Combine("KaizenAttachments", uniqueFileName).Replace("\\", "/");
+                string relativePath = Path.Combine("RMTCAttachments", uniqueFileName).Replace("\\", "/");
                 var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
                 using (var stream = new FileStream(filePath, FileMode.Create))
@@ -139,10 +137,10 @@ namespace QMS.Controllers
                     await file.CopyToAsync(stream);
                 }
 
-                record.KaizenFile = relativePath;
-                record.Id = kId;
+                record.Filename = relativePath;
+                record.Id = Id;
 
-                var updateResult = await _kaizenTrackerRepository.UpdateAsync(record);
+                var updateResult = await _rmtcRepository.UpdateAsync(record);
                 if (!updateResult.Success)
                     return StatusCode(500, new { message = "Failed to update the record with file info." });
 
@@ -151,22 +149,7 @@ namespace QMS.Controllers
             catch (Exception ex)
             {
                 _systemLogService.WriteLog(ex.Message);
-                return StatusCode(500, new { message = "File upload or update failed." });
-            }
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> GetVendor()
-        {
-            try
-            {
-                var vendorList = await _kaizenTrackerRepository.GetVendorDropdownAsync();
-                return Json(vendorList);
-            }
-            catch (Exception ex)
-            {
-                _systemLogService.WriteLog(ex.Message);
-                return StatusCode(500, "Error retrieving vendor dropdown.");
+                return StatusCode(500, new { ex.Message });
             }
         }
 
@@ -175,14 +158,34 @@ namespace QMS.Controllers
         {
             try
             {
-                var result = await _kaizenTrackerRepository.DeleteAsync(id);
+                var result = await _rmtcRepository.DeleteAsync(id);
                 return Json(result);
             }
             catch (Exception ex)
             {
                 _systemLogService.WriteLog(ex.Message);
-                return Json(new { success = false, message = "Error occurred while deleting Kaizen record." });
+                return Json(new { success = false, message = "Error occurred while deleting RMTC record." });
             }
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetVendors()
+        {
+            try
+            {
+                var vendorList = await _rmtcRepository.GetVendorDropdownAsync();
+                return Json(vendorList);
+            }
+            catch (Exception ex)
+            {
+                _systemLogService.WriteLog(ex.Message);
+                return StatusCode(500, ex.Message);
+            }
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetProductCodeSearch(string search)
+        {
+            var data = await _rmtcRepository.GetCodeSearchAsync(search);
+            return Json(data);
         }
     }
 }

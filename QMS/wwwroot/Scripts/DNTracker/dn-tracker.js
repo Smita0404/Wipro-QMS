@@ -254,7 +254,7 @@ function OnTabGridLoad(response) {
                 return `<i onclick="delConfirm(${rowData.DNoteId})" class="fas fa-trash-alt text-danger" title="Delete" style="cursor:pointer;"></i>`;
             }
         },
-        { title: "S.No", field: "Sr_No", frozen: true, hozAlign: "center", headerSort: false, headerMenu: headerMenu, width: 70 },
+        { title: "S.No", field: "Sr_No", frozen: true, hozAlign: "center", headerSort: false, headerMenu: headerMenu, width:90 },
 
         editableColumn("DNote Number", "DNoteNumber", "input", "center", "input", {}, {}, 150),
 
@@ -265,9 +265,10 @@ function OnTabGridLoad(response) {
 
         editableColumn("Wattage", "Wattage", "input", "center", "input", {}, {}, 100),
 
-        editableColumn("Quantity", "DQty", "input", "center", null, {}, {}, 90),
 
-        editableColumn("Requisition By", "DRequisitionBy", "input", "center", null, {}, {}, 150),
+        editableColumn("Quantity", "DQty", "input", "center", "input", {}, {}, 130),
+
+        editableColumn("Requisition By", "DRequisitionBy", "input", "center", "input", {}, {}, 130),
 
         editableColumn("Vendor", "Vendor", "select2", "center", "input", {}, {
             values: vendorOptions
