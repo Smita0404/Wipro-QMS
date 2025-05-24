@@ -195,7 +195,7 @@ function OnTabGridLoad(response) {
                 return `<i onclick="delConfirm(${rowData.Id})" class="fas fa-trash-alt text-danger" title="Delete" style="cursor:pointer;"></i>`;
             }
         },
-        { title: "ID", field: "Id", hozAlign: "center", visible: false },
+        { title: "ID", field: "Id", hozAlign: "center", frozen: true, visible: false },
         { title: "SNo", field: "Sr_No", frozen: true, hozAlign: "center", headerMenu: headerMenu, width: 110 },
 
         editableColumn("Vendor", "Vendor", "select2", "center", null, {}, { values: vendorOptions }, function (cell) {
