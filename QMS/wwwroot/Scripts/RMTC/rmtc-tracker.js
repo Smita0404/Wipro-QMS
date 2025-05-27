@@ -126,13 +126,13 @@ function loadData() {
                     OnTabGridLoad(safeData);
                 } else {
                     showDangerAlert('No data available to load.');
-                    OnTabGridLoad([]);
+                    OnTabGridLoad(safeData);
                 }
             })
             .fail(function (xhr, status, error) {
                 console.error('Error retrieving data:', status, error, xhr.responseText);
                 showDangerAlert('Error retrieving data: ' + (error || status));
-                OnTabGridLoad([]);
+                OnTabGridLoad(safeData);
             })
             .always(function () {
                 Blockloaderhide();

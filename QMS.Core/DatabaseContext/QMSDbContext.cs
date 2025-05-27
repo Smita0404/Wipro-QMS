@@ -31,6 +31,7 @@ namespace QMS.Core.DatabaseContext
         public DbSet<KaizenTracker> KaizenTracker { get; set; }
         public DbSet<SPMReport> SPMReports { get; set; }
         public DbSet<RMTCDetails> RMTCDetails { get; set; }
+        public DbSet<COPQComplaintDump> COPQComplaintDump { get; set; }
         public class InspectionResult
         {
             public int InspectionID { get; set; }
