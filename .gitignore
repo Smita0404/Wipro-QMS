@@ -362,3 +362,4 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /QMS/appsettings.json
+/QMS/wwwroot/RMTCAttachments/300354_20250527184013489.pdf

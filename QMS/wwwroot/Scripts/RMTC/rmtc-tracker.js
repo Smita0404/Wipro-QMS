@@ -560,9 +560,9 @@ function saveEditedRow(rowData) {
         contentType: "application/json",
         success: function (res) {
             if (res && res.success) {
-                // if (isNew) {
+                if (isNew) {
                    loadData();
-             //  }
+               }
                 if (isNew && res.id) {
                     rowData.Id = res.id;
                 }
