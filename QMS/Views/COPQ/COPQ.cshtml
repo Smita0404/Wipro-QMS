@@ -6,20 +6,11 @@
 <link href="~/css/tabulator/tabulator.min.css" rel="stylesheet" />
 <link href="~/css/tabulator/tabulator_bootstrap4.min.css" rel="stylesheet" />
 <link href="~/css/pnotify.css" rel="stylesheet" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-<script src="~/js/jquery.min.js"></script>
-<script src="~/js/jquery.datatables.js"></script>
-<script src="~/js/pnotify.js"></script>
-<script src="~/js/pnotify.confirm.js"></script>
-<script src="~/lib/bootstrap/dist/js/datatables.buttons.min.js"></script>
-<script src="~/lib/bootstrap/dist/js/popupAlert.js"></script>
-<script src="~/lib/bootstrap/dist/js/jszip.min.js"></script>
-<script src="~/lib/bootstrap/dist/js/buttons.html5.min.js"></script>
-<script src="~/js/common.js"></script>
-<script src="~/js/tabulator.js"></script>
-<script src="~/js/xlsx.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.6.2/js/bootstrap.bundle.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/litepicker/dist/css/litepicker.css" />
+
 
 <style>
     .nav-pills .nav-link {
@@ -41,6 +32,12 @@
             font-weight: bold;
         }
 
+    .col-1-5 {
+        flex: 0 0 auto;
+        width: 10.5%;
+        max-width: 10.5%;
+        margin-left: 50px;
+    }
     .form-control {
         padding: 0 10px !important;
         border: 0;
@@ -99,6 +96,44 @@
     .tabulator .tabulator-header .tabulator-frozen.tabulator-frozen-left {
         border-right: 1px solid #ccc;
     }
+
+    .calendar-container {
+        cursor: pointer;
+        padding: 10px 15px;
+        width: 100%;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        transition: background-color 0.3s, box-shadow 0.3s;
+        gap: 8px;
+    }
+
+        .calendar-container:hover {
+            background-color: #e3f2fd;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .calendar-container i.fa-calendar {
+            color: #2196f3;
+            font-size: 1.2em;
+            padding-left: 20px;
+        }
+
+        .calendar-container span {
+            color: #4682B4;
+            margin: 0;
+            font-size: 16px;
+        }
+
+    .container__predefined-ranges {
+        font-size: 14px;
+    }
+
+    .month-item {
+        font-size: 14px;
+    }
+
 </style>
 
 <div class="content">
@@ -122,15 +157,13 @@
                             <div>
                                 <b style="font-size: large;color: #4682B4;">Complaint Dump</b>
                             </div>
-
                             <div>
-                                <button id="addButton" type="button" class="btn btn-outline-success legitRipple mr-2" onclick="openCOPQForm()">
+                                <button id="addButton" type="button" class="btn btn-outline-success legitRipple mr-2" style="width: 140px; font-size:15px">
                                     <i class="fas fa-plus mr-2 fa-1x"></i>Add
                                 </button>
-                                <button id="backButton" class="btn btn-outline-primary" onclick="history.back()">
+                                <button id="backButton" class="btn btn-outline-primary">
                                     <i class="fas fa-arrow-left"></i> Back
                                 </button>
-
                             </div>
                         </div>
                     </div>
@@ -139,118 +172,156 @@
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-body">
+                                    <div class="col-md-4">
+                                        <div id="customDateTrigger" class="calendar-container">
+                                            <i class="fa fa-calendar"></i>
+                                            <span id="dateRangeText">Select Date Range</span>
+                                        </div>
+                                    </div>
                                     <div class="chart-container">
+                                        <div class="form-group row"></div>
+                                        <div class="form-group row"></div>
                                         <div class="form-group">
                                             <div id="copq-table" class="col-12"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                               
+                            </div>
+                        </div>
+                    </div>
+                   
+                </div>
+
+                <!-- Tab 2 to Tab 6 content placeholders -->
+                <div class="tab-pane fade" id="tab2" role="tabpanel">
+                    <div class="card" id="divindent">
+                        <div class="card-body px-3 py-2">
+                            <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+                                <div id="indent-table"></div>
+                            </div>
+                            <div class="text-end mt-3">
+                                <button class="btn btn-primary" onclick="getIndentFormData()">Save Indent</button>
+                            </div>
+                        </div>
+                    </div>
+
+                   @*  <div class="row" id="divindentGrid">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="col-md-4">
+                                        <div id="customDateTrigger" class="calendar-container">
+                                            <i class="fa fa-calendar"></i>
+                                            <span id="dateRangeText">Select Date Range</span>
+                                        </div>
+                                    </div>
+                                    <div class="chart-container">
+                                        <div class="form-group row"></div>
+                                        <div class="form-group row"></div>
+                                        <div class="form-group">
+                                            <div id="indent-table" class="col-12"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div> *@
+                   </div>
+
+                <div class="tab-pane fade" id="tab3" role="tabpanel">
+                    <div class="card" id="podiv1">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <div>
+                                <b style="font-size: large;color: #4682B4;">Pending PO</b>
+                            </div>
+                            <div>
+                                <button id="addPOButton" type="button" class="btn btn-outline-success legitRipple mr-2" style="width: 140px; font-size:15px">
+                                    <i class="fas fa-plus mr-2 fa-1x"></i>Add
+                                </button>
+                                <button id="backButton" class="btn btn-outline-primary">
+                                    <i class="fas fa-arrow-left"></i> Back
+                                </button>
+                            </div>
+                          
+                        </div>
+                    </div>
+
+                    <div class="row" id="podiv2Grid">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="chart-container">
+                                        <div class="col-md-4">
+                                            <div id="customDateTriggerPO" class="calendar-container">
+                                                <i class="fa fa-calendar"></i>
+                                                <span id="POdateRangeText">Select Date Range</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="form-group row"></div>
+                                            <div class="form-group row"></div>
+                                            <div id="po-table" class="col-12"></div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="card" id="div3Form" style="border-radius:10px;border:1px solid #4682B4;">
-                        <div class="card-header d-flex justify-content-between align-items-center" style="border-radius: 10px 10px 0 0; border-bottom: 2px solid #4682B4;">
-                            <h5 class="card-title font-weight-bold mb-0">Complaint Dump</h5>
+                      </div> 
+                <div class="tab-pane fade" id="tab4" role="tabpanel">
+                      
+                            <div class="card" id="Invoicediv1">
+                                <div class="card-body d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <b style="font-size: large;color: #4682B4;">Invoice List</b>
+                                    </div>
+
+                                  
+                                </div>
+                            </div>
+
+                            <div class="row" id="Invoicediv2Grid">
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="chart-container">
+                                                <div class="form-group">
+                                                    <div id="Invoice-table" class="col-12"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                  
+                </div>
+                <div class="tab-pane fade" id="tab5" role="tabpanel">
+                    <div class="card" id="PCChartdiv1">
+                        <div class="card-body d-flex justify-content-between align-items-center">
                             <div>
-                                <button type="button" id="saveButton"  onclick="InsertUpdateDetail()" class="btn btn-success me-2">
-                                    <i class="fas fa-floppy-disk mr-2"></i>Save
-                                </button>
-
-                                <button type="button" class="btn btn-warning" onclick="window.location.href='/COPQ/COPQ'">
-                                    <i class="fas fa-arrow-left mr-2"></i>Back
-                                </button>
-
-
-
-
-
+                                <b style="font-size: large;color: #4682B4;">PC Chart</b>
                             </div>
-                        </div>
 
-                        <div class="card-body">
-                            <div class="form-group">
-                                <input type="text" class="form-control" id="Id" name="Id" hidden />
-                                <div class="row form-group align-items-center mb-2 gx-1">
-                                    <label class="col-2"><b>CCCN Date</b></label>
-                                    <div class="col-2" >
-                                        <input type="date" class="form-control" id="CCCNDate" name="CCCNDate" />
-                                        <span id="Date_Error" class="text-danger"></span>
-                                    </div>
-                                    <div class="col-2"></div>
-                                    <label class="col-2"><b>Reported By</b></label>
-                                    <div class="col-2">
-                                        <input type="text" class="form-control" id="ReportedBy" name="ReportedBy" />
-                                    </div>
-                                </div>
-
-                                <div class="row form-group align-items-center mb-2 gx-1">
-                                    <label class="col-2"><b>Location</b></label>
-                                    <div class="col-2">
-                                        <input type="text" class="form-control" id="Location" name="Location" />
-                                    </div>
-                                    <div class="col-2"></div>
-                                    <label class="col-2"><b>Customer Name</b></label>
-                                    <div class="col-2">
-                                        <input type="text" class="form-control" id="CustomerName" name="CustomerName" />
-                                    </div>
-                                </div>
-
-                                <div class="row form-group align-items-center mb-2 gx-1">
-                                    <label class="col-2"><b>Dealer Name</b></label>
-                                    <div class="col-2">
-                                        <input type="text" class="form-control" id="DealerName" name="DealerName" />
-                                    </div>
-                                    <div class="col-2"></div>
-                                    <label class="col-2"><b>Description</b></label>
-                                    <div class="col-2">
-                                        <input type="text" class="form-control" id="Description" name="Description" />
-                                    </div>
-                                </div>
-
-                                <div class="row form-group align-items-center mb-2 gx-1">
-                                    <label class="col-2"><b>Status</b></label>
-                                    <div class="col-2">
-                                        <select class="form-control" id="Status" name="Status">
-                                            <option value="">-- Select --</option>
-                                            <option value="Open">Open</option>
-                                            <option value="In Progress">In Progress</option>
-                                            <option value="Closed">Closed</option>
-                                            <option value="On Hold">On Hold</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-2"></div>
-                                    <label class="col-2">
-                                        <b>Completion</b>
-                                    </label>
-                                    <div class="col-2">
-                                        <input class="form-control" id="Completion" name="Completion" type="text" />
-                                    </div>
-                                </div>
-                                <div class="row form-group align-items-center mb-2 gx-1">
-                                    <label class="col-2"><b>Closure Remarks</b></label>
-                                    <div class="col-8">
-                                        <textarea class="form-control" id="ClosureRemarks" name="ClosureRemarks" rows="3"></textarea>
-                                    </div>
-                                </div>
-
-                            </div>
+                           
                         </div>
                     </div>
 
-                </div>
-
-                <!-- Tab 2 to Tab 6 content placeholders -->
-                <div class="tab-pane fade" id="tab2" role="tabpanel">
-                    <!-- Content for Indent Dump -->
-                </div>
-                <div class="tab-pane fade" id="tab3" role="tabpanel">
-                    <!-- Content for Pending Po -->
-                </div>
-                <div class="tab-pane fade" id="tab4" role="tabpanel">
-                    <!-- Content for Invoice List -->
-                </div>
-                <div class="tab-pane fade" id="tab5" role="tabpanel">
-                    <!-- Content for PC Chart -->
+                    <div class="row" id="divPCGrid">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="chart-container">
+                                        <div class="form-group">
+                                            <div id="PC-table" class="col-12"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
                 </div>
                 <div class="tab-pane fade" id="tab6" role="tabpanel">
                     <!-- Content for Region Names -->
@@ -262,6 +333,48 @@
 </div>
 
 @section Scripts {
+    <!-- jQuery -->
+    <script src="~/js/jquery.min.js"></script>
+
+    <!-- jQuery UI (if you use sortable, draggable, etc.) -->
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+
+    <!-- jQuery BlockUI (for popupalert.js) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.blockUI/2.70/jquery.blockUI.min.js"></script>
+
+    <!-- DataTables core -->
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+
+    <!-- DataTables Buttons extensions -->
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
+
+    <!-- Select2 -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <!-- Tabulator -->
+    <script src="https://unpkg.com/tabulator-tables@5.5.0/dist/js/tabulator.min.js"></script>
+    <script src="~/js/tabulator.js"></script>
+
+    <!-- Moment.js and Litepicker -->
+    <script src="https://cdn.jsdelivr.net/npm/moment/min/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/litepicker/dist/litepicker.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/litepicker/dist/plugins/ranges.js"></script>
+
+    <!-- XLSX -->
+    <script src="~/js/xlsx.min.js"></script>
+
+    <!-- PNotify -->
+    <script src="~/js/pnotify.js"></script>
+    <script src="~/js/pnotify.confirm.js"></script>
+
+    <!-- Noty (if used) -->
+    <script src="https://cdn.jsdelivr.net/npm/noty/lib/noty.min.js"></script>
+
+    <!-- Popup Alert -->
+    <script src="~/lib/bootstrap/dist/js/popupalert.js"></script>
     <script src="~/scripts/COPQ/copq.js" asp-append-version="true"></script>
-   
+    <script src="~/scripts/COPQ/po.js" asp-append-version="true"></script>
+    <script src="~/scripts/COPQ/indentdump.js" asp-append-version="true"></script>
 }
