@@ -37145,10 +37145,8 @@ body {
         }
 
     .sidebar-dark .nav-sidebar .nav-item > .nav-link.active {
-        background-color: #eee !important;
-        color: #0c83ff !important;
-        font-weight: bold;
-        font-size: small;
+        background-color: rgba(255,255,255,.1);
+        color: #fff
     }
 
     .sidebar-dark .nav-sidebar .nav-item-open > .nav-link:not(.disabled), .sidebar-dark .nav-sidebar > .nav-item-expanded:not(.nav-item-open) > .nav-link {
