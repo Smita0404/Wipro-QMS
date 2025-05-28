@@ -1,101 +1,145 @@
-﻿$(document).ready(function () {
-    $("#div1").show();
-    $("#div2Grid").show();
-    $("#div3Form").hide();
+﻿var tabledata = [];
+var table = null;
+let filterStartDate = moment().startOf('week').format('YYYY-MM-DD');
+let filterEndDate = moment().endOf('week').format('YYYY-MM-DD');
+
+$(document).ready(function () {
+    $('#dateRangeText').text(
+        moment(filterStartDate).format('MMMM D, YYYY') + ' - ' + moment(filterEndDate).format('MMMM D, YYYY')
+    );
+
+    const picker = new Litepicker({
+        element: document.getElementById('customDateTrigger'),
+        singleMode: false,
+        format: 'DD-MM-YYYY',
+        numberOfMonths: 2,
+        numberOfColumns: 2,
+        dropdowns: { minYear: 2020, maxYear: null, months: true, years: true },
+        plugins: ['ranges'],
+        setup: (picker) => {
+            picker.on('selected', (start, end) => {
+                filterStartDate = start.format('YYYY-MM-DD');
+                filterEndDate = end.format('YYYY-MM-DD');
+                $('#dateRangeText').text(`${start.format('MMMM D, YYYY')} - ${end.format('MMMM D, YYYY')}`);
+                loadData();
+            });
+
+            picker.on('clear', () => {
+                filterStartDate = "";
+                filterEndDate = "";
+                $('#dateRangeText').text("Select Date Range");
+                loadData();
+            });
+        },
+        ranges: {
+            Today: [moment(), moment()],
+            Yesterday: [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+            'This Month': [moment().startOf('month'), moment().endOf('month')],
+            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        },
+        startDate: moment().startOf('week').format('DD-MM-YYYY'),
+        endDate: moment().endOf('week').format('DD-MM-YYYY')
+    });
+
+    $('#customDateTrigger').on('click', function () {
+        picker.show();
+    });
+
+    document.getElementById('backButton').addEventListener('click', function () {
+        window.history.back();
+    });
+
     loadData();
 });
-function openCOPQForm() {
-    $("#div1").hide();
-    $("#div2Grid").hide();
-    $("#div3Form").show();
-}
 
 function loadData() {
     Blockloadershow();
+
     $.ajax({
         url: '/COPQ/GetAll',
         type: 'GET',
-        success: function (data) {
-            Blockloaderhide();
-            if (data && Array.isArray(data)) {
-                OnCOPQGridLoad(data);
-            }
-            else {
-                showDangerAlert('No data available to load.');
-            }
+        dataType: 'json',
+        data: {
+            startDate: filterStartDate,
+            endDate: filterEndDate
         },
+        success: function (data) {
+            if (Array.isArray(data)) {
+                renderCOPQTable(data); // load into Tabulator or grid
+            } else {
+                showDangerAlert('No Data available.');
+            }
+            Blockloaderhide();
+        },
+        
         error: function (xhr, status, error) {
             showDangerAlert('Error retrieving data: ' + error);
             Blockloaderhide();
         }
     });
 }
+function renderCOPQTable(response) {
+    if (!Array.isArray(response)) {
+        console.error("Invalid response, expected array:", response);
+        showDangerAlert("Invalid data received.");
+        Blockloaderhide();
+        return;
+    }
 
-function OnCOPQGridLoad(response) {
-    debugger;
     Blockloadershow();
 
-    let tabledata = [];
-    let columns = [];
+    const tabledata = response.map((item, index) => ({
+        Sr_No: index + 1,
+        Id: item.id,
+        CCCNDate: item.cccnDate ? new Date(item.cccnDate).toLocaleDateString("en-GB") : "",
+        ReportedBy: item.reportedBy,
+        CLocation: item.cLocation,
+        CustName: item.custName,
+        DealerName: item.dealerName,
+        CDescription: item.cDescription,
+        CStatus: item.cStatus,
+        Completion: item.completion,
+        Remarks: item.remarks,
+        CreatedDate: item.createdDate ? new Date(item.createdDate).toLocaleDateString("en-GB") : "",
+        CreatedBy: item.createdBy,
+        UpdatedDate: item.updatedDate ? new Date(item.updatedDate).toLocaleDateString("en-GB") : "",
+        UpdatedBy: item.updatedBy,
+        IsDeleted: item.isDeleted
+    }));
+   
+    const columns = [
+        {
+            title: "Action",
+            field: "Action",
+            hozAlign: "center",
+            headerHozAlign: "center",
+            frozen: true, headerMenu: headerMenu,
+            formatter: function (cell) {
+                const rowData = cell.getRow().getData();
+                return `<i onclick="delConfirm(${rowData.Id})" class="fas fa-trash-alt mr-2 fa-1x" title="Delete" style="color:red;cursor:pointer;margin-left: 5px;"></i>`;
+            }
+        },
+        { title: "SNo", field: "Sr_No", sorter: "number", hozAlign: "center", headerHozAlign: "center", headerMenu: headerMenu, frozen: true },
+        editableColumn("CCCN Date", "CCCNDate", "date", "center"),
+        editableColumn("Reported By", "ReportedBy"),
+        editableColumn("Location", "CLocation"),
+        editableColumn("Customer Name", "CustName"),
+        editableColumn("Dealer Name", "DealerName"),
+        editableColumn("Description", "CDescription"),
+        editableColumn("Status", "CStatus"),
+        editableColumn("Completion", "Completion"),
+        editableColumn("Remarks", "Remarks"),
+        { title: "Created By", field: "CreatedBy", headerMenu: headerMenu, visible: false },
+        { title: "Created Date", field: "CreatedDate", headerMenu: headerMenu, visible: false },
+        { title: "Updated By", field: "UpdatedBy", headerMenu: headerMenu, visible: false },
+        { title: "Updated Date", field: "UpdatedDate", headerMenu: headerMenu, visible: false }
+    ];
 
-  
-        response.forEach((item, index) => {
-            let cccnDate = item.cccnDate ? new Date(item.cccnDate).toLocaleDateString("en-GB") : "";
-            let createdDate = item.createdDate ? new Date(item.createdDate).toLocaleDateString("en-GB") : "";
-            let updatedDate = item.updatedDate ? new Date(item.updatedDate).toLocaleDateString("en-GB") : "";
-
-            tabledata.push({
-                Sr_No: index + 1,
-                Id: item.id,
-                CCCNDate: cccnDate,
-                ReportedBy: item.reportedBy,
-                Location: item.cLocation,
-                CustName: item.custName,
-                DealerName: item.dealerName,
-                Description: item.cDescription,
-                Status: item.cStatus,
-                Completion: item.completion,
-                CreatedDate: createdDate,
-                CreatedBy: item.createdBy,
-                UpdatedDate: updatedDate,
-                UpdatedBy: item.updatedBy,
-                Remarks: item.remarks,
-                IsDeleted: item.isDeleted
-            });
-        });
-
-        columns = [
-            {
-                title: "Action",
-                field: "Action",
-                hozAlign: "center",
-                headerHozAlign: "center", frozen: true,
-                formatter: function (cell) {
-                    const rowData = cell.getRow().getData();
-                    return `
-                        <i data-toggle="modal" onclick="delConfirm(${rowData.Id})" class="fas fa-trash-alt mr-2 fa-1x" title="Delete" style="color:red;cursor:pointer;margin-left: 5px;"></i>
-                        
-                    `;
-                }
-            },
-            { title: "SNo", field: "Sr_No", frozen: true, sorter: "number", headerMenu: headerMenu, hozAlign: "center", headerHozAlign: "center" },
-            { title: "CCCN Date", field: "CCCNDate", sorter: "date", headerMenu: headerMenu, headerFilter: "input", hozAlign: "left", headerHozAlign: "center" },
-            { title: "Reported By", field: "ReportedBy", headerMenu: headerMenu, headerFilter: "input", hozAlign: "left", headerHozAlign: "center" },
-            { title: "Location", field: "Location", headerMenu: headerMenu, headerFilter: "input", hozAlign: "left", headerHozAlign: "center" },
-            { title: "Customer Name", field: "CustName", headerMenu: headerMenu, headerFilter: "input", hozAlign: "left", headerHozAlign: "center" },
-            { title: "Dealer Name", field: "DealerName", headerMenu: headerMenu, headerFilter: "input", hozAlign: "left", headerHozAlign: "center" },
-            { title: "Description", field: "Description", headerMenu: headerMenu, headerFilter: "input", hozAlign: "left", headerHozAlign: "center" },
-            { title: "Status", field: "Status", headerMenu: headerMenu, headerFilter: "input", hozAlign: "left", headerHozAlign: "center" },
-            { title: "Completion", field: "Completion", headerMenu: headerMenu, headerFilter: "input", hozAlign: "left",  headerSort: false, headerHozAlign: "center" },
-            { title: "Created Date", field: "CreatedDate", sorter: "date", headerMenu: headerMenu, headerFilter: "input", headerSort: false, hozAlign: "left", headerHozAlign: "center", visible: false },
-            { title: "Created By", field: "CreatedBy", headerMenu: headerMenu, headerFilter: "input", hozAlign: "left", headerSort: false, headerHozAlign: "center", visible: false },
-            { title: "Updated Date", field: "UpdatedDate", sorter: "date", headerMenu: headerMenu, headerFilter: "input", hozAlign: "left", headerSort: false, headerHozAlign: "center", visible: false },
-            { title: "Updated By", field: "UpdatedBy", headerMenu: headerMenu, headerFilter: "input", hozAlign: "left", headerHozAlign: "center", headerSort: false, visible: false },
-            { title: "Remarks", field: "Remarks", headerMenu: headerMenu, headerFilter: "input", hozAlign: "left", headerHozAlign: "center" }
-           
-        ];
-
-        // Initialize Tabulator
+    if (typeof table !== 'undefined' && table instanceof Tabulator) {
+        table.replaceData(tabledata);
+    } else {
         table = new Tabulator("#copq-table", {
             data: tabledata,
             layout: "fitDataFill",
@@ -105,171 +149,215 @@ function OnCOPQGridLoad(response) {
             paginationSizeSelector: [10, 50, 100, 500],
             paginationCounter: "rows",
             placeholder: "No data available",
-            columns: columns,
-            dataEmpty: "<div style='text-align: center; font-size: 1rem; color: gray;'>No data available</div>"
+            columns: columns
         });
 
-        table.on("cellClick", function (e, cell) {
-            // Prevent triggering edit if clicking on the Action buttons
-            if (cell.getField() !== "Action") {
-                const rowData = cell.getRow().getData();
-
-                // Set button for update mode
-                $("#saveButton").html('<i class="fas fa-edit mr-2"></i>Update');
-                $("#div1").hide();
-                $("#div2Grid").hide();
-                $("#div3Form").show();
-                // Load data into form for editing
-                editComplaint(rowData.Id);
-            }
+        table.on("cellEdited", function (cell) {
+            saveEditedRow(cell.getRow().getData());
         });
 
-    
+        $("#addButton").off("click").on("click", function () {
+            const newRow = {
+                Id: 0,
+                Sr_No: table.getDataCount() + 1,
+                CCCNDate: "",
+                ReportedBy: "",
+                CLocation: "",
+                CustName: "",
+                DealerName: "",
+                CDescription: "",
+                CStatus: "",
+                Completion: "",
+                Remarks: ""
+            };
+            table.addRow(newRow, false);
+        });
+    }
 
     Blockloaderhide();
 }
-function editComplaint(id) {
-    $.ajax({
-        url: '/COPQ/GetById', // Adjust to your actual controller route
-        type: 'GET',
-        data: { id: id },
-        success: function (data) {
-            if (data) {
-                // Populate form fields
-                $('#Id').val(data.id);
-                $('#CCCNDate').val(data.cccnDate ? moment(data.cccnDate).format('YYYY-MM-DD') : '');
-                $('#ReportedBy').val(data.reportedBy);
-                $('#CLocation').val(data.cLocation);
-                $('#CustName').val(data.custName);
-                $('#DealerName').val(data.dealerName);
-                $('#CDescription').val(data.cDescription);
-                $('#CStatus').val(data.cStatus);
-                $('#Completion').val(data.completion);
-                $('#Remarks').val(data.remarks);
 
-                // Show the modal or form
-                $('#complaintModal').modal('show');
-            } else {
-                PNotify.error({ text: 'Complaint not found.' });
-            }
-        },
-        error: function (err) {
-            console.error('Error fetching complaint:', err);
-            PNotify.error({ text: 'Error fetching complaint data.' });
-        }
-    });
+//function renderCOPQTable(response) {
+//    if (!Array.isArray(response)) {
+//        console.error("Invalid response, expected array:", response);
+//        showDangerAlert("Invalid data received.");
+//        Blockloaderhide();
+//        return;
+//    }
+
+//    Blockloadershow();
+
+//    const tabledata = response.map((item, index) => ({
+//        Sr_No: index + 1,
+//        Id: item.id,
+//        CCCNDate: item.cccnDate ? new Date(item.cccnDate).toLocaleDateString("en-GB") : "",
+//        ReportedBy: item.reportedBy,
+//        CLocation: item.cLocation,
+//        CustName: item.custName,
+//        DealerName: item.dealerName,
+//        CDescription: item.cDescription,
+//        CStatus: item.cStatus,
+//        Completion: item.completion,
+//        Remarks: item.remarks,
+//        CreatedDate: item.createdDate ? new Date(item.createdDate).toLocaleDateString("en-GB") : "",
+//        CreatedBy: item.createdBy,
+//        UpdatedDate: item.updatedDate ? new Date(item.updatedDate).toLocaleDateString("en-GB") : "",
+//        UpdatedBy: item.updatedBy,
+//        IsDeleted: item.isDeleted
+//    }));
+
+//    const columns = [
+//        {
+//            title: "Action",
+//            field: "Action",
+//            hozAlign: "center",
+//            headerHozAlign: "center",
+//            frozen: true,
+//            formatter: function (cell) {
+//                const rowData = cell.getRow().getData();
+//                return `<i onclick="delConfirm(${rowData.Id})" class="fas fa-trash-alt mr-2 fa-1x" title="Delete" style="color:red;cursor:pointer;margin-left: 5px;"></i>`;
+//            }
+//        },
+//        { title: "SNo", field: "Sr_No", sorter: "number", hozAlign: "center", headerHozAlign: "center", frozen: true },
+//        editableColumn("CCCN Date", "CCCNDate", "date", "center"),
+//        editableColumn("Reported By", "ReportedBy"),
+//        editableColumn("Location", "CLocation"),
+//        editableColumn("Customer Name", "CustName"),
+//        editableColumn("Dealer Name", "DealerName"),
+//        editableColumn("Description", "CDescription"),
+//        editableColumn("Status", "CStatus"),
+//        editableColumn("Completion", "Completion"),
+//        editableColumn("Remarks", "Remarks"),
+//        { title: "Created By", field: "CreatedBy", visible: false },
+//        { title: "Created Date", field: "CreatedDate", visible: false },
+//        { title: "Updated By", field: "UpdatedBy", visible: false },
+//        { title: "Updated Date", field: "UpdatedDate", visible: false }
+//    ];
+
+//    if (typeof table !== 'undefined' && table instanceof Tabulator) {
+//        table.replaceData(tabledata);
+//    } else {
+//        table = new Tabulator("#copq-table", {
+//            data: tabledata,
+//            layout: "fitDataFill",
+//            movableColumns: true,
+//            pagination: "local",
+//            paginationSize: 10,
+//            paginationSizeSelector: [10, 50, 100, 500],
+//            paginationCounter: "rows",
+//            placeholder: "No data available",
+//            columns: columns
+//        });
+
+//        table.on("cellEdited", function (cell) {
+//            saveEditedRow(cell.getRow().getData());
+//        });
+
+//        $("#addButton").off("click").on("click", function () {
+//            const newRow = {
+//                Id: 0,
+//                Sr_No: table.getDataCount() + 1,
+//                CCCNDate: "",
+//                ReportedBy: "",
+//                CLocation: "",
+//                CustName: "",
+//                DealerName: "",
+//                CDescription: "",
+//                CStatus: "",
+//                Completion: "",
+//                Remarks: ""
+//            };
+//            table.addRow(newRow, false);
+//        });
+//    }
+
+//    Blockloaderhide();
+//}
+
+// Utility for editable column config
+function editableColumn(title, field, editor = "input", align = "left") {
+    return {
+        title: title,
+        field: field,
+        editor: editor,
+        hozAlign: align,
+        headerHozAlign: "center"
+    };
 }
 
-function InsertUpdateDetail() {
-    // Clear previous errors
-    $("#Date_Error").text("");
 
-    // Collect form data
-    const model = {
-        id: $("#Id").val() || 0, // Assuming you store Id in a hidden input or set to 0 for insert
-        cccnDate: $("#CCCNDate").val(),
-        reportedBy: $("#ReportedBy").val(),
-        cLocation: $("#Location").val(),
-        custName: $("#CustomerName").val(),
-        dealerName: $("#DealerName").val(),
-        cDescription: $("#Description").val(),
-        cStatus: $("#Status").val(),
-        completion: $("#Completion").val(),
-        remarks: $("#ClosureRemarks").val(),
-        // Add other fields if needed
+function toIsoDatePO(value) {
+    if (!value) return "";
+    const parts = value.split('/');
+    return parts.length === 3 ? `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}` : value;
+}
+
+function saveEditedRow(rowData) {
+    const cleanedData = {
+        Id: rowData.Id || 0,
+        CCCNDate: toIsoDatePO(rowData.CCCNDate),
+        ReportedBy: rowData.ReportedBy || null,
+        CLocation: rowData.CLocation || null,
+        CustName: rowData.CustName || null,
+        DealerName: rowData.DealerName || null,
+        CDescription: rowData.CDescription || null,
+        CStatus: rowData.CStatus || null,
+        Completion: rowData.Completion || null,
+        Remarks: rowData.Remarks || null
     };
 
-    // Basic validation
-    if (!model.cccnDate) {
-        $("#Date_Error").text("Please select CCCN Date.");
-        return;
-    }
+    const isNew = cleanedData.Id === 0;
+    const url = isNew ? '/COPQ/CreateAsync' : '/COPQ/UpdateAsync';
 
-    // Decide URL and method depending on Insert or Update
-    const isUpdate = model.id && model.id > 0;
-    const url = isUpdate ? "/COPQ/UpdateAsync" : "/COPQ/CreateAsync";
-   
     $.ajax({
-        type: "POST",
         url: url,
-        contentType: "application/json",
-        data: JSON.stringify(model),
-        success: function (response) {
-            if (response.success) {
-                showSuccessAlert(response.message || "Saved successfully.");
-                $("#div1").show();
-                $("#div2Grid").show();
-                $("#div3Form").hide();
-                loadData(); clearComplaintForm();
+        type: 'POST',
+        data: JSON.stringify(cleanedData),
+        contentType: 'application/json',
+        success: function (data) {
+            if (data.success) {
+                loadData();
             } else {
-                showDangerAlert(response.message || "Failed to save.");
+                showDangerAlert(data.message || (isNew ? "Create failed." : "Update failed."));
             }
         },
-        error: function (xhr, status, error) {
-            showDangerAlert("Error occurred while saving: " + error);
+        error: function (xhr) {
+            showDangerAlert(xhr.responseText || "Error saving record.");
         }
     });
 }
 
 var headerMenu = function () {
-    var menu = [];
-    var columns = this.getColumns();
+    const menu = [];
+    const columns = this.getColumns();
 
-    for (let column of columns) {
+    columns.forEach(column => {
+        const icon = document.createElement("i");
+        icon.classList.add("fas", column.isVisible() ? "fa-check-square" : "fa-square");
 
-        //create checkbox element using font awesome icons
-        let icon = document.createElement("i");
-        icon.classList.add("fas");
-        icon.classList.add(column.isVisible() ? "fa-check-square" : "fa-square");
-
-        //build label
-        let label = document.createElement("span");
-        let title = document.createElement("span");
-
+        const label = document.createElement("span");
+        const title = document.createElement("span");
         title.textContent = " " + column.getDefinition().title;
 
         label.appendChild(icon);
         label.appendChild(title);
 
-        //create menu item
         menu.push({
             label: label,
             action: function (e) {
-                //prevent menu closing
                 e.stopPropagation();
-
-                //toggle current column visibility
                 column.toggle();
-
-                //change menu item icon
-                if (column.isVisible()) {
-                    icon.classList.remove("fa-square");
-                    icon.classList.add("fa-check-square");
-                } else {
-                    icon.classList.remove("fa-check-square");
-                    icon.classList.add("fa-square");
-                }
+                icon.classList.toggle("fa-check-square", column.isVisible());
+                icon.classList.toggle("fa-square", !column.isVisible());
             }
         });
-    }
+    });
 
     return menu;
 };
-function clearComplaintForm() {
-    $("#Id").val('');
-    $("#CCCNDate").val('');
-    $("#ReportedBy").val('');
-    $("#Location").val('');
-    $("#CustomerName").val('');
-    $("#DealerName").val('');
-    $("#Description").val('');
-    $("#Status").val('');
-    $("#Completion").val('');
-    $("#ClosureRemarks").val('');
-    $("#saveButton").html('<i class="fas fa-floppy-disk mr-2"></i>Save');
-}
+
 function delConfirm(Id) {
-   // console.log(Id);
+    console.log(Id);
     PNotify.prototype.options.styling = "bootstrap3";
     (new PNotify({
         title: 'Confirm Deletion',
