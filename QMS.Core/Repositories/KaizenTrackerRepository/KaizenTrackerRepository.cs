@@ -95,7 +95,7 @@ namespace QMS.Core.Repositories.KaizenTrackerRepository
                 };
 
                 await _dbContext.Database.ExecuteSqlRawAsync(
-                    "EXEC sp_Insert_KaizenTracker @Vendor, @KaizenTheme, @KMonth, @Team, @KaizenFile, @Remarks, @CreatedBy, @IsDeleted",
+                    "EXEC sp_Insert_KaizenTracker @Vendor, @KaizenTheme, @KMonth, @Team, @KaizenFile,  @CreatedBy,@Remarks, @IsDeleted",
                     parameters);
 
                 return new OperationResult { Success = true };
@@ -124,8 +124,8 @@ namespace QMS.Core.Repositories.KaizenTrackerRepository
                 };
 
                 await _dbContext.Database.ExecuteSqlRawAsync(
-                    "EXEC sp_Update_KaizenTracker @Id, @Vendor, @KaizenTheme, @KMonth, @Team, @KaizenFile, @Remarks, @UpdatedBy",
-                    parameters);
+                    "EXEC sp_Update_KaizenTracker @Id, @Vendor, @KaizenTheme, @KMonth, @Team, @KaizenFile, @UpdatedBy, @Remarks",
+    parameters);
 
                 return new OperationResult { Success = true };
             }
