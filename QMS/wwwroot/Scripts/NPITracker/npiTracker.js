@@ -541,10 +541,12 @@ function InsertUpdateNpiTracker(rowData) {
         success: function (response) {
             Blockloaderhide();
             if (response.success) {
-                //showSuccessAlert("Row saved successfully.");
-                setTimeout(function () {
-                    window.location.reload();
-                }, 2500);
+                if (rowData.Id == 0) {
+                    showSuccessAlert("Row saved successfully.");
+                }
+                else{
+                    rowData.Id = response.id;
+                }
             } else {
                 showDangerAlert("Failed to save row: " + response.message);
             }

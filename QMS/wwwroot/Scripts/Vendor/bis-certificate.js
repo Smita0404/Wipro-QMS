@@ -7,7 +7,7 @@ $(document).ready(function () {
     if (inputElement.length) {
         // Attach the keydown event handler
         inputElement.on('keydown', function (event) {
-            handleSearch(event);
+            handleBisSearch(event);
         });
     }
 
@@ -18,7 +18,8 @@ $(document).ready(function () {
     });
 });
 
-function handleSearch(event) {
+/*let searchTimeout; // Timeout variable for debounce*/
+function handleBisSearch(event) {
     debugger
     if (event.key !== 'Enter') return;
 
@@ -33,11 +34,11 @@ function handleSearch(event) {
     searchTimeout = setTimeout(() => {
         pagedData = {}; // Clear cached data
         // Load data with the processed query
-        fetchRelatedData(searchTerms, event.target);
+        fetchBisRelatedData(searchTerms, event.target);
     }, 300); // Delay of 300ms
 }
 
-function fetchRelatedData(productCatNo, inputField) {
+function fetchBisRelatedData(productCatNo, inputField) {
     debugger
     $.ajax({
         url: '/Vendor/GetCodeSearch', // API endpoint
@@ -46,7 +47,7 @@ function fetchRelatedData(productCatNo, inputField) {
         dataType: 'json', // Expected response data type
         success: function (data) {
             if (data && data.length > 0) {
-                displaySuggestions(data, inputField);
+                displayBisSuggestions(data, inputField);
             } else {
                 showDangerAlert('No data found for the entered Product Cat No.');
             }
@@ -59,7 +60,7 @@ function fetchRelatedData(productCatNo, inputField) {
 
 
 // Function to display suggestions in a dropdown
-function displaySuggestions(data, inputField) {
+function displayBisSuggestions(data, inputField) {
     // Create a dropdown container
     const dropdown = document.createElement('div');
     dropdown.className = 'suggestion-dropdown';
@@ -112,7 +113,7 @@ function displaySuggestions(data, inputField) {
 
 // Function to remove any existing dropdowns
 function removeExistingDropdown(inputField) {
-    const existingDropdown = inputField.parentElement.querySelector('.suggestion-dropdown');
+    const existingDropdown = document.querySelector('.suggestion-dropdown');
     if (existingDropdown) {
         existingDropdown.remove();
     }

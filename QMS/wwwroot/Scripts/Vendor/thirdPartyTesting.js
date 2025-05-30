@@ -4,6 +4,130 @@ $(document).ready(function () {
     loadTPTReportData();
 
     loadTPTReportDropdown();
+
+    const inputElement = $("#TPTRsear_Code");
+    if (inputElement.length) {
+        // Attach the keydown event handler
+        inputElement.on('keydown', function (event) {
+            handleThirdTestingSearch(event);
+        });
+    }
+
+    $('#TPTReportForm').on('keypress', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+        }
+    });
+});
+
+function handleThirdTestingSearch(event) {
+    debugger
+    if (event.key !== 'Enter') return;
+
+    clearTimeout(searchTimeout);
+    let processedQuery = '';
+    let searchQuery = event.target.value.trim(); // Get value from input field
+    processedQuery = searchQuery.substring(0, 4);
+
+    let searchTerms = processedQuery;
+
+    // Debounce to reduce the frequency of API calls
+    searchTimeout = setTimeout(() => {
+        pagedData = {}; // Clear cached data
+        // Load data with the processed query
+        fetchThirdRelatedData(searchTerms, event.target);
+    }, 300); // Delay of 300ms
+}
+
+function fetchThirdRelatedData(productCatNo, inputField) {
+    debugger
+    $.ajax({
+        url: '/Vendor/GetCodeSearch', // API endpoint
+        type: 'GET', // HTTP method
+        data: { search: productCatNo }, // Query parameters
+        dataType: 'json', // Expected response data type
+        success: function (data) {
+            if (data && data.length > 0) {
+                displayThirdSuggestions(data, inputField);
+            } else {
+                showDangerAlert('No data found for the entered Product Cat No.');
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error('Error fetching data:', error);
+        }
+    });
+}
+
+
+// Function to display suggestions in a dropdown
+function displayThirdSuggestions(data, inputField) {
+    // Create a dropdown container
+    const dropdown = document.createElement('div');
+    dropdown.className = 'suggestion-dropdown';
+    dropdown.style.position = 'absolute';
+    dropdown.style.backgroundColor = 'white';
+    dropdown.style.border = '1px solid #ccc';
+    dropdown.style.zIndex = 1000;
+    dropdown.style.overflowY = 'auto'; // Enable vertical scrolling
+    dropdown.style.maxHeight = '300px'; // Set a fixed height for the dropdown
+    dropdown.style.width = `190px`; // Set the width to match the input field
+    dropdown.style.boxShadow = '0px 4px 6px rgba(0, 0, 0, 0.1)'; // Add shadow for better visibility
+
+    // Position the dropdown relative to the input field
+    const rect = inputField.getBoundingClientRect(); // Get input field position relative to the viewport
+    //dropdown.style.top = `${rect.bottom + window.scrollY}px`; // Correct vertical positioning
+    //dropdown.style.left = `${rect.left + window.scrollX}px`; // Correct horizontal positioning
+
+    // Populate dropdown with suggestions
+    data.forEach(item => {
+        const option = document.createElement('div');
+        option.className = 'suggestion-item';
+        option.textContent = `${item.oldPart_No}`;
+        option.style.padding = '8px';
+        option.style.cursor = 'pointer';
+
+        // Add hover effect for options
+        option.addEventListener('mouseover', () => {
+            option.style.backgroundColor = '#4682B4'; // Change background on hover
+        });
+        option.addEventListener('mouseout', () => {
+            option.style.backgroundColor = ''; // Reset background on mouse out
+        });
+
+        // When an option is clicked, set the value of the input field and remove the dropdown
+        option.addEventListener('click', () => {
+            const oldPartNoInput = document.getElementById('tptr_productCodeInput');
+            if (oldPartNoInput) {
+                oldPartNoInput.value = item.oldPart_No; // Set value of the input field
+            }
+            dropdown.remove(); // Remove dropdown after selection
+        });
+
+        dropdown.appendChild(option); // Add option to the dropdown
+    });
+
+    // Remove any existing dropdown (if any) before appending the new one
+    removeExistingDropdown(inputField);
+    inputField.parentElement.appendChild(dropdown); // Append dropdown inside the parent element of the input field
+}
+
+// Function to remove any existing dropdowns
+function removeExistingDropdown(inputField) {
+    const existingDropdown = document.querySelector('.suggestion-dropdown');
+    if (existingDropdown) {
+        existingDropdown.remove();
+    }
+}
+
+
+
+
+// Remove dropdown on outside click
+document.addEventListener('click', function (e) {
+    if (!e.target.closest('.suggestion-dropdown') && !e.target.closest('#TPTRsear_Code')) {
+        removeExistingDropdown();
+    }
 });
 
 function loadTPTReportData() {
@@ -145,6 +269,7 @@ function clearTPTReportForm() {
     // Optionally, clear any hidden fields or reset any custom data
     $('#tptr_remainingAttachments').val('');
     $('#tptr_Attachments').val('');
+    $("#TPTRsear_Code").val('');
 }
 
 function InsertUpdateVendorReport(event) {

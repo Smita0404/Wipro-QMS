@@ -1,5 +1,4 @@
-﻿
-@{
+﻿@{
     ViewData["Title"] = "Third Party Inspection";
 }
 <link href="~/css/fontawesome/styles.min.css" rel="stylesheet" />
@@ -60,7 +59,7 @@
         margin-top: -17px !important;
     }
 
-   .tabulator .tabulator-header .tabulator-col {
+    .tabulator .tabulator-header .tabulator-col {
         font-size: 14px;
         background-color: #D6E4F0;
         font-weight: 600;
@@ -108,8 +107,8 @@
             font-size: 16px;
         }
 
-    .container__predefined-ranges{
-        font-size : 14px;
+    .container__predefined-ranges {
+        font-size: 14px;
     }
 
     .month-item {
@@ -147,101 +146,94 @@
             <div class="card">
                 <div class="card-body">
                     <div id="Third">
-                        <form method="post" action="/ThirdPartyInspection/Create" enctype="multipart/form-data">
-                            <div class="card w-80">
-                                <div class="card-body">
-                                    <div class="col-12 pt-2">
-                                        <div class="row form-group align-items-center mb-2">
-                                            <div class="col-6 pe-3 d-flex align-items-center">
-                                                <label class="me-3 mb-0 col-4" style="margin-right: 20px;"><b>Inspection Date</b></label>
-                                                <input type="date" name="InspectionDate" id="InspectionDate" class="form-control col-6" required style="flex-grow: 1;" />
-                                                <input type="hidden" id="InspectionID" />
-                                            </div>
-                                            <div class="col-6 pe-3 d-flex align-items-center">
-                                                <label class="me-3 mb-0 col-4" style="margin-right: 20px;"><b>Project Name&nbsp;:</b></label>
-                                                <input type="text" name="ProjectName" id="ProjectName" class="form-control col-6" placeholder="Enter project name" required style="flex-grow: 1;" />
-                                            </div>
-                                        </div>
+                        <form id="ThirdPaInspForm" method="post" action="/ThirdPartyInspection/Create" enctype="multipart/form-data">
 
-                                        <div class="row form-group align-items-center mb-2">
-                                            <div class="col-6 pe-3 d-flex align-items-center">
-                                                <label class="me-3 mb-0 col-4" style="margin-right: 20px;"><b>Inspector Name</b></label>
-                                                <input type="text" name="InspName" id="InspName" class="form-control col-6" placeholder="Enter inspector name" required style="flex-grow: 1;" />
-                                            </div>
-                                            <div class="col-6 pe-3 d-flex align-items-center">
-                                                <label class="me-3 mb-0 col-4" style="margin-right: 20px;"><b>Product Code</b></label>
-                                                <input type="text" name="ProductCode" id="ProductCode" class="form-control col-6" placeholder="Enter product code" required style="flex-grow: 1;" />
-                                            </div>
-                                        </div>
-
-                                        <div class="row form-group align-items-center mb-2">
-                                            <div class="col-6 pe-3 d-flex align-items-center">
-                                                <label class="me-3 mb-0 col-4" style="margin-right: 20px;"><b>Product Description</b></label>
-                                                <input type="text" name="ProdDesc" id="ProdDesc" class="form-control col-6" placeholder="Enter product description" required style="flex-grow: 1;" />
-                                            </div>
-                                            <div class="col-6 pe-3 d-flex align-items-center">
-                                                <label class="me-3 mb-0 col-4" style="margin-right: 20px;"><b>LOT Quantity</b></label>
-                                                <input type="text" name="LOTQty" id="LOTQty" class="form-control col-6" placeholder="Enter LOT quantity" required style="flex-grow: 1;" />
-                                            </div>
-                                        </div>
-
-                                        <div class="row form-group align-items-center mb-2">
-                                            <div class="col-6 pe-3 d-flex align-items-center">
-                                                <label class="me-3 mb-0 col-4" style="margin-right: 20px;"><b>Project Value</b></label>
-                                                <input type="text" name="ProjectValue" id="ProjectValue" class="form-control col-6" placeholder="Enter project value" required style="flex-grow: 1;" />
-                                            </div>
-                                            <div class="col-6 pe-3 d-flex align-items-center">
-                                                <label class="me-3 mb-0 col-4" style="margin-right: 20px;"><b>Location</b></label>
-                                                <input type="text" name="Location" id="Location" class="form-control col-6" placeholder="Enter location" required style="flex-grow: 1;" />
-                                            </div>
-                                        </div>
-
-                                        <div class="row form-group align-items-center mb-2">
-                                            <div class="col-6 pe-3 d-flex align-items-center">
-                                                <label class="me-3 mb-0 col-4" style="margin-right: 20px;"><b>Mode</b></label>
-                                                <input type="text" name="Mode" id="Mode" class="form-control col-6" placeholder="Enter mode" required style="flex-grow: 1;" />
-                                            </div>
-                                            <div class="col-6 pe-3 d-flex align-items-center">
-                                                <label class="me-3 mb-0 col-4" style="margin-right: 20px;"><b>First Attempt</b></label>
-                                                <input type="text" name="FirstAttempt" id="FirstAttempt" class="form-control col-6" placeholder="Enter first attempt details" required style="flex-grow: 1;" />
-                                            </div>
-                                        </div>
-
-                                        <div class="row form-group align-items-center mb-2">
-                                            <div class="col-6 pe-3 d-flex align-items-center">
-                                                <label class="me-3 mb-0 col-4" style="margin-right: 20px;"><b>Remark</b></label>
-                                                <textarea name="Remark" id="Remark" class="form-control col-6" placeholder="Enter remark" required style="flex-grow: 1;"></textarea>
-                                            </div>
-                                            <div class="col-6 pe-3 d-flex align-items-center">
-                                                <label class="me-3 mb-0 col-4" style="margin-right: 20px;"><b>Action Plan</b></label>
-                                                <textarea name="ActionPlan" id="ActionPlan" class="form-control col-6" placeholder="Enter action plan" required style="flex-grow: 1;"></textarea>
-                                            </div>
-                                        </div>
-
-                                        <div class="row form-group align-items-center mb-2">
-                                            <div class="col-6 pe-3 d-flex align-items-center">
-                                                <label class="me-3 mb-0 col-4" style="margin-right: 20px;"><b>MOM Date</b></label>
-                                                <input type="date" name="MOMDate" id="MOMDate" class="form-control col-6" required style="flex-grow: 1;" />
-                                            </div>
-                                        </div>
+                            <div class="col-12 pt-2">
+                                <div class="row form-group align-items-center mb-2">
+                                    <div class="col-6 pe-3 d-flex align-items-center">
+                                        <label class="me-3 mb-0 col-4" style="margin-right: 20px;"><b>Inspection Date</b></label>
+                                        <input type="date" name="InspectionDate" id="InspectionDate" class="form-control col-6" required style="flex-grow: 1;" />
+                                        <input type="hidden" id="InspectionID" />
+                                    </div>
+                                    <div class="col-6 pe-3 d-flex align-items-center">
+                                        <label class="me-3 mb-0 col-4" style="margin-right: 20px;"><b>Project Name&nbsp;:</b></label>
+                                        <input type="text" name="ProjectName" id="ProjectName" class="form-control col-6" placeholder="Enter project name" required style="flex-grow: 1;" />
                                     </div>
                                 </div>
-                                <div class="card w-60" >
-                                    <div class="card-body">
-                                      
-                                        <div class="col-12 d-flex align-items-center">
-                                            <label class="me-3 mb-0 col-2"><b>Attachments (As applicable) </b></label>
-                                            <input type="file" name="AttachmentFiles" id="AttachmentFile" class="form-control col-6" multiple required style="flex-grow: 1; min-width: 0;" />
-                                                    <div id="attachmentLinks" class="file-item"></div>
 
-                                            <!-- Hidden input for remaining attachments -->
-                                            <input type="hidden" id="remainingAttachments" name="RemainingAttachments" value="">
-                                        </div>
-                                        <input type="hidden" id="Attachments" name="Attachments">
+                                <div class="row form-group align-items-center mb-2">
+                                    <div class="col-6 pe-3 d-flex align-items-center">
+                                        <label class="me-3 mb-0 col-4" style="margin-right: 20px;"><b>Inspector Name</b></label>
+                                        <input type="text" name="InspName" id="InspName" class="form-control col-6" placeholder="Enter inspector name" required style="flex-grow: 1;" />
+                                    </div>
+                                    <div class="col-6 pe-3 d-flex align-items-center">
+                                        <label class="me-3 mb-0 col-4" style="margin-right: 20px;"><b>Product Code</b></label>
+                                        <input type="text" name="sear_Code" id="sear_Code" class="form-control" placeholder="Search Code" aria-label="Search Code" oninput="handleSearch(this)" style="text-transform: uppercase;" />
+                                        <input type="text" name="ProductCode" id="ProductCode" class="form-control col-5" placeholder="Enter product code" required style="flex-grow: 1;margin-left: 10px;" />
+                                    </div>
+                                </div>
 
+                                <div class="row form-group align-items-center mb-2">
+                                    <div class="col-6 pe-3 d-flex align-items-center">
+                                        <label class="me-3 mb-0 col-4" style="margin-right: 20px;"><b>Product Description</b></label>
+                                        <input type="text" name="ProdDesc" id="ProdDesc" class="form-control col-6" placeholder="Enter product description" required style="flex-grow: 1;" />
+                                    </div>
+                                    <div class="col-6 pe-3 d-flex align-items-center">
+                                        <label class="me-3 mb-0 col-4" style="margin-right: 20px;"><b>LOT Quantity</b></label>
+                                        <input type="text" name="LOTQty" id="LOTQty" class="form-control col-6" placeholder="Enter LOT quantity" required style="flex-grow: 1;" />
+                                    </div>
+                                </div>
+
+                                <div class="row form-group align-items-center mb-2">
+                                    <div class="col-6 pe-3 d-flex align-items-center">
+                                        <label class="me-3 mb-0 col-4" style="margin-right: 20px;"><b>Project Value</b></label>
+                                        <input type="text" name="ProjectValue" id="ProjectValue" class="form-control col-6" placeholder="Enter project value" required style="flex-grow: 1;" />
+                                    </div>
+                                    <div class="col-6 pe-3 d-flex align-items-center">
+                                        <label class="me-3 mb-0 col-4" style="margin-right: 20px;"><b>Location</b></label>
+                                        <input type="text" name="Location" id="Location" class="form-control col-6" placeholder="Enter location" required style="flex-grow: 1;" />
+                                    </div>
+                                </div>
+
+                                <div class="row form-group align-items-center mb-2">
+                                    <div class="col-6 pe-3 d-flex align-items-center">
+                                        <label class="me-3 mb-0 col-4" style="margin-right: 20px;"><b>Mode</b></label>
+                                        <input type="text" name="Mode" id="Mode" class="form-control col-6" placeholder="Enter mode" required style="flex-grow: 1;" />
+                                    </div>
+                                    <div class="col-6 pe-3 d-flex align-items-center">
+                                        <label class="me-3 mb-0 col-4" style="margin-right: 20px;"><b>First Attempt</b></label>
+                                        <input type="text" name="FirstAttempt" id="FirstAttempt" class="form-control col-6" placeholder="Enter first attempt details" required style="flex-grow: 1;" />
+                                    </div>
+                                </div>
+
+                                <div class="row form-group align-items-center mb-2">
+                                    <div class="col-6 pe-3 d-flex align-items-center">
+                                        <label class="me-3 mb-0 col-4" style="margin-right: 20px;"><b>MOM Date</b></label>
+                                        <input type="date" name="MOMDate" id="MOMDate" class="form-control col-6" required style="flex-grow: 1;" />
+                                    </div>
+                                    <div class="col-6 pe-3 d-flex align-items-center">
+                                        <label class="me-3 mb-0 col-4" style="margin-right: 20px;"><b>Action Plan</b></label>
+                                        <textarea name="ActionPlan" id="ActionPlan" class="form-control col-6" placeholder="Enter action plan" required style="flex-grow: 1;"></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="row form-group align-items-center mb-4">
+                                    <div class="col-6 pe-3 d-flex align-items-center">
+                                        <label class="me-3 mb-0 col-4" style="margin-right: 20px;"><b>Remark</b></label>
+                                        <textarea name="Remark" id="Remark" class="form-control col-12" placeholder="Enter remark" required style="flex-grow: 1;"></textarea>
                                     </div>
                                 </div>
                             </div>
+                            <div class="col-12 d-flex align-items-center">
+                                <label class="me-3 mb-0 col-2"><b>Attachments (As applicable) </b></label>
+                                <input type="file" name="AttachmentFiles" id="AttachmentFile" class="form-control col-6" multiple required style="flex-grow: 1; min-width: 0;" />
+                                <div id="attachmentLinks" class="file-item"></div>
+
+                                <!-- Hidden input for remaining attachments -->
+                                <input type="hidden" id="remainingAttachments" name="RemainingAttachments" value="">
+                            </div>
+                            <input type="hidden" id="Attachments" name="Attachments">
+
                         </form>
                     </div>
                     <div class="row" id="divcustomDate">

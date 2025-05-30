@@ -48,33 +48,33 @@
     }
 
     .form-control {
-    padding: 0 9px !important;
-    border: 0;
-    border-bottom: 1px solid #cccccc;
-    border-radius: 0px;
-    }
-
-    label {
-    margin-bottom: 0;
-    margin-top: .3rem;
-    }
-
-    .form-group {
-    margin-bottom: 0.5rem; /* Reduce space between each input group */
-    }
-
-    .custome-body {
-    margin-bottom: -17px !important;
-    padding: 0.75rem !important;
-    margin-top: -17px !important;
-    }
-
-    .form-control {
-        padding: 0 10px !important;
+        padding: 0 6px !important;
         border: 0;
         border-bottom: 1px solid #cccccc;
         border-radius: 0px;
     }
+
+    label {
+        margin-bottom: 0;
+        margin-top: .3rem;
+    }
+
+    .form-group {
+        margin-bottom: 0.5rem; /* Reduce space between each input group */
+    }
+
+    .custome-body {
+        margin-bottom: -17px !important;
+        padding: 0.75rem !important;
+        margin-top: -17px !important;
+    }
+
+    /* .form-control {
+        padding: 0 10px !important;
+        border: 0;
+        border-bottom: 1px solid #cccccc;
+        border-radius: 0px;
+    } */
 
     label {
         margin-bottom: 0;
@@ -88,7 +88,6 @@
     #scrollToTopBtn {
         outline: none; /* Removes the focus border */
     }
-
 
     .tabulator .tabulator-header .tabulator-col {
         font-size: 14px;
@@ -619,13 +618,13 @@
 
                                         <!-- Search Code Input -->
                                         <div class="col-md-5">
-                                            <label for="sear_Certi_Code" class="sr-only">Search Code</label>
                                             <input type="text"
                                                    name="sear_Certi_Code"
                                                    id="sear_Certi_Code"
                                                    class="form-control"
                                                    placeholder="Search Code"
                                                    aria-label="Search Code"
+                                                   autocomplete="off"
                                                    oninput="handleCertiSearch(this)"
                                                    style="text-transform: uppercase;" />
 
@@ -635,6 +634,7 @@
                                             <input type="text"
                                                    id="certi_productCodeInput"
                                                    class="form-control form-control-border txt"
+                                                   style="margin-left:-15px;"
                                                    placeholder="Enter Product Code…"
                                                    aria-label="Product Code"
                                                    autocomplete="off"
@@ -737,7 +737,7 @@
 
 
                                         <!-- Search Code Input -->
-                                        <div class="col-md-6">
+                                        <div class="col-md-5">
                                             <label for="TPTRsear_Code" class="sr-only">Search Code</label>
                                             <input type="text"
                                                    name="TPTRsear_Code"
@@ -745,16 +745,17 @@
                                                    class="form-control"
                                                    placeholder="Search Code"
                                                    aria-label="Search Code"
-                                                   oninput="handleSearch(this)"
+                                                   oninput="handleThirdTestingSearch(this)"
                                                    style="text-transform: uppercase;" />
 
                                         </div>
                                         <!-- Product Code Input -->
-                                        <div class="col-md-6">
+                                        <div class="col-md-7">
                                             <input type="text"
                                                    id="tptr_productCodeInput"
                                                    class="form-control form-control-border txt"
                                                    placeholder="Enter Product Code…"
+                                                   style="margin-left:-15px;"
                                                    aria-label="Product Code"
                                                    autocomplete="off"
                                                    required />
@@ -863,7 +864,7 @@
                                        
 
                                         <!-- Search Code Input -->
-                                        <div class="col-md-6">
+                                        <div class="col-md-5">
                                             <label for="BISsear_Code" class="sr-only">Search Code</label>
                                             <input type="text"
                                                    name="BISsear_Code"
@@ -871,16 +872,17 @@
                                                    class="form-control"
                                                    placeholder="Search Code"
                                                    aria-label="Search Code"
-                                                   oninput="handleSearch(this)"
+                                                   oninput="handleBisSearch(this)"
                                                    style="text-transform: uppercase;" />
 
                                         </div>
                                          <!-- Product Code Input -->
-                                        <div class="col-md-6">
+                                        <div class="col-md-7">
                                             <input type="text"
                                                    id="BISproductCodeInput"
                                                    class="form-control form-control-border txt"
                                                    placeholder="Enter Product Code…"
+                                                   style="margin-left:-15px;"
                                                    aria-label="Product Code"
                                                    autocomplete="off"
                                                    required />
@@ -965,6 +967,6 @@
 
 @section Scripts {
     <script src="~/scripts/vendor/vendordetails.js" asp-append-version="true"></script>
-    <script src="~/scripts/vendor/bis-certificate.js" asp-append-version="true"></script>
     <script src="~/scripts/vendor/thirdPartyTesting.js" asp-append-version="true"></script>
+    <script src="~/scripts/vendor/bis-certificate.js" asp-append-version="true"></script>
 }

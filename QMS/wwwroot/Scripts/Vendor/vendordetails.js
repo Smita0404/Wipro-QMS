@@ -135,7 +135,7 @@ function removeExistingDropdown() {
 
 // Remove dropdown on outside click
 document.addEventListener('click', function (e) {
-    if (!e.target.closest('.suggestion-dropdown') && !e.target.closest('#sear_Code')) {
+    if (!e.target.closest('.suggestion-dropdown') && !e.target.closest('#sear_Certi_Code')) {
         removeExistingDropdown();
     }
 });
@@ -285,6 +285,7 @@ function clearCertificateForm() {
     $('#remainingAttachments').val('');
     $('#Attachments').val('');
     $('#attachmentLinks').empty(); // Clear file links section
+    $("#sear_Certi_Code").val('');
 }
 function InsertUpdateVendorcert(event) {
     event.preventDefault();  // Prevent form submission

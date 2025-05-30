@@ -85,13 +85,8 @@ function InsertUpdateBisProject() {
     };
 
     $.ajax({
-<<<<<<< HEAD
         type: "POST",
         url: ajaxUrl,
-=======
-        url: ajaxUrl,
-        type: "POST",
->>>>>>> b4ed558d9ddf8c4101a3055d8a617e49702139e3
         data: Model,
         success: function (response) {
             Blockloaderhide();
@@ -103,10 +98,6 @@ function InsertUpdateBisProject() {
                     showSuccessAlert("Bis Projecet Tracker Detail Saved Successfully!");
                 }
 
-<<<<<<< HEAD
-=======
-                // Redirect to the index page
->>>>>>> b4ed558d9ddf8c4101a3055d8a617e49702139e3
                 setTimeout(function () {
                     window.location.href = '/BisProjectTrac/BisProjectTracker';
                 }, 2500);

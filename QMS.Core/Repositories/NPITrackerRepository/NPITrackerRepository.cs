@@ -158,7 +158,7 @@ namespace QMS.Core.Repositories.NPITrackerRepository
         {
             try
             {
-                return await base.DeleteAsync<BisProject_Tracker>(id);
+                return await base.DeleteAsync<NPITracker>(id);
             }
             catch (Exception ex)
             {
