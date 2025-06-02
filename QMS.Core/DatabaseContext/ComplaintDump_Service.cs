@@ -2,11 +2,12 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using QMS.Core.DatabaseContext.Shared;
+using QMS.Core.Models;
 
 namespace QMS.Core.DatabaseContext
 {
     [Table("tbl_COPQComplaintDump")]
-    public class COPQComplaintDump : SqlTable
+    public class ComplaintDump_Service : SqlTable
     {
         [Key]
         [Column("Id")]
@@ -53,5 +54,23 @@ namespace QMS.Core.DatabaseContext
 
         [Column("UpdatedBy")]
         public string? UpdatedBy { get; set; }
+    }
+
+    public class BulkCreateResult
+    {
+        public OperationResult Result { get; set; } = new();
+        public List<(ComplaintViewModel Record, string Reason)> FailedRecords { get; set; } = new();
+    }
+
+    public class BulkCreatePOResult
+    {
+        public OperationResult Result { get; set; } = new();
+        public List<(PendingPoViewModel Record, string Reason)> FailedRecords { get; set; } = new();
+    }
+
+    public class BulkCreateIndentResult
+    {
+        public OperationResult Result { get; set; } = new();
+        public List<(IndentDumpViewModel Record, string Reason)> FailedRecords { get; set; } = new();
     }
 }

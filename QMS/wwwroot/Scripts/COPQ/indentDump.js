@@ -1,15 +1,15 @@
-﻿let filterStartDatePO = moment().startOf('month').format('YYYY-MM-DD');
-let filterEndDatePO = moment().endOf('month').format('YYYY-MM-DD');
-let tablePO = null;
-let vendorOptions = {};
+﻿let filterStartDateIndent = moment().startOf('month').format('YYYY-MM-DD');
+let filterEndDateIndent = moment().endOf('month').format('YYYY-MM-DD');
+let tableIndent = null;
+
 $(document).ready(function () {
 
-    $('#POdateRangeText').text(
-        moment(filterStartDatePO).format('MMMM D, YYYY') + ' - ' + moment(filterEndDatePO).format('MMMM D, YYYY')
+    $('#IndentdateRangeText').text(
+        moment(filterStartDateIndent).format('MMMM D, YYYY') + ' - ' + moment(filterEndDateIndent).format('MMMM D, YYYY')
     );
 
     const picker = new Litepicker({
-        element: document.getElementById('customDateTriggerPO'),
+        element: document.getElementById('customDateTriggerIndent'),
         singleMode: false,
         format: 'DD-MM-YYYY',
         numberOfMonths: 2,
@@ -18,15 +18,15 @@ $(document).ready(function () {
         plugins: ['ranges'],
         setup: (picker) => {
             picker.on('selected', (start, end) => {
-                filterStartDatePO = start.format('YYYY-MM-DD');
-                filterEndDatePO = end.format('YYYY-MM-DD');
-                $('#POdateRangeText').text(`${start.format('MMMM D, YYYY')} - ${end.format('MMMM D, YYYY')}`);
+                filterStartDateIndent = start.format('YYYY-MM-DD');
+                filterEndDateIndent = end.format('YYYY-MM-DD');
+                $('#IndentdateRangeText').text(`${start.format('MMMM D, YYYY')} - ${end.format('MMMM D, YYYY')}`);
                 loadDatapo();
             });
             picker.on('clear', () => {
-                filterStartDatePO = "";
-                filterEndDatePO = "";
-                $('#POdateRangeText').text("Select Date Range");
+                filterStartDateIndent = "";
+                filterEndDateIndent = "";
+                $('#IndentdateRangeText').text("Select Date Range");
                 loadDatapo();
             });
         },
@@ -42,7 +42,7 @@ $(document).ready(function () {
         endDate: moment().endOf('week').format('DD-MM-YYYY')
     });
 
-    $('#customDateTriggerPO').on('click', function () {
+    $('#customDateTriggerIndent').on('click', function () {
         picker.show();
     });
 
@@ -52,57 +52,46 @@ $(document).ready(function () {
 
     $('#upload-button').on('click', async function () {
         var expectedColumns = [
-            'Vendor', 'Material', 'Reference No', 'PO No', 'PO Date', 'PR No', 'Batch No', 'PO Qty', 'Balance Qty', 'Destination','Balance Value'
+            'Indent No', 'Indent Date', 'Business Unit', 'Vertical', 'Branch', 'Indent Status', 'End Customer Name', 'Complaint Id', 'Customer Code', 'Customer Name', 'Bill Request Date',
+            'Created By', 'Wipro Commit Date', 'Material No', 'Item Description', 'Quantity', 'Price', 'Final Price', 'SAPSO No', 'Create SoQty', 'Inv_qnty', 'Inv_value', 'Wipro Catelog No',
+            'Batch Code', 'Batch Date', 'MainProd Code', 'User Name'
         ];
 
         var url = '/Service/UploadPoDumpExcel';
         handleImportExcelFile(url, expectedColumns);
     });
 
-    loadDatapo();
+    loadIndentData();
 });
 
-function loadDatapo() {
+function loadIndentData() {
     Blockloadershow();
 
     $.ajax({
-        url: '/Service/GetVendor',
-        type: 'GET'
-    }).done(function (vendorData) {
-        if (Array.isArray(vendorData)) {
-            vendorOptions = vendorData.reduce((acc, v) => {
-                acc[v.value] = v.label;
-                return acc;
-            }, {});
-        }
-
-        $.ajax({
-            url: '/Service/GetAllPO',
-            type: 'GET',
-            dataType: 'json',
-            data: {
-                startDate: filterStartDatePO,
-                endDate: filterEndDatePO
-            },
-            success: function (data) {
-                if (data.success && Array.isArray(data.data)) {
-                    renderTable(data.data);
-                } else {
-                    showDangerAlert('No data available to load.');
-                    renderTable([]); // avoid errors
-                }
-            },
-            error: function (xhr, status, error) {
-                showDangerAlert('Error retrieving data: ' + error);
-                Blockloaderhide();
+        url: '/Service/GetAllIndent',
+        type: 'GET',
+        dataType: 'json',
+        data: {
+            startDate: filterStartDateIndent,
+            endDate: filterEndDateIndent
+        },
+        success: function (data) {
+            if (data.success && Array.isArray(data.data)) {
+                renderIndentTable(data.data);
+            } else {
+                showDangerAlert('No data available to load.');
+                renderIndentTable([]); // avoid errors
             }
-        });
+        },
+        error: function (xhr, status, error) {
+            showDangerAlert('Error retrieving data: ' + error);
+            Blockloaderhide();
+        }
+    });
 
-    }); // <- this was missing
 }
 
-
-function renderTable(response) {
+function renderIndentTable(response) {
     if (!Array.isArray(response)) {
         console.error("Invalid response, expected array:", response);
         showDangerAlert("Invalid data received. Expected array.");
@@ -118,17 +107,33 @@ function renderTable(response) {
         tabledata.push({
             Sr_No: index + 1,
             Id: item.id,
-            Vendor: item.vendor,
-            Material: item.material,
-            ReferenceNo: item.referenceNo,
-            PONo: item.poNo,
-            PODate: item.poDate ? new Date(item.poDate).toLocaleDateString("en-GB") : "",
-            PRNo: item.prNo,
-            BatchNo: item.batchNo,
-            POQty: item.poQty,
-            BalanceQty: item.balanceQty,
-            Destination: item.destination,
-            BalanceValue: item.balanceValue,
+            Indent_No : item.indent_No,
+            Indent_Date : item.indent_Date ? new Date(item.indent_Date).toLocaleDateString("en-GB") : "",
+            Business_Unit : item.business_Unit,
+            Vertical : item.vertical,
+            Branch : item.branch,
+            Indent_Status : item.indent_Status,
+            End_Cust_Name : item.end_Cust_Name,
+            Complaint_Id : item.complaint_Id,
+            Customer_Code : item.customer_Code,
+            Customer_Name : item.customer_Name,
+            Bill_Req_Date : item.bill_Req_Date ? new Date(item.bill_Req_Date).toLocaleDateString("en-GB") : "",
+            Created_By : item.created_By,
+            Wipro_Commit_Date : item.wipro_Commit_Date ? new Date(item.wipro_Commit_Date).toLocaleDateString("en-GB") : "",
+            Material_No : item.material_No,
+            Item_Description : item.item_Description,
+            Quantity : item.quantity,
+            Price : item.price,
+            Final_Price : item.final_Price,
+            SapSoNo : item.sapSoNo,
+            CreateSoQty : item.createSoQty,
+            Inv_Qty : item.inv_Qty,
+            Inv_Value : item.inv_Value,
+            WiproCatelog_No : item.wiproCatelog_No,
+            Batch_Code : item.batch_Code,
+            Batch_Date : item.batch_Date ? new Date(item.batch_Date).toLocaleDateString("en-GB") : "",
+            Main_Prodcode : item.main_Prodcode,
+            User_Name : item.user_Name,
             CreatedDate: item.createdDate ? new Date(item.createdDate).toLocaleDateString("en-GB") : "",
             CreatedBy: item.createdBy,
             UpdatedDate: item.updatedDate ? new Date(item.updatedDate).toLocaleDateString("en-GB") : "",
@@ -136,9 +141,10 @@ function renderTable(response) {
             IsDeleted: item.isDeleted
         });
     });
+
     console.log(tabledata);
-    if (tabledata.length === 0 && tablePO) {
-        tablePO.clearData();
+    if (tabledata.length === 0 && tableIndent) {
+        tableIndent.clearData();
         Blockloaderhide();
         return;
     }
@@ -153,37 +159,47 @@ function renderTable(response) {
             frozen: true, headerMenu: headerMenu,
             formatter: function (cell) {
                 const rowData = cell.getRow().getData();
-                return `<i onclick="delConfirmPO(${rowData.Id})" class="fas fa-trash-alt mr-2 fa-1x" title="Delete" style="color:red;cursor:pointer;margin-left: 5px;"></i>`;
+                return `<i onclick="delConfirmIndent(${rowData.Id})" class="fas fa-trash-alt mr-2 fa-1x" title="Delete" style="color:red;cursor:pointer;margin-left: 5px;"></i>`;
             }
         },
         { title: "SNo", field: "Sr_No", frozen: true, sorter: "number", headerMenu: headerMenu, hozAlign: "center", headerHozAlign: "center" },
-        editableColumn("PO Date", "PODate", "date", "center"),
-        editableColumn("Vendor", "Vendor", "select2", "center", "input", {}, {
-            values: vendorOptions
-        }, function (cell) {
-            const val = cell.getValue();
-            return vendorOptions[val] || val;
-        }, 130),
-       // editableColumn("Vendor", "Vendor"),
-        editableColumn("Material", "Material"),
-        editableColumn("Reference No", "ReferenceNo"),
-        editableColumn("PO No", "PONo"),
-        editableColumn("PR No", "PRNo"),
-        editableColumn("Batch No", "BatchNo"),
-        editableColumn("PO Qty", "POQty", "input", "center"),
-        editableColumn("Balance Qty", "BalanceQty", "input", "center"),
-        editableColumn("Destination", "Destination"),
-        editableColumn("Balance Value", "BalanceValue", "input", "center"),
+        editableColumn("Indent No", "Indent_No"),
+        editableColumn("Indent Date", "Indent_Date", "date", "center"),
+        editableColumn("Business Unit", "Business_Unit"),
+        editableColumn("Vertical", "Vertical"),
+        editableColumn("Branch", "Branch"),
+        editableColumn("Indent Status", "Indent_Status"),
+        editableColumn("End Customer Name", "End_Cust_Name"),
+        editableColumn("Complaint Id", "Complaint_Id"),
+        editableColumn("Customer Code", "Customer_Code"),
+        editableColumn("Customer Name", "Customer_Name"),
+        editableColumn("Bill Request Date", "Bill_Req_Date", "date", "center"),
+        editableColumn("Created_By", "Created_By"),
+        editableColumn("Wipro Commit Date", "Wipro_Commit_Date", "date", "center"),
+        editableColumn("Material No", "Material_No"),
+        editableColumn("Item Description", "Item_Description"),
+        editableColumn("Quantity", "Quantity"),
+        editableColumn("Material No", "Material_No"),
+        editableColumn("Price", "Price"),
+        editableColumn("Final Price", "Final_Price"),
+        editableColumn("SAPSO No", "SapSoNo"),
+        editableColumn("Create SoQty", "CreateSoQty"),
+        editableColumn("Inv Qty", "Inv_Qty"),
+        editableColumn("Inv Value", "Inv_Value"),
+        editableColumn("WiproCatelog No", "WiproCatelog_No"),
+        editableColumn("Batch Code", "Batch_Code"),
+        editableColumn("Batch Date", "Batch_Date"),
+        editableColumn("User Name", "User_Name"),
         { title: "Created By", field: "CreatedBy", visible: false, headerMenu: headerMenu, hozAlign: "center" },
         { title: "Created Date", field: "CreatedDate", visible: false, headerMenu: headerMenu, hozAlign: "center" },
         { title: "Updated By", field: "UpdatedBy", visible: false, headerMenu: headerMenu, hozAlign: "center" },
         { title: "Updated Date", field: "UpdatedDate", visible: false, headerMenu: headerMenu, hozAlign: "center" }
     ];
 
-    if (tablePO) {
-        tablePO.replaceData(tabledata);
+    if (tableIndent) {
+        tableIndent.replaceData(tabledata);
     } else {
-        tablePO = new Tabulator("#po-table", {
+        tableIndent = new Tabulator("#indent-table", {
             data: tabledata,
             layout: "fitDataFill",
             movableColumns: true,
@@ -195,31 +211,47 @@ function renderTable(response) {
             columns: columns
         });
 
-        tablePO.on("cellEdited", function (cell) {
-            saveEditedRowPO(cell.getRow().getData());
+        tableIndent.on("cellEdited", function (cell) {
+            InsertUpdateIndentDump(cell.getRow().getData());
         });
 
-        $("#addPOButton").on("click", function () {
+        $("#addIndentButton").on("click", function () {
             const newRow = {
                 Id: 0,
-                Sr_No: tablePO.getDataCount() + 1,
-                PODate: "",
-                Vendor: "",
-                Material: "",
-                ReferenceNo: "",
-                PONo: "",
-                PRNo: "",
-                BatchNo: "",
-                POQty: 0,
-                BalanceQty: 0,
-                Destination: "",
-                BalanceValue: 0,
+                Sr_No: tableIndent.getDataCount() + 1,
+                Indent_No     : "",
+                Indent_Date   : "",
+                Business_Unit : "",
+                Vertical      : "",
+                Branch        : "",
+                Indent_Status : "",
+                End_Cust_Name : "",
+                Complaint_Id  : "",
+                Customer_Code : "",
+                Customer_Name : "",
+                Bill_Req_Date : "",
+                Created_By        : "",
+                Wipro_Commit_Date : "",
+                Material_No       : "",
+                Item_Description  : "",
+                Quantity          : "",
+                Price             : "",
+                Final_Price       : "",
+                SapSoNo           : "",
+                CreateSoQty       : "",
+                Inv_Qty           : "",
+                Inv_Value         : "",
+                WiproCatelog_No   : "",
+                Batch_Code        : "",
+                Batch_Date        : "",
+                Main_Prodcode     : "",
+                User_Name         : "",
                 CreatedBy: "",
                 CreatedDate: "",
                 UpdatedBy: "",
                 UpdatedDate: ""
             };
-            tablePO.addRow(newRow, false);
+            tableIndent.addRow(newRow, false);
         });
     }
 
@@ -241,37 +273,52 @@ function editableColumn(title, field, editorType = true, align = "center", heade
         headerHozAlign: "left"
     };
 
-    
-
     return columnDef;
 }
 
-function saveEditedRowPO(rowData) {
-    
+function InsertUpdateIndentDump(rowData) {
 
     function toIsoDate(value) {
         if (!value) return "";
         const parts = value.split('/');
         return parts.length === 3 ? `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}` : value;
     }
-    console.log(rowData);
+
     const cleanedData = {
         Id: rowData.Id || 0,
         PODate: toIsoDate(rowData.PODate),
-        Vendor: rowData.Vendor|| null,
-        Material: rowData.Material || null,
-        ReferenceNo: rowData.ReferenceNo || null,
-        PONo: rowData.PONo || null,
-        PRNo: rowData.PRNo || null,
-        BatchNo: rowData.BatchNo || null,
-        POQty: rowData.POQty || null,
-        BalanceQty: rowData.BalanceQty || null,
-        Destination: rowData.Destination || null,
-        BalanceValue: rowData.BalanceValue || null
+        Vendor: rowData.Vendor || null,
+        Indent_No: rowData.Vendor || null,
+        Indent_Date: rowData.Vendor || null,
+        Business_Unit: rowData.Vendor || null,
+        Vertical: rowData.Vendor || null,
+        Branch: rowData.Vendor || null,
+        Indent_Status: rowData.Vendor || null,
+        End_Cust_Name: rowData.Vendor || null,
+        Complaint_Id: rowData.Vendor || null,
+        Customer_Code: rowData.Vendor || null,
+        Customer_Name: rowData.Vendor || null,
+        Bill_Req_Date: rowData.Vendor || null,
+        Created_By: rowData.Vendor || null,
+        Wipro_Commit_Date: rowData.Vendor || null,
+        Material_No: rowData.Vendor || null,
+        Item_Description: rowData.Vendor || null,
+        Quantity: rowData.Vendor || "",
+        Price: rowData.Vendor || null,
+        Final_Price: rowData.Vendor || null,
+        SapSoNo: rowData.Vendor || null,
+        CreateSoQty: rowData.Vendor || "",
+        Inv_Qty: rowData.Vendor || "",
+        Inv_Value: rowData.Vendor || null,
+        WiproCatelog_No: rowData.Vendor || null,
+        Batch_Code: rowData.Vendor || null,
+        Batch_Date: rowData.Vendor || null,
+        Main_Prodcode: rowData.Vendor || null,
+        User_Name: rowData.Vendor || null
     };
     console.log(cleanedData);
     const isNew = cleanedData.Id === 0;
-    const url = isNew ? '/Service/CreatePO' : '/Service/UpdatePO';
+    const url = isNew ? '/Service/CreateIndent' : '/Service/UpdateIndent';
 
     $.ajax({
         url: url,
@@ -280,13 +327,13 @@ function saveEditedRowPO(rowData) {
         contentType: 'application/json',
         success: function (data) {
             if (data.success) {
-                loadDatapo();
+                loadIndentData();
             } else {
                 showDangerAlert(data.message || (isNew ? "Create failed." : "Update failed."));
             }
         },
         error: function (xhr) {
-            showDangerAlert(xhr.responseText || "Error saving PO record.");
+            showDangerAlert(xhr.responseText || "Error saving Indent Dump record.");
         }
     });
 }
@@ -320,7 +367,7 @@ var headerMenu = function () {
     return menu;
 };
 
-function delConfirmPO(Id) {
+function delConfirmIndent(Id) {
     PNotify.prototype.options.styling = "bootstrap3";
     new PNotify({
         title: 'Confirm Deletion',
@@ -332,13 +379,13 @@ function delConfirmPO(Id) {
         history: { history: false }
     }).get().on('pnotify.confirm', function () {
         $.ajax({
-            url: '/Service/PODelete',
+            url: '/Service/IndentDelete',
             type: 'POST',
             data: { id: Id },
             success: function (data) {
                 if (data.success) {
                     showSuccessAlert("Deleted successfully.");
-                    setTimeout(() => loadDatapo(), 1000);
+                    setTimeout(() => loadIndentData(), 1000);
                 } else {
                     showDangerAlert(data.message || "Deletion failed.");
                 }
@@ -377,11 +424,13 @@ Tabulator.extendModule("edit", "editors", {
     }
 });
 
-function BlankPoDown() {
+function BlankIndentDumpDown() {
     Blockloadershow();
 
     var expectedColumns = [
-        'Vendor', 'Material', 'Reference No', 'PO No', 'PO Date', 'PR No', 'Batch No', 'PO Qty', 'Balance Qty', 'Destination', 'Balance Value'
+        'Indent No', 'Indent Date', 'Business Unit', 'Vertical', 'Branch', 'Indent Status', 'End Customer Name', 'Complaint Id', 'Customer Code', 'Customer Name', 'Bill Request Date',
+        'Created By', 'Wipro Commit Date', 'Material No', 'Item Description', 'Quantity', 'Price', 'Final Price', 'SAPSO No', 'Create SoQty', 'Inv_qnty', 'Inv_value','Wipro Catelog No',
+        'Batch Code', 'Batch Date', 'MainProd Code', 'User Name'
     ];
 
     // Create worksheet with only the header row
@@ -413,7 +462,7 @@ function BlankPoDown() {
     Blockloaderhide();
 };
 
-function openPoUpload() {
+function openIndentUpload() {
     clearForm();
     if (!$('#uploadModal').length) {
         $('body').append(partialView);

@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace QMS.Core.DatabaseContext
 {
     [Table("tbl_PODetails")]
-    public class PODetail : SqlTable
+    public class PendingPo_Service : SqlTable
     {
         // Overrides
         [Key]

@@ -31,8 +31,15 @@ namespace QMS.Core.DatabaseContext
         public DbSet<KaizenTracker> KaizenTracker { get; set; }
         public DbSet<SPMReport> SPMReports { get; set; }
         public DbSet<RMTCDetails> RMTCDetails { get; set; }
-        public DbSet<COPQComplaintDump> COPQComplaintDump { get; set; }
-        public DbSet<PODetail> PODetails { get; set; }
+
+        //// ------- Service -------- ////
+        public DbSet<ComplaintDump_Service> COPQComplaintDump { get; set; }
+        public DbSet<FailedRecord_Log> FailedRecord_Log { get; set; }
+        public DbSet<PendingPo_Service> PODetails { get; set; }
+        public DbSet<IndentDump_Service> IndentDump { get; set; }
+
+        //// ------- Service -------- ////
+       
         public class InspectionResult
         {
             public int InspectionID { get; set; }

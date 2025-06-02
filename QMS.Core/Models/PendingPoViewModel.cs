@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace QMS.Core.Models
 {
-    public class PODetailViewModel
+    public class PendingPoViewModel
     {
         public int Id { get; set; }
         public string? Vendor { get; set; }

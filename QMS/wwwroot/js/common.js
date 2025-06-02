@@ -18,7 +18,7 @@ function createUploadButton() {
 }
 
 $('#btnUploadData').on('click', function () {
-    $('#fileInput').val(''); // Clear the file input
+    $('#fileInput').val(''); // Clear the file input5
     $('#uploadModal').modal('show').on('shown.bs.modal', function () {
         var backdrops = $('.modal-backdrop');
 

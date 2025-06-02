@@ -51,6 +51,15 @@ $(document).ready(function () {
         window.history.back();
     });
 
+    $('#upload-button').on('click', async function () { 
+        var expectedColumns = [
+            'CCCN Date', 'Reported By', 'Location', 'Customer Name', 'Dealer Name', 'Description', 'Status', 'Completion', 'ClosureRemarks'
+        ];
+
+        var url = '/Service/UploadComplaintDumpExcel';
+        handleImportExcelFile(url, expectedColumns);
+    });
+
     loadData();
 });
 
@@ -58,7 +67,7 @@ function loadData() {
     Blockloadershow();
 
     $.ajax({
-        url: '/COPQ/GetAll',
+        url: '/Service/GetAll',
         type: 'GET',
         dataType: 'json',
         data: {
@@ -73,7 +82,7 @@ function loadData() {
             }
             Blockloaderhide();
         },
-        
+
         error: function (xhr, status, error) {
             showDangerAlert('Error retrieving data: ' + error);
             Blockloaderhide();
@@ -108,7 +117,7 @@ function renderCOPQTable(response) {
         UpdatedBy: item.updatedBy,
         IsDeleted: item.isDeleted
     }));
-   
+
     const columns = [
         {
             title: "Action",
@@ -177,103 +186,6 @@ function renderCOPQTable(response) {
     Blockloaderhide();
 }
 
-//function renderCOPQTable(response) {
-//    if (!Array.isArray(response)) {
-//        console.error("Invalid response, expected array:", response);
-//        showDangerAlert("Invalid data received.");
-//        Blockloaderhide();
-//        return;
-//    }
-
-//    Blockloadershow();
-
-//    const tabledata = response.map((item, index) => ({
-//        Sr_No: index + 1,
-//        Id: item.id,
-//        CCCNDate: item.cccnDate ? new Date(item.cccnDate).toLocaleDateString("en-GB") : "",
-//        ReportedBy: item.reportedBy,
-//        CLocation: item.cLocation,
-//        CustName: item.custName,
-//        DealerName: item.dealerName,
-//        CDescription: item.cDescription,
-//        CStatus: item.cStatus,
-//        Completion: item.completion,
-//        Remarks: item.remarks,
-//        CreatedDate: item.createdDate ? new Date(item.createdDate).toLocaleDateString("en-GB") : "",
-//        CreatedBy: item.createdBy,
-//        UpdatedDate: item.updatedDate ? new Date(item.updatedDate).toLocaleDateString("en-GB") : "",
-//        UpdatedBy: item.updatedBy,
-//        IsDeleted: item.isDeleted
-//    }));
-
-//    const columns = [
-//        {
-//            title: "Action",
-//            field: "Action",
-//            hozAlign: "center",
-//            headerHozAlign: "center",
-//            frozen: true,
-//            formatter: function (cell) {
-//                const rowData = cell.getRow().getData();
-//                return `<i onclick="delConfirm(${rowData.Id})" class="fas fa-trash-alt mr-2 fa-1x" title="Delete" style="color:red;cursor:pointer;margin-left: 5px;"></i>`;
-//            }
-//        },
-//        { title: "SNo", field: "Sr_No", sorter: "number", hozAlign: "center", headerHozAlign: "center", frozen: true },
-//        editableColumn("CCCN Date", "CCCNDate", "date", "center"),
-//        editableColumn("Reported By", "ReportedBy"),
-//        editableColumn("Location", "CLocation"),
-//        editableColumn("Customer Name", "CustName"),
-//        editableColumn("Dealer Name", "DealerName"),
-//        editableColumn("Description", "CDescription"),
-//        editableColumn("Status", "CStatus"),
-//        editableColumn("Completion", "Completion"),
-//        editableColumn("Remarks", "Remarks"),
-//        { title: "Created By", field: "CreatedBy", visible: false },
-//        { title: "Created Date", field: "CreatedDate", visible: false },
-//        { title: "Updated By", field: "UpdatedBy", visible: false },
-//        { title: "Updated Date", field: "UpdatedDate", visible: false }
-//    ];
-
-//    if (typeof table !== 'undefined' && table instanceof Tabulator) {
-//        table.replaceData(tabledata);
-//    } else {
-//        table = new Tabulator("#copq-table", {
-//            data: tabledata,
-//            layout: "fitDataFill",
-//            movableColumns: true,
-//            pagination: "local",
-//            paginationSize: 10,
-//            paginationSizeSelector: [10, 50, 100, 500],
-//            paginationCounter: "rows",
-//            placeholder: "No data available",
-//            columns: columns
-//        });
-
-//        table.on("cellEdited", function (cell) {
-//            saveEditedRow(cell.getRow().getData());
-//        });
-
-//        $("#addButton").off("click").on("click", function () {
-//            const newRow = {
-//                Id: 0,
-//                Sr_No: table.getDataCount() + 1,
-//                CCCNDate: "",
-//                ReportedBy: "",
-//                CLocation: "",
-//                CustName: "",
-//                DealerName: "",
-//                CDescription: "",
-//                CStatus: "",
-//                Completion: "",
-//                Remarks: ""
-//            };
-//            table.addRow(newRow, false);
-//        });
-//    }
-
-//    Blockloaderhide();
-//}
-
 // Utility for editable column config
 function editableColumn(title, field, editor = "input", align = "left") {
     return {
@@ -307,7 +219,7 @@ function saveEditedRow(rowData) {
     };
 
     const isNew = cleanedData.Id === 0;
-    const url = isNew ? '/COPQ/CreateAsync' : '/COPQ/UpdateAsync';
+    const url = isNew ? '/Service/CreateAsync' : '/Service/UpdateAsync';
 
     $.ajax({
         url: url,
@@ -369,7 +281,7 @@ function delConfirm(Id) {
         history: { history: false }
     })).get().on('pnotify.confirm', function () {
         $.ajax({
-            url: '/COPQ/Delete',
+            url: '/Service/Delete',
             type: 'POST',
             data: { id: Id },
             success: function (data) {
@@ -384,5 +296,70 @@ function delConfirm(Id) {
                 showDangerAlert('Error occurred during deletion.');
             }
         });
+    });
+}
+
+function BlankComplaintDumpDown() {
+    Blockloadershow();
+
+    var expectedColumns = [
+        'CCCN Date', 'Reported By', 'Location', 'Customer Name', 'Dealer Name', 'Description', 'Status', 'Completion', 'ClosureRemarks'
+    ];
+
+    // Create worksheet with only the header row
+    var data = [expectedColumns];
+    var ws = XLSX.utils.aoa_to_sheet(data);
+
+    // Apply bold style to header cells
+    expectedColumns.forEach((col, index) => {
+        const cellRef = XLSX.utils.encode_cell({ c: index, r: 0 }); // r: 0 => first row
+        if (!ws[cellRef]) return;
+        ws[cellRef].s = {
+            font: {
+                bold: true
+            }
+        };
+    });
+
+    // Auto-width calculation
+    const columnWidths = expectedColumns.map(col => ({ wch: col.length + 2 }));
+    ws['!cols'] = columnWidths;
+
+
+    // Create workbook and export
+    var wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Complaint Dump Temaplate");
+
+    XLSX.writeFile(wb, "Complaint_Dump_Temaplate.xlsx");
+
+    Blockloaderhide();
+};
+
+function openUpload() {
+
+    clearForm();
+    if (!$('#uploadModal').length) {
+        $('body').append(partialView);
+    }
+    $('#uploadModal').modal('show');
+}
+
+function clearForm() {
+    // Clear all input fields
+    document.querySelectorAll('.form-control').forEach(function (input) {
+        if (input.tagName === 'INPUT') {
+            if (input.type === 'hidden' || input.readOnly) {
+                // Skip hidden or readonly inputs
+                return;
+            }
+            input.value = ''; // Clear input value
+        } else if (input.tagName === 'SELECT') {
+            input.selectedIndex = 0; // Reset dropdown to first option
+        }
+    });
+
+    // Clear error messages if needed
+    document.querySelectorAll('.text-danger').forEach(function (error) {
+        error.textContent = '';
     });
 }
